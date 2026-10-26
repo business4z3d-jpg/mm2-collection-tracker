@@ -358,6 +358,47 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
 .shotbtn{margin:18px 0 0 8px;vertical-align:top}
 @media (max-width:480px){.views button{padding:8px 9px;font-size:.84rem}.shotbtn{margin-left:0}}
 .mcard.shotcard{width:min(760px,100%)}.shot{padding:22px;display:grid;gap:12px}.shot h3{margin:0;font-family:var(--f-display);font-weight:400}.shot img{width:100%;border-radius:12px;border:1px solid var(--line)}
+
+/* alerts */
+.alerts{margin-top:14px;background:var(--surface);border:1px solid var(--gold);border-radius:var(--r);padding:10px 12px;max-width:640px}
+.al-head{display:flex;gap:8px;align-items:center}.al-head small{color:var(--muted)}.al-head .pbtn{margin-left:auto}
+.alerts ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.alerts li button{width:100%;display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;text-align:left;font:inherit;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer}
+.alerts li button.good{border-color:color-mix(in srgb,var(--owned) 50%,var(--line))}
+.alerts .mi{width:30px;height:30px;display:grid;place-items:center;overflow:hidden;color:var(--dim)}.alerts .mi img{width:90%;height:90%;object-fit:contain}.alerts .mi svg{width:16px;height:16px}
+.alerts .pn{display:grid;font-size:.88rem;font-weight:600}.alerts .pn small{font-weight:400;color:var(--muted)}
+/* converter */
+.conv{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:10px}
+.conv h2{font-family:var(--f-display);font-weight:400;font-size:1.05rem;margin:0}
+.cv-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cv-row input{font:inherit;font-size:.9rem;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+#cvN{width:72px}.cv-p{flex:1 1 200px;min-width:0}.cv-p input{width:100%}
+.cv-name{display:flex;align-items:center;gap:8px;width:100%;font:inherit;font-weight:600;color:var(--ink);background:var(--bg2);border:1px solid var(--gold);border-radius:10px;padding:5px 10px;cursor:pointer;text-align:left}.cv-name:empty{display:none}
+.cv-name small{margin-left:auto;font-family:var(--f-mono);color:var(--gold)}.cv-name .mi{width:26px;height:26px;display:grid;place-items:center;overflow:hidden;color:var(--dim)}.cv-name .mi img{width:90%;height:90%;object-fit:contain}.cv-name .mi svg{width:16px;height:16px}
+.cv-eq{font-family:var(--f-display);color:var(--muted)}
+.cv-quick{margin:0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.82rem;color:var(--muted)}
+.cv-out{margin:0;font-size:1.05rem}.cv-out small{display:block;margin-top:2px;color:var(--muted);font-size:.8rem}.cv-hint{color:var(--dim);font-size:.88rem}
+/* trade board */
+.bd-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bd-mine{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}.bd-mine small{color:var(--muted)}
+.bd-form{gap:12px}.bd-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bd-cols h4{margin:0 0 6px;font-size:.88rem;display:flex;flex-wrap:wrap;gap:8px;align-items:center}.bd-cols h4 small{color:var(--muted);font-family:var(--f-mono)}
+.bd-form .picker input,.bd-text{width:100%;font:inherit;font-size:.9rem;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.bchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.bchip{display:inline-flex;align-items:center;gap:4px;font-size:.8rem;background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--rc);border-radius:8px;padding:3px 4px 3px 8px}
+.bchip button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:.75rem}
+.bd-btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bd-list{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:10px}.bd-list>.empty{color:var(--dim);font-size:.9rem;padding:8px}
+.bp{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:10px}.bp.mine{border-color:color-mix(in srgb,var(--gold) 45%,var(--line))}
+.bp header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center}
+.bd-match{font-size:.8rem;color:#06281b;background:var(--owned);border-radius:99px;padding:3px 10px}
+.btiles{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.bt{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--rc);border-radius:8px;padding:3px 8px 3px 4px;cursor:pointer;max-width:100%}
+.bt span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bt .mi{width:24px;height:24px;display:grid;place-items:center;overflow:hidden;color:var(--dim);flex:none}.bt .mi img{width:90%;height:90%;object-fit:contain}.bt .mi svg{width:14px;height:14px}
+.bt.hit{border-color:var(--owned);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--owned) 40%,transparent)}.bt.hit.sp,.bt.hit.wl{background:color-mix(in srgb,var(--owned) 14%,var(--bg2))}
+.bp footer{display:flex;gap:8px;padding:0;margin:0;border:0}
+@media (max-width:640px){.bd-cols{grid-template-columns:1fr}}
 </style>
 
 <header class="hero">
@@ -367,6 +408,7 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
       <h1>MM2 Collection<span>Tracker</span></h1>
       <p class="lede">Every knife, gun and pet from Ancient to Common. Tick what you own, and whatever is left is your trade list.</p>
       <div class="acctrow"><p class="acct" id="acct">Connecting…</p><button class="gbtn" id="authBtn" hidden><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span>Sign in with Google</span></button></div>
+      <div class="alerts" id="alerts" hidden></div>
       <div class="views" role="group" aria-label="Section"><button id="vCol" aria-pressed="true">Collection</button><button id="vTrade" aria-pressed="false">Trade checker</button><button id="vMk" aria-pressed="false">Market</button><button id="vPlay" aria-pressed="false">Players <span class="vbn" id="vPlayN" hidden></span></button></div><button class="tbtn shotbtn" id="shotBtn">📸 Share image</button>
     </div>
     <div class="ringbox">
@@ -431,10 +473,21 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
       <ul class="tlist" id="listB"></ul>
       <div class="sum"><span>Total value <button class="clr" data-clear="B">clear</button></span><b id="totB">0</b></div></div>
   </div>
+  <div class="conv"><h2>How much is it in…?</h2>
+    <div class="cv-row"><input type="number" id="cvN" min="1" max="999" value="1" aria-label="Amount">
+      <div class="picker cv-p"><button class="cv-name" id="cvAName" title="Change item"></button><input id="cvA" placeholder="Item, e.g. Chroma Evergun" autocomplete="off" aria-label="Item to convert"><ul class="sugg" id="cvAS" hidden></ul></div>
+      <span class="cv-eq">=</span>
+      <div class="picker cv-p"><button class="cv-name" id="cvBName" title="Change item"></button><input id="cvB" placeholder="…in what? e.g. Seer" autocomplete="off" aria-label="Convert into"><ul class="sugg" id="cvBS" hidden></ul></div>
+      <button class="pbtn" id="cvSwap" aria-label="Swap">⇄</button></div>
+    <p class="cv-quick">Quick: <button class="pbtn" data-cvq="Seer">Seer</button><button class="pbtn" data-cvq="Candy">Candy</button><button class="pbtn" data-cvq="Icebreaker">Icebreaker</button><button class="pbtn" data-cvq="Harvester">Harvester</button></p>
+    <p class="cv-out" id="cvOut"></p></div>
   <p class="tc-foot">Values from MM2Values (<span class="vdate">Oct 25, 2026</span>). Win means you get at least 5% more value than you give, Lose means at least 5% less. Values are estimates, so check demand too: an item with high demand is easier to trade on later. Items marked “needed” are ones still missing from your collection.</p>
 </section>
 
 <section class="wrap mk" id="mkView" hidden aria-label="Market">
+  <div class="mk-top"><h2>Trade board</h2><div class="bd-tools"><span class="pl-note" id="bdCount"></span><button class="tbtn" id="bdOnly" aria-pressed="false">Only posts that match me</button><button class="pbtn" id="bdRefresh">↻ Refresh</button></div></div>
+  <div id="bdMine"></div>
+  <ul class="bd-list" id="bdList"></ul>
   <div class="mk-top"><h2>Biggest movers</h2><div class="seg mk-days" id="mkDays" role="group" aria-label="Period"><button data-d="1">24h</button><button data-d="7" aria-pressed="true">7 days</button><button data-d="30">30 days</button><button data-d="99999">All time</button></div></div>
   <p class="mk-sum" id="mkSum"></p>
   <div class="mk-grid"><div><h3 class="up">▲ Going up</h3><ul class="mk-list" id="mkUp"></ul></div><div><h3 class="dn">▼ Going down</h3><ul class="mk-list" id="mkDn"></ul></div></div>
@@ -1866,7 +1919,7 @@ document.querySelectorAll("[data-clear]").forEach(b=>b.addEventListener("click",
 $("swap").addEventListener("click",()=>{trade={A:trade.B,B:trade.A};saveTrade();renderTrade()});
 function showView(v,keepHash){$("colView").hidden=v!=="col";$("tradeView").hidden=v!=="trade";$("playView").hidden=v!=="players";$("mkView").hidden=v!=="market";
   $("vCol").setAttribute("aria-pressed",v==="col");$("vTrade").setAttribute("aria-pressed",v==="trade");$("vPlay").setAttribute("aria-pressed",v==="players");$("vMk").setAttribute("aria-pressed",v==="market");
-  if(v==="trade")renderTrade();if(v==="players"&&!keepHash)openPlayers();if(v==="market")renderMarket();
+  if(v==="trade")renderTrade();if(v==="players"&&!keepHash)openPlayers();if(v==="market"){renderMarket();loadBoard()}
   if(!keepHash)try{history.replaceState(null,"",v==="col"?location.pathname+location.search:"#"+v)}catch(e){}}
 $("vMk").addEventListener("click",()=>showView("market"));
 
@@ -2093,6 +2146,107 @@ async function openProfile(uid){showView("players",true);$("plMain").hidden=true
 $("plProf").addEventListener("click",e=>{const a=e.target.closest("[data-add]");if(a){addTrade(a.dataset.add,a.dataset.id);if(curProfile&&!partner&&fbMe()&&fbMe().uid!==curProfile.uid)setPartner({uid:curProfile.uid,name:curProfile.name||"Unnamed"});a.textContent="✓";a.disabled=true;return}
   const o=e.target.closest("[data-open]");if(o)openItem(o.dataset.open)});
 
+
+/* ---------- generic item picker ---------- */
+function itemPicker(inp,ul,onPick,pool){let res=[],sel=0,bt;pool=pool||tradeable;
+  const draw=()=>{ul.innerHTML=res.map((i,n)=>`<li role="option" aria-selected="${n===sel}" data-id="${esc(i.id)}"><span class="mi">${miniArt(i)}</span><span class="sn">${esc(i.name)}<small>${i.cat}${owned.has(i.id)?(qty[i.id]>1?" · spare":" · owned"):" · needed"}</small></span><span class="sv">${fmt(i.val)}</span></li>`).join("");ul.hidden=!res.length};
+  const pick=i=>{res=[];draw();onPick(i)};
+  inp.addEventListener("input",()=>{clearTimeout(bt);const q=inp.value.trim().toLowerCase();sel=0;res=q?pool.filter(i=>i.name.toLowerCase().includes(q)).sort((x,y)=>(x.name.toLowerCase().startsWith(q)?0:1)-(y.name.toLowerCase().startsWith(q)?0:1)||(y.val??-1)-(x.val??-1)).slice(0,10):[];draw()});
+  inp.addEventListener("keydown",e=>{if(ul.hidden)return;if(e.key==="ArrowDown"){sel=Math.min(sel+1,res.length-1);draw();e.preventDefault()}else if(e.key==="ArrowUp"){sel=Math.max(sel-1,0);draw();e.preventDefault()}else if(e.key==="Enter"&&res[sel]){e.preventDefault();pick(res[sel])}else if(e.key==="Escape"){res=[];draw()}});
+  ul.addEventListener("mousedown",e=>{const li=e.target.closest("li");if(!li)return;e.preventDefault();pick(byId.get(li.dataset.id))});
+  inp.addEventListener("blur",()=>{bt=setTimeout(()=>{ul.hidden=true},120)});inp.addEventListener("focus",()=>clearTimeout(bt))}
+
+/* ---------- value converter ---------- */
+let cvA=null,cvB=null;
+function drawConv(){const out=$("cvOut");const n=Math.max(1,+$("cvN").value||1);
+  $("cvAName").innerHTML=cvA?`<span class="mi">${miniArt(cvA)}</span>${esc(cvA.name)} <small>${fmt(cvA.val)}</small>`:"";$("cvBName").innerHTML=cvB?`<span class="mi">${miniArt(cvB)}</span>${esc(cvB.name)} <small>${fmt(cvB.val)}</small>`:"";
+  $("cvA").hidden=!!cvA;$("cvB").hidden=!!cvB;
+  if(!cvA||!cvB){out.innerHTML=`<span class="cv-hint">Pick two items to compare.</span>`;return}
+  if(!cvA.val||!cvB.val){out.innerHTML=`<span class="cv-hint">One of these items has no value yet.</span>`;return}
+  const r=cvA.val*n/cvB.val;const whole=Math.floor(r+1e-9),rest=cvA.val*n-whole*cvB.val;
+  out.innerHTML=`<b>${n}× ${esc(cvA.name)}</b> = <b class="gold">${r>=100?Math.round(r).toLocaleString("en-US"):r.toLocaleString("en-US",{maximumFractionDigits:r<1?3:1})}× ${esc(cvB.name)}</b><small>${whole>=1?`${whole.toLocaleString("en-US")}× ${esc(cvB.name)}${rest>0?` + ${fmt(Math.round(rest))} value left over`:" exactly"}`:`You'd need ${Math.ceil(1/r*n)}× ${esc(cvA.name)} for one ${esc(cvB.name)}`} · values from MM2Values</small>`}
+itemPicker($("cvA"),$("cvAS"),i=>{cvA=i;$("cvA").value="";drawConv()},items.filter(i=>i.val));
+itemPicker($("cvB"),$("cvBS"),i=>{cvB=i;$("cvB").value="";drawConv()},items.filter(i=>i.val));
+$("cvAName").addEventListener("click",()=>{cvA=null;drawConv();$("cvA").focus()});$("cvBName").addEventListener("click",()=>{cvB=null;drawConv();$("cvB").focus()});
+$("cvN").addEventListener("input",drawConv);
+$("cvSwap").addEventListener("click",()=>{[cvA,cvB]=[cvB,cvA];drawConv()});
+document.querySelectorAll("[data-cvq]").forEach(b=>b.addEventListener("click",()=>{const i=items.find(x=>x.name===b.dataset.cvq&&x.val);if(i){cvB=i;drawConv()}}));
+drawConv();
+
+/* ---------- value alerts ---------- */
+const LVKEY="mm2-lastvals-v1";
+function checkAlerts(){let last=null;try{last=JSON.parse(localStorage.getItem(LVKEY)||"null")}catch(e){}
+  const watch=items.filter(i=>i.val!=null&&(wish.has(i.id)||(owned.has(i.id)&&qty[i.id]>1)));
+  const now={};items.forEach(i=>{if(i.val!=null)now[i.id]=i.val});
+  try{localStorage.setItem(LVKEY,JSON.stringify(now))}catch(e){}
+  if(!last)return;
+  const al=[];for(const i of watch){const o=last[i.id];if(o==null||o===i.val)continue;const up=i.val>o;
+    if(wish.has(i.id)&&!owned.has(i.id)&&!up)al.push({i,o,kind:"Wishlist item got cheaper",good:true});
+    else if(owned.has(i.id)&&qty[i.id]>1&&up)al.push({i,o,kind:"Your spare went up",good:true});
+    else al.push({i,o,kind:wish.has(i.id)?"Wishlist item went up":"Your spare went down",good:false})}
+  if(!al.length)return;
+  const el=$("alerts");el.hidden=false;
+  el.innerHTML=`<div class="al-head"><b>🔔 Value alerts</b><small>since your last visit</small><button class="pbtn" id="alX" aria-label="Dismiss alerts">✕</button></div><ul>${al.map(a=>`<li><button data-open="${esc(a.i.id)}" class="${a.good?"good":"bad"}"><span class="mi">${miniArt(a.i)}</span><span class="pn"><span>${esc(a.i.name)}</span><small>${a.kind}</small></span><span class="mk-v">${fmt(a.o)} → <b>${fmt(a.i.val)}</b></span><span class="mk-p ${a.i.val>a.o?"up":"dn"}">${a.i.val>a.o?"▲":"▼"} ${Math.abs((a.i.val-a.o)/a.o*100).toFixed(0)}%</span></button></li>`).join("")}</ul>`;
+  $("alX").addEventListener("click",()=>{el.hidden=true});
+  el.addEventListener("click",e=>{const b=e.target.closest("[data-open]");if(b)openItem(b.dataset.open)});
+  const good=al.filter(a=>a.good);if(good.length)notify(good.length===1?`${good[0].i.name}: ${good[0].kind.toLowerCase()}`:`${good.length} value alerts`,good.map(a=>`${a.i.name} ${fmt(a.o)} → ${fmt(a.i.val)}`).join(", "))}
+
+/* ---------- trade board ---------- */
+let posts=null,myPost=null,bdOnly=false,bdLf=[],bdFt=[];
+const postTile=(id,mark)=>{const i=byId.get(id);if(!i)return"";return `<li class="bt${mark?" "+mark:""}" style="--rc:${RC[i.cat]}" data-open="${esc(id)}" title="${esc(i.name)} · ${fmt(i.val)}"><span class="mi">${miniArt(i)}</span><span>${esc(i.name)}</span></li>`};
+function postMatch(p){const mySp=new Set(spares());
+  const iHave=(p.lf||[]).filter(id=>owned.has(id)),iHaveSp=iHave.filter(id=>mySp.has(id));
+  const iNeed=(p.ft||[]).filter(id=>byId.has(id)&&!owned.has(id)),iWish=iNeed.filter(id=>wish.has(id));
+  return{iHave,iHaveSp,iNeed,iWish,score:iHaveSp.length*2+iHave.length+iNeed.length*2+iWish.length*3}}
+async function loadBoard(){const fb=window.FB;const L=$("bdList");
+  if(!fb){$("bdMine").innerHTML=`<p class="pl-note">The trade board works on <a href="${PROFILE_URL}#market" target="_blank" rel="noopener">mm2inventory.netlify.app</a>.</p>`;L.innerHTML="";return}
+  if(!posts){L.innerHTML=`<li class="empty">Loading posts…</li>`;try{posts=await fb.listPosts()}catch(e){L.innerHTML=`<li class="empty">Couldn't load the board (${esc(e.code||e.message)}).</li>`;return}}
+  const me=fb.me();myPost=me?posts.find(p=>p.uid===me.uid)||null:null;drawMine();drawBoard()}
+function drawMine(){const el=$("bdMine");const me=fbMe();
+  if(!me){el.innerHTML=`<p class="pl-note">Sign in with Google to post what you're looking for and what you have for trade.</p>`;return}
+  if(!me.pub){el.innerHTML=`<p class="pl-note">Make your profile public (Players → Your profile) to post on the board, so people can see your collection.</p>`;return}
+  const edit=el.dataset.edit==="1"||!myPost;
+  if(!edit){el.innerHTML=`<div class="bd-mine"><b>Your post is live</b> <small>${ago(myPost.created)}</small><button class="pbtn" id="bdEdit">Edit</button><button class="pbtn" id="bdDel">Delete</button></div>`;
+    $("bdEdit").addEventListener("click",()=>{el.dataset.edit="1";bdLf=[...(myPost.lf||[])];bdFt=[...(myPost.ft||[])];drawMine()});
+    $("bdDel").addEventListener("click",async()=>{try{await window.FB.deletePost();posts=posts.filter(p=>p.uid!==me.uid);myPost=null;drawMine();drawBoard()}catch(e){alert("Couldn't delete: "+(e.code||e.message))}});return}
+  const chips=(l,k)=>l.map(id=>{const i=byId.get(id);return i?`<span class="bchip" style="--rc:${RC[i.cat]}">${esc(i.name)}<button data-rm="${k}" data-id="${esc(id)}" aria-label="Remove ${esc(i.name)}">✕</button></span>`:""}).join("");
+  el.innerHTML=`<div class="pl-card bd-form"><h2>${myPost?"Edit your post":"New post"}</h2>
+    <div class="bd-cols"><div><h4>Looking for <small>${bdLf.length}/30</small> <button class="pbtn" id="bdUseW">Use my wishlist</button></h4><div class="bchips">${chips(bdLf,"lf")}</div><div class="picker"><input id="bdLfQ" placeholder="Add an item you want…" autocomplete="off"><ul class="sugg" id="bdLfS" hidden></ul></div></div>
+    <div><h4>For trade <small>${bdFt.length}/30</small> <button class="pbtn" id="bdUseS">Use my spares</button></h4><div class="bchips">${chips(bdFt,"ft")}</div><div class="picker"><input id="bdFtQ" placeholder="Add an item you offer…" autocomplete="off"><ul class="sugg" id="bdFtS" hidden></ul></div></div></div>
+    <input class="bd-text" id="bdText" maxlength="200" placeholder="Note (optional), e.g. “overpay for Chroma Evergun”" value="${esc(myPost&&myPost.text||"")}">
+    <div class="bd-btns"><button class="pbtn ok" id="bdSave">${myPost?"Update post":"Post"}</button>${myPost?'<button class="pbtn" id="bdCancel">Cancel</button>':""}<span class="pl-msg" id="bdMsg"></span></div></div>`;
+  const keepText=()=>{const t=$("bdText");return t?t.value:""};
+  const redraw=()=>{const t=keepText();drawMine();$("bdText").value=t};
+  itemPicker($("bdLfQ"),$("bdLfS"),i=>{if(!bdLf.includes(i.id)&&bdLf.length<30)bdLf.push(i.id);redraw();$("bdLfQ").focus()},tradeable.filter(i=>!owned.has(i.id)));
+  itemPicker($("bdFtQ"),$("bdFtS"),i=>{if(!bdFt.includes(i.id)&&bdFt.length<30)bdFt.push(i.id);redraw();$("bdFtQ").focus()},tradeable.filter(i=>owned.has(i.id)));
+  $("bdUseW").addEventListener("click",()=>{bdLf=[...new Set([...bdLf,...[...wish].filter(id=>!owned.has(id)&&byId.has(id))])].slice(0,30);redraw()});
+  $("bdUseS").addEventListener("click",()=>{bdFt=[...new Set([...bdFt,...spares().sort((a,b)=>(byId.get(b).val||0)-(byId.get(a).val||0))])].slice(0,30);redraw()});
+  el.querySelectorAll("[data-rm]").forEach(b=>b.addEventListener("click",()=>{const l=b.dataset.rm==="lf"?bdLf:bdFt;l.splice(l.indexOf(b.dataset.id),1);redraw()}));
+  if($("bdCancel"))$("bdCancel").addEventListener("click",()=>{el.dataset.edit="";drawMine()});
+  $("bdSave").addEventListener("click",async()=>{if(!bdLf.length&&!bdFt.length){$("bdMsg").textContent="Add at least one item.";return}
+    $("bdSave").disabled=true;$("bdMsg").textContent="Saving…";
+    try{const p=await window.FB.savePost(bdLf,bdFt,$("bdText").value.trim().slice(0,200));posts=[p,...posts.filter(x=>x.uid!==p.uid)];myPost=p;el.dataset.edit="";drawMine();drawBoard()}
+    catch(e){$("bdSave").disabled=false;$("bdMsg").textContent="Couldn't save: "+(e.code||e.message)}})}
+function drawBoard(){const L=$("bdList");if(!posts)return;const me=fbMe();
+  let ps=posts.map(p=>({p,m:postMatch(p)}));
+  if(bdOnly)ps=ps.filter(x=>x.m.iHave.length||x.m.iNeed.length);
+  ps.sort((a,b)=>bdOnly?b.m.score-a.m.score||(b.p.created-a.p.created):b.p.created-a.p.created);
+  $("bdCount").textContent=`${posts.length} post${posts.length===1?"":"s"}`;
+  L.innerHTML=ps.length?ps.map(({p,m})=>{const mine=me&&p.uid===me.uid;const mySp=new Set(spares());
+    return `<li class="bp${mine?" mine":""}" data-pid="${esc(p.uid)}"><header><button class="ofr-who" data-uid="${esc(p.uid)}"><span class="pl-av">${av(p.name)}</span><span><b>${esc(p.name||"Unnamed")}</b>${mine?' <span class="tg wl">you</span>':""}<small>${ago(p.created||0)}</small></span></button>
+      ${!mine&&(m.iHave.length||m.iNeed.length)?`<span class="bd-match">${m.iNeed.length?`<b>${m.iNeed.length}</b> you need${m.iWish.length?` (${m.iWish.length}★)`:""}`:""}${m.iNeed.length&&m.iHave.length?" · ":""}${m.iHave.length?`you have <b>${m.iHave.length}</b> they want${m.iHaveSp.length?` (${m.iHaveSp.length} spare)`:""}`:""}</span>`:""}</header>
+      ${p.text?`<p class="ofr-msg">“${esc(p.text)}”</p>`:""}
+      <div class="bd-cols"><div><h4>Looking for</h4><ul class="btiles">${(p.lf||[]).map(id=>postTile(id,owned.has(id)?(mySp.has(id)?"hit sp":"hit"):"")).join("")||'<li class="pl-note">–</li>'}</ul></div>
+      <div><h4>For trade</h4><ul class="btiles">${(p.ft||[]).map(id=>postTile(id,!owned.has(id)?(wish.has(id)?"hit wl":"hit"):"")).join("")||'<li class="pl-note">–</li>'}</ul></div></div>
+      ${!mine&&me&&(m.iHave.length||m.iNeed.length)?`<footer><button class="pbtn ok" data-propose>Propose trade</button></footer>`:""}</li>`}).join(""):`<li class="empty">${bdOnly?"No posts match your collection yet.":"No posts yet. Be the first!"}</li>`}
+$("bdList").addEventListener("click",e=>{const w=e.target.closest("[data-uid]");if(w){openProfile(w.dataset.uid);return}
+  const t=e.target.closest("[data-open]");if(t){openItem(t.dataset.open);return}
+  const pr=e.target.closest("[data-propose]");if(!pr)return;const p=posts.find(x=>x.uid===pr.closest("[data-pid]").dataset.pid);if(!p)return;const m=postMatch(p);
+  const mySp=new Set(spares());trade={A:{},B:{}};m.iHave.sort((a,b)=>(mySp.has(b)?1:0)-(mySp.has(a)?1:0)).forEach(id=>trade.A[id]=1);m.iNeed.forEach(id=>trade.B[id]=1);saveTrade();
+  setPartner({uid:p.uid,name:p.name||"Unnamed"});showView("trade")});
+$("bdOnly").addEventListener("click",e=>{bdOnly=!bdOnly;e.currentTarget.setAttribute("aria-pressed",bdOnly);drawBoard()});
+$("bdRefresh").addEventListener("click",()=>{posts=null;loadBoard()});
+
 /* ---------- share image ---------- */
 function shareCanvas(){const W=1200,H=675,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
   const D='"Bungee","Arial Black",sans-serif',B='"Rubik",system-ui,sans-serif',M='"JetBrains Mono",monospace';
@@ -2132,12 +2286,13 @@ tabs();setView(view);render();acct("wait");
   if(v&&v.v){for(const[id,x]of Object.entries(v.v)){const i=byId.get(id);if(!i||x[0]==null)continue;i.val=x[0];i.dem=x[1];i.stab=x[2]}
     if(v.updated){VDATE=new Date(v.updated+"T12:00:00Z").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"});document.querySelectorAll(".vdate").forEach(e=>e.textContent=VDATE)}}
   if(h)for(const[id,a]of Object.entries(h))if(a&&a.length)VALHIST[id]=a;
+  if(v&&v.v)checkAlerts();
   if(v||h){render();if(!$("tradeView").hidden)renderTrade();if(!$("mkView").hidden)renderMarket();if(cur&&!$("modal").hidden)openItem(cur)}
 }catch(e){}})();
 if(location.hash==="#trade")showView("trade");else if(location.hash==="#players")showView("players");else if(location.hash==="#market")showView("market");
 else if(location.hash.startsWith("#u/")){const uid=decodeURIComponent(location.hash.slice(3));showView("players",true);$("plMain").hidden=true;$("plProf").hidden=false;$("plProf").innerHTML='<p class="pl-note">Loading profile…</p>';
   const go=()=>openProfile(uid);if(window.FB&&window.FB.ready)go();else{window.addEventListener("fbready",go,{once:true});setTimeout(()=>{if(!window.FB)go()},6000)}}
-window.MM={getState:()=>({owned:[...owned],qty:{...qty},wish:[...wish]}),setState:s=>{owned=new Set(s.owned||[]);qty=s.qty||{};wish=new Set(s.wish||[]);save();render()},spares:()=>spares(),wishList:()=>[...wish],getOwned:()=>[...owned],setOwned:a=>{owned=new Set(a);try{localStorage.setItem(KEY,JSON.stringify([...owned]))}catch(e){}render()},setCloud:(c,name)=>{cloud=c;who=name||""},save:()=>save(),acct:s=>acct(s),summary:()=>mySummary(),refreshPlayers:()=>{loadOffers();if(!$("playView").hidden&&!$("plMain").hidden){plCache=null;openPlayers()}else renderMe()}};
+window.MM={getState:()=>({owned:[...owned],qty:{...qty},wish:[...wish]}),setState:s=>{owned=new Set(s.owned||[]);qty=s.qty||{};wish=new Set(s.wish||[]);save();render()},spares:()=>spares(),wishList:()=>[...wish],getOwned:()=>[...owned],setOwned:a=>{owned=new Set(a);try{localStorage.setItem(KEY,JSON.stringify([...owned]))}catch(e){}render()},setCloud:(c,name)=>{cloud=c;who=name||""},save:()=>save(),acct:s=>acct(s),summary:()=>mySummary(),refreshPlayers:()=>{loadOffers();if(!$("mkView").hidden){posts=null;loadBoard()}if(!$("playView").hidden&&!$("plMain").hidden){plCache=null;openPlayers()}else renderMe()}};
 </script>
 
 <script type="module">
@@ -2241,6 +2396,17 @@ else {
     },
     setOfferStatus: (id, status) => updateDoc(doc(fs, "offers", id), { status, updated: Date.now() }),
     deleteOffer: id => deleteDoc(doc(fs, "offers", id)),
+    async listPosts() {
+      const s = await getDocs(query(collection(fs, "posts"), orderBy("created", "desc"), limit(150)));
+      return s.docs.map(d => ({ uid: d.id, ...d.data() }));
+    },
+    async savePost(lf, ft, text) {
+      const p = { name: me.name, lf, ft, created: Date.now() };
+      if (text) p.text = text;
+      await setDoc(doc(fs, "posts", me.uid), p);
+      return { uid: me.uid, ...p };
+    },
+    deletePost: () => deleteDoc(doc(fs, "posts", me.uid)),
     async whoHas(id) {
       const s = await getDocs(query(collection(fs, "pitems"), where("owned", "array-contains", id), limit(300)));
       return s.docs.map(d => d.id);
