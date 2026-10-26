@@ -311,6 +311,53 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
 .tpartner input{font:inherit;font-size:.88rem;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;flex:1 1 200px;min-width:0}
 .tpartner .pl-msg{flex-basis:100%}
 @media (max-width:560px){.ofr-cols{grid-template-columns:1fr}}
+
+/* duplicates + wishlist */
+.tbtn{font:inherit;font-size:.85rem;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:10px;padding:8px 12px;cursor:pointer}
+.tbtn[aria-pressed="true"]{color:#241a00;background:var(--gold);border-color:var(--gold)}
+.qb,.wb{position:absolute;z-index:2;top:10px;font-family:var(--f-mono);font-size:.72rem;font-weight:700;border-radius:99px;padding:2px 7px;pointer-events:none}
+.qb{right:8px;background:var(--owned);color:#06281b}
+.wb{right:8px;color:var(--gold);background:rgba(14,12,24,.7);font-size:.8rem}
+.qb+.wb{right:48px}
+.list .qb,.list .wb{top:50%;transform:translateY(-50%);right:90px}.list .qb+.wb{right:130px}
+.mrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.qstep{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:6px 10px;font-size:.88rem}
+.qstep button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--bg2);color:var(--ink);font-size:1rem;cursor:pointer}
+.qstep b{font-family:var(--f-mono);min-width:2ch;text-align:center}.qstep small{color:var(--muted)}
+.wishbtn{font:inherit;font-weight:600;font-size:.88rem;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:12px;padding:10px 14px;cursor:pointer;margin-left:auto}
+.tg{font-weight:700}.tg.sp{color:var(--owned)}.tg.wl,.gold{color:var(--gold)}
+.wishbtn[aria-pressed="true"]{color:var(--gold);border-color:var(--gold)}
+
+/* market */
+.mk{padding-block:22px 40px;display:grid;gap:14px}
+.mk-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}.mk-top h2{font-family:var(--f-display);font-weight:400;font-size:1.3rem;margin:0}
+.mk-days button{font:inherit;font-size:.82rem;font-weight:600;padding:7px 11px;width:auto}
+.mk-sum{margin:0;color:var(--muted);font-size:.9rem}.up{color:var(--owned)}.dn{color:var(--danger)}
+.mk-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.mk-grid h3{font-family:var(--f-display);font-weight:400;font-size:1rem;margin:0 0 8px}
+.mk-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}.mk-list .empty{color:var(--dim);font-size:.88rem;padding:8px}
+.mk-row{width:100%;display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--rc);border-radius:10px;padding:6px 10px;cursor:pointer}
+.mk-row .mi{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;overflow:hidden;color:var(--dim)}.mk-row .mi img{width:90%;height:90%;object-fit:contain}.mk-row .mi svg{width:18px;height:18px}
+.mk-v{font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}.mk-v b{color:var(--ink)}
+.mk-p{font-family:var(--f-mono);font-size:.82rem;font-weight:700;min-width:62px;text-align:right}.mk-p.up{color:var(--owned)}.mk-p.dn{color:var(--danger)}
+@media (max-width:760px){.mk-grid{grid-template-columns:1fr}.mk-v{display:none}}
+
+/* chat, ratings */
+.ofr-new{box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 40%,transparent)}
+.ofr-countered{opacity:.65}
+.ofr-rate,.ofr-rated{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.85rem;color:var(--muted)}
+.chat{border-top:1px solid var(--line);padding-top:10px;display:grid;gap:8px}
+.chat-list{list-style:none;margin:0;padding:0;display:grid;gap:6px;max-height:280px;overflow:auto}
+.chat-list li{max-width:85%;background:var(--surface2);border:1px solid var(--line);border-radius:12px 12px 12px 4px;padding:6px 10px;display:grid;font-size:.88rem;justify-self:start}
+.chat-list li.me{justify-self:end;background:color-mix(in srgb,var(--gold) 16%,var(--surface2));border-radius:12px 12px 4px 12px}
+.chat-list li b{font-size:.72rem;color:var(--muted)}.chat-list li small{font-size:.68rem;color:var(--dim)}
+.chat-list li span{overflow-wrap:anywhere}
+.chat-list .chat-empty{max-width:none;background:none;border:0;color:var(--dim)}
+.chat-form{display:flex;gap:8px}.chat-form input{flex:1;min-width:0;font:inherit;font-size:.88rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.pl-rep{margin:4px 0 0;font-size:.85rem;color:var(--muted)}.pl-rep b{color:var(--owned)}
+
+.shotbtn{margin:18px 0 0 8px;vertical-align:top}
+@media (max-width:480px){.views button{padding:8px 9px;font-size:.84rem}.shotbtn{margin-left:0}}
+.mcard.shotcard{width:min(760px,100%)}.shot{padding:22px;display:grid;gap:12px}.shot h3{margin:0;font-family:var(--f-display);font-weight:400}.shot img{width:100%;border-radius:12px;border:1px solid var(--line)}
 </style>
 
 <header class="hero">
@@ -320,7 +367,7 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
       <h1>MM2 Collection<span>Tracker</span></h1>
       <p class="lede">Every knife, gun and pet from Ancient to Common. Tick what you own, and whatever is left is your trade list.</p>
       <div class="acctrow"><p class="acct" id="acct">Connecting…</p><button class="gbtn" id="authBtn" hidden><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span>Sign in with Google</span></button></div>
-      <div class="views" role="group" aria-label="Section"><button id="vCol" aria-pressed="true">Collection</button><button id="vTrade" aria-pressed="false">Trade checker</button><button id="vPlay" aria-pressed="false">Players <span class="vbn" id="vPlayN" hidden></span></button></div>
+      <div class="views" role="group" aria-label="Section"><button id="vCol" aria-pressed="true">Collection</button><button id="vTrade" aria-pressed="false">Trade checker</button><button id="vMk" aria-pressed="false">Market</button><button id="vPlay" aria-pressed="false">Players <span class="vbn" id="vPlayN" hidden></span></button></div><button class="tbtn shotbtn" id="shotBtn">📸 Share image</button>
     </div>
     <div class="ringbox">
       <div class="ring" aria-hidden="true">
@@ -344,6 +391,8 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
       <option value="name">Name A–Z</option>
     </select>
     <label class="tog"><input type="checkbox" id="missing"> Missing only</label>
+    <button class="tbtn" id="fWish" aria-pressed="false">★ Wishlist</button>
+    <button class="tbtn" id="fSpare" aria-pressed="false">×2 Spares</button>
     <div class="seg" role="group" aria-label="View">
       <button id="vGrid" aria-pressed="true" aria-label="Grid view"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></button>
       <button id="vList" aria-pressed="false" aria-label="List view"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="18" height="4" rx="2"/><rect x="3" y="10" width="18" height="4" rx="2"/><rect x="3" y="16" width="18" height="4" rx="2"/></svg></button>
@@ -383,6 +432,13 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
       <div class="sum"><span>Total value <button class="clr" data-clear="B">clear</button></span><b id="totB">0</b></div></div>
   </div>
   <p class="tc-foot">Values from MM2Values (<span class="vdate">Oct 25, 2026</span>). Win means you get at least 5% more value than you give, Lose means at least 5% less. Values are estimates, so check demand too: an item with high demand is easier to trade on later. Items marked “needed” are ones still missing from your collection.</p>
+</section>
+
+<section class="wrap mk" id="mkView" hidden aria-label="Market">
+  <div class="mk-top"><h2>Biggest movers</h2><div class="seg mk-days" id="mkDays" role="group" aria-label="Period"><button data-d="1">24h</button><button data-d="7" aria-pressed="true">7 days</button><button data-d="30">30 days</button><button data-d="99999">All time</button></div></div>
+  <p class="mk-sum" id="mkSum"></p>
+  <div class="mk-grid"><div><h3 class="up">▲ Going up</h3><ul class="mk-list" id="mkUp"></ul></div><div><h3 class="dn">▼ Going down</h3><ul class="mk-list" id="mkDn"></ul></div></div>
+  <p class="tc-foot">Changes come from MM2Values and are checked every 6 hours. ★ = on your wishlist. Going up on something you have as a spare? Good time to trade it.</p>
 </section>
 
 <section class="wrap pl" id="playView" hidden aria-label="Players">
@@ -1653,14 +1709,20 @@ const KEY="mm2-owned-v1",VKEY="mm2-view";
 let owned=new Set();
 try{const s=localStorage.getItem(KEY);if(s)owned=new Set(JSON.parse(s))}catch(e){}
 {const byOld=new Map(items.filter(i=>!LOWC.has(i.cat)).map(i=>[i.cat[0]+":"+i.name,i.id]));const n=new Set();owned.forEach(id=>n.add(LEGACY[id]||byOld.get(id)||id));owned=n}
+const QKEY="mm2-qty-v1",WKEY="mm2-wish-v1";
+let qty={},wish=new Set();
+try{qty=JSON.parse(localStorage.getItem(QKEY)||"{}")||{}}catch(e){}
+try{wish=new Set(JSON.parse(localStorage.getItem(WKEY)||"[]"))}catch(e){}
+const spares=()=>Object.keys(qty).filter(id=>qty[id]>1&&owned.has(id));
 let view="grid";try{view=localStorage.getItem(VKEY)||"grid"}catch(e){}
 let cat="All";
 const byId=new Map(items.map(i=>[i.id,i]));
 
 /* ---------- account / saving ---------- */
 let cloud=null,saveT=null,who="";
-function save(){try{localStorage.setItem(KEY,JSON.stringify([...owned]))}catch(e){}
-  if(cloud){clearTimeout(saveT);saveT=setTimeout(()=>cloud.set({owned:[...owned],updated:Date.now()}).then(()=>acct("ok")).catch(()=>acct("err")),600)}
+function save(){for(const id in qty)if(!owned.has(id)||qty[id]<2)delete qty[id];
+  try{localStorage.setItem(KEY,JSON.stringify([...owned]));localStorage.setItem(QKEY,JSON.stringify(qty));localStorage.setItem(WKEY,JSON.stringify([...wish]))}catch(e){}
+  if(cloud){clearTimeout(saveT);saveT=setTimeout(()=>cloud.set({owned:[...owned],qty,wish:[...wish],updated:Date.now()}).then(()=>acct("ok")).catch(()=>acct("err")),600)}
   updateCode()}
 function acct(s){const el=$("acct");if(!el)return;el.dataset.s=s;
   el.textContent=s==="ok"?`Signed in${who?" as "+who:""} · saved to your account`:s==="err"?"Couldn't save to your account. Kept in this browser for now.":s==="off"?ACCT_OFF_TEXT:s==="setup"?"Sign-in isn't set up yet. Progress is saved in this browser.":"Connecting…";
@@ -1687,31 +1749,33 @@ function stats(){
   document.querySelectorAll(".grp").forEach(g=>{const t=grpStats(g.dataset.c);g.querySelector(".gc").textContent=`${t.h} / ${t.n}`})}
 
 /* ---------- list ---------- */
+function badges(i){const q=qty[i.id]||0;return (q>1&&owned.has(i.id)?`<span class="qb" title="${q} copies">×${q}</span>`:"")+(wish.has(i.id)?'<span class="wb" title="On your wishlist">★</span>':"")}
+function refreshCard(id){const li=document.querySelector(`.card[data-id="${CSS.escape(id)}"]`);if(!li)return;li.querySelectorAll(".qb,.wb").forEach(x=>x.remove());li.querySelector(".chk").insertAdjacentHTML("afterend",badges(byId.get(id)))}
 function cardHTML(i){const own=owned.has(i.id);const untr=i.lock||EXTRA.has(i.cat);
   return `<li class="card${own?" own":""}${i.cat==="Chroma"?" chroma":""}" data-id="${esc(i.id)}" style="--rc:${RC[i.cat]}">
-<button class="chk" aria-pressed="${own}" aria-label="I own ${esc(i.name)}">${CHECK}</button>
+<button class="chk" aria-pressed="${own}" aria-label="I own ${esc(i.name)}">${CHECK}</button>${badges(i)}
 <button class="open" aria-label="${esc(i.name)} details"><span class="art">${artHTML(i)}</span><span class="info"><span class="nm">${esc(i.name)}</span><span class="meta"><span>${TYPE[i.type]||""}${untr?' · <span class="lk">untradeable</span>':""}</span><span class="v${i.val==null?" na":""}">${i.val!=null?fmt(i.val):""}</span></span></span></button></li>`}
 function render(){
-  const q=$("q").value.trim().toLowerCase(),onlyMiss=$("missing").checked,srt=$("sort").value;
+  const q=$("q").value.trim().toLowerCase(),onlyMiss=$("missing").checked,srt=$("sort").value,fw=$("fWish").getAttribute("aria-pressed")==="true",fs=$("fSpare").getAttribute("aria-pressed")==="true";
   const show=cat==="All"?CATS.filter(c=>!EXTRA.has(c)):cat===EVC?CATS:[cat];let html="";
   for(const c of show){
-    let arr=items.filter(i=>i.cat===c&&(cat!==EVC||i.ev==="H26")&&(!q||i.name.toLowerCase().includes(q))&&(!onlyMiss||!owned.has(i.id)));
-    if(cat==="All"&&q&&!arr.length)continue;
+    let arr=items.filter(i=>i.cat===c&&(cat!==EVC||i.ev==="H26")&&(!q||i.name.toLowerCase().includes(q))&&(!onlyMiss||!owned.has(i.id))&&(!fw||wish.has(i.id))&&(!fs||(qty[i.id]>1&&owned.has(i.id))));
+    if(cat==="All"&&(q||fw||fs)&&!arr.length)continue;
     arr.sort(srt==="name"?(a,b)=>a.name.localeCompare(b.name):(a,b)=>(b.val??-1)-(a.val??-1)||a.name.localeCompare(b.name));
     if(cat===EVC&&!arr.length&&!q&&!onlyMiss)continue;
     const s=grpStats(c);
     html+=`<section class="grp c-${c}" data-c="${c}" style="--rc:${RC[c]}"><div class="gh"><h2>${c===EVC?"Halloween 2026 · rarity TBA":c}</h2><span class="gc">${s.h} / ${s.n}</span>${EXTRA.has(c)?'<span class="nt">untradeable · not counted</span>':""}<span class="gl"></span></div><ul class="cards">`;
-    html+=arr.length?arr.map(cardHTML).join(""):`<li class="empty">${onlyMiss&&!q?"Nothing missing here. Nice.":"No matches."}</li>`;
+    html+=arr.length?arr.map(cardHTML).join(""):`<li class="empty">${fw?"Nothing on your wishlist here.":fs?"No spares here.":onlyMiss&&!q?"Nothing missing here. Nice.":"No matches."}</li>`;
     html+=`</ul></section>`}
-  if(!html)html=`<p class="empty" style="margin-top:26px">No items match “${esc(q)}”.</p>`;
+  if(!html)html=`<p class="empty" style="margin-top:26px">${fw&&!q?"Your wishlist is empty. Open an item and tap ☆ Wishlist to add it.":fs&&!q?"No spares yet. Open an item you own and set how many copies you have.":"No items match “"+esc(q)+"”."}</p>`;
   $("groups").innerHTML=html;$("groups").className=view==="list"?"list":"";
   stats();updateCode()}
-function setOwn(id,on){on?owned.add(id):owned.delete(id);save();
+function setOwn(id,on){on?owned.add(id):owned.delete(id);if(!on)delete qty[id];save();refreshCard(id);
   if($("missing").checked&&on){render();return}
   const li=document.querySelector(`.card[data-id="${CSS.escape(id)}"]`);
   if(li){li.classList.toggle("own",on);li.querySelector(".chk").setAttribute("aria-pressed",on)}
   stats()}
-function updateCode(){const c=$("code");if(c)c.value=btoa(unescape(encodeURIComponent(JSON.stringify([...owned]))))}
+function updateCode(){const c=$("code");if(c)c.value=btoa(unescape(encodeURIComponent(JSON.stringify(Object.keys(qty).length||wish.size?{o:[...owned],q:qty,w:[...wish]}:[...owned]))))}
 
 $("tabs").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;cat=b.dataset.c;
   document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));render()});
@@ -1720,6 +1784,7 @@ $("groups").addEventListener("click",e=>{const li=e.target.closest(".card");if(!
   if(e.target.closest(".open"))openItem(id)});
 let qT;$("q").addEventListener("input",()=>{clearTimeout(qT);qT=setTimeout(render,120)});
 ["sort","missing"].forEach(id=>$(id).addEventListener("input",render));
+["fWish","fSpare"].forEach(id=>$(id).addEventListener("click",e=>{const b=e.currentTarget;const on=b.getAttribute("aria-pressed")!=="true";b.setAttribute("aria-pressed",on);if(on)$(id==="fWish"?"fSpare":"fWish").setAttribute("aria-pressed","false");render()}));
 function setView(v){view=v;try{localStorage.setItem(VKEY,v)}catch(e){}$("vGrid").setAttribute("aria-pressed",v==="grid");$("vList").setAttribute("aria-pressed",v==="list");$("groups").className=v==="list"?"list":""}
 $("vGrid").addEventListener("click",()=>setView("grid"));$("vList").addEventListener("click",()=>setView("list"));
 
@@ -1745,9 +1810,14 @@ function openItem(id){const i=byId.get(id);if(!i)return;cur=id;lastFocus=documen
 <p class="tags"><span>${TYPE[i.type]||""}</span>${untr?'<span class="lk">Untradeable</span>':"<span>Tradeable</span>"}${i.val!=null?'<span>Value: MM2Values · '+VDATE+'</span>':""}</p>
 <p class="how"><b>How to get:</b> ${i.src?esc(i.src):"Trading"}</p>
 <button class="ownbtn" id="ownbtn" aria-pressed="${own}">${CHECK}<span>${own?"In your inventory":"Mark as owned"}</span></button>
+<div class="mrow"><div class="qstep" id="qstep" ${own&&!untr?"":"hidden"}><span>Copies</span><button data-dq="-1" aria-label="One less">−</button><b id="qn">${qty[id]||1}</b><button data-dq="1" aria-label="One more">+</button><small id="qsp">${(qty[id]||1)>1?(qty[id]-1)+" spare for trade":"no spares"}</small></div>
+<button class="wishbtn" id="wishbtn" aria-pressed="${wish.has(id)}">${wish.has(id)?"★ On your wishlist":"☆ Wishlist"}</button></div>
 <h4>Value history</h4>${chart(VALHIST[id])}
 <div class="mlinks"><a class="b" href="${mv}" target="_blank" rel="noopener">See it on MM2Values ↗</a><a class="b" href="${wiki}" target="_blank" rel="noopener">MM2 Wiki ↗</a></div></div>`;
-  $("ownbtn").addEventListener("click",e=>{const on=!owned.has(id);setOwn(id,on);const b=e.currentTarget;b.setAttribute("aria-pressed",on);b.querySelector("span").textContent=on?"In your inventory":"Mark as owned"});
+  const drawQ=()=>{const n=qty[id]||1;$("qn").textContent=n;$("qsp").textContent=n>1?(n-1)+" spare"+(n>2?"s":"")+" for trade":"no spares";$("qstep").hidden=!owned.has(id)||untr};
+  $("ownbtn").addEventListener("click",e=>{const on=!owned.has(id);setOwn(id,on);const b=e.currentTarget;b.setAttribute("aria-pressed",on);b.querySelector("span").textContent=on?"In your inventory":"Mark as owned";drawQ()});
+  $("qstep").addEventListener("click",e=>{const b=e.target.closest("[data-dq]");if(!b)return;const n=Math.max(1,Math.min(99,(qty[id]||1)+(+b.dataset.dq)));if(n>1)qty[id]=n;else delete qty[id];save();refreshCard(id);drawQ()});
+  $("wishbtn").addEventListener("click",e=>{const b=e.currentTarget;wish.has(id)?wish.delete(id):wish.add(id);save();refreshCard(id);b.setAttribute("aria-pressed",wish.has(id));b.textContent=wish.has(id)?"★ On your wishlist":"☆ Wishlist"});
   $("modal").hidden=false;document.body.style.overflow="hidden";$("mclose").focus()}
 function closeItem(){$("modal").hidden=true;document.body.style.overflow="";cur=null;if(lastFocus&&lastFocus.focus)lastFocus.focus()}
 $("mclose").addEventListener("click",closeItem);
@@ -1758,10 +1828,10 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("modal").hidden)
 const msg=t=>{$("msg").textContent=t;setTimeout(()=>$("msg").textContent="",2500)};
 $("copy").addEventListener("click",()=>{const t=$("code").value;
   navigator.clipboard.writeText(t).then(()=>msg("Code copied.")).catch(()=>{$("code").select();msg("Code selected. Press Ctrl+C to copy.")})});
-$("load").addEventListener("click",()=>{try{const a=JSON.parse(decodeURIComponent(escape(atob($("code").value.trim()))));if(!Array.isArray(a))throw 0;owned=new Set(a);save();render();msg("Progress loaded.")}catch(e){msg("That code isn't valid. Copy the whole code and try again.")}});
+$("load").addEventListener("click",()=>{try{const a=JSON.parse(decodeURIComponent(escape(atob($("code").value.trim()))));if(Array.isArray(a)){owned=new Set(a)}else if(a&&Array.isArray(a.o)){owned=new Set(a.o);qty=a.q||{};wish=new Set(a.w||[])}else throw 0;save();render();msg("Progress loaded.")}catch(e){msg("That code isn't valid. Copy the whole code and try again.")}});
 let armed=false;
 $("reset").addEventListener("click",e=>{const b=e.currentTarget;if(!armed){armed=true;b.textContent="Tap again to reset";setTimeout(()=>{armed=false;b.textContent="Reset everything"},3000);return}
-  owned=new Set();save();render();armed=false;b.textContent="Reset everything";msg("Progress reset.")});
+  owned=new Set();qty={};wish=new Set();save();render();armed=false;b.textContent="Reset everything";msg("Progress reset.")});
 
 
 /* ---------- trade checker ---------- */
@@ -1794,10 +1864,30 @@ function setupPicker(k){const inp=$("pick"+k),ul=$("sugg"+k);let res=[],sel=0,bt
 setupPicker("A");setupPicker("B");
 document.querySelectorAll("[data-clear]").forEach(b=>b.addEventListener("click",()=>{trade[b.dataset.clear]={};saveTrade();renderTrade()}));
 $("swap").addEventListener("click",()=>{trade={A:trade.B,B:trade.A};saveTrade();renderTrade()});
-function showView(v,keepHash){$("colView").hidden=v!=="col";$("tradeView").hidden=v!=="trade";$("playView").hidden=v!=="players";
-  $("vCol").setAttribute("aria-pressed",v==="col");$("vTrade").setAttribute("aria-pressed",v==="trade");$("vPlay").setAttribute("aria-pressed",v==="players");
-  if(v==="trade")renderTrade();if(v==="players"&&!keepHash)openPlayers();
-  if(!keepHash)try{history.replaceState(null,"",v==="trade"?"#trade":v==="players"?"#players":location.pathname+location.search)}catch(e){}}
+function showView(v,keepHash){$("colView").hidden=v!=="col";$("tradeView").hidden=v!=="trade";$("playView").hidden=v!=="players";$("mkView").hidden=v!=="market";
+  $("vCol").setAttribute("aria-pressed",v==="col");$("vTrade").setAttribute("aria-pressed",v==="trade");$("vPlay").setAttribute("aria-pressed",v==="players");$("vMk").setAttribute("aria-pressed",v==="market");
+  if(v==="trade")renderTrade();if(v==="players"&&!keepHash)openPlayers();if(v==="market")renderMarket();
+  if(!keepHash)try{history.replaceState(null,"",v==="col"?location.pathname+location.search:"#"+v)}catch(e){}}
+$("vMk").addEventListener("click",()=>showView("market"));
+
+/* ---------- market: biggest movers ---------- */
+let mkDays=7;
+function movers(days){const cut=new Date(Date.now()-days*864e5).toISOString().slice(0,10);const out=[];
+  for(const[id,h]of Object.entries(VALHIST)){const i=byId.get(id);if(!i||!h||h.length<2)continue;const now=h.at(-1);if(days<9999&&now[0]<cut)continue;
+    let base=h[0];for(const x of h){if(x[0]<=cut)base=x;else break}
+    if(base===now||!base[1]||base[1]===now[1])continue;out.push({i,from:base[1],to:now[1],d:now[1]-base[1],p:(now[1]-base[1])/base[1],date:now[0]})}
+  return out}
+function mkRow(x){const i=x.i,up=x.d>0;const tag=owned.has(i.id)?(qty[i.id]>1?'<span class="tg sp">spare ×'+(qty[i.id]-1)+'</span>':"owned"):'<span class="need">needed</span>';
+  return `<li><button class="mk-row" data-open="${esc(i.id)}" style="--rc:${RC[i.cat]}"><span class="mi">${miniArt(i)}</span><span class="pn"><span>${wish.has(i.id)?'<i class="star">★</i> ':""}${esc(i.name)}</span><small>${i.cat} · ${tag}</small></span><span class="mk-v">${fmt(x.from)} → <b>${fmt(x.to)}</b></span><span class="mk-p ${up?"up":"dn"}">${up?"▲":"▼"} ${Math.abs(x.p*100).toFixed(x.p*100>=10||x.p*100<=-10?0:1)}%</span></button></li>`}
+function renderMarket(){const m=movers(mkDays);const up=m.filter(x=>x.d>0).sort((a,b)=>b.p-a.p||b.d-a.d),dn=m.filter(x=>x.d<0).sort((a,b)=>a.p-b.p||a.d-b.d);
+  const firstDay=Object.values(VALHIST).reduce((a,h)=>h&&h[0]&&h[0][0]<a?h[0][0]:a,"9999");
+  document.querySelectorAll("#mkDays button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.d===mkDays));
+  const mine=m.filter(x=>owned.has(x.i.id)).reduce((s,x)=>s+x.d*(qty[x.i.id]||1),0);
+  $("mkSum").innerHTML=m.length?`<b>${m.length}</b> value change${m.length>1?"s":""} · your inventory <b class="${mine>=0?"up":"dn"}">${mine>=0?"+":"−"}${fmt(Math.abs(mine))}</b>`:`No value changes in this period yet. Tracking started ${firstDay==="9999"?"recently":firstDay}; values are checked every 6 hours, so movers show up here as soon as MM2Values updates something.`;
+  const list=(l,empty)=>l.length?l.slice(0,25).map(mkRow).join(""):`<li class="empty">${empty}</li>`;
+  $("mkUp").innerHTML=list(up,"Nothing went up.");$("mkDn").innerHTML=list(dn,"Nothing went down.")}
+$("mkDays").addEventListener("click",e=>{const b=e.target.closest("[data-d]");if(!b)return;mkDays=+b.dataset.d;renderMarket()});
+$("mkView").addEventListener("click",e=>{const b=e.target.closest("[data-open]");if(b)openItem(b.dataset.open)});
 $("vCol").addEventListener("click",()=>showView("col"));$("vTrade").addEventListener("click",()=>showView("trade"));$("vPlay").addEventListener("click",()=>showView("players"));
 
 /* ---------- players / public profiles ---------- */
@@ -1809,7 +1899,7 @@ function ago(t){const d=(Date.now()-t)/864e5;return d<1/24?"just now":d<1?Math.r
 const av=n=>esc((n||"?")[0].toUpperCase());
 const fbMe=()=>window.FB&&window.FB.me();
 const isFollowing=uid=>{const m=fbMe();return !!(m&&m.follows&&uid in m.follows)};
-function plTile(i,side){return `<li class="pt" style="--rc:${RC[i.cat]}"><button class="pt-open" data-open="${esc(i.id)}"><span class="mi">${miniArt(i)}</span><span class="pn">${esc(i.name)}<small>${i.cat} · ${fmt(i.val)}</small></span></button>${side?`<button class="pt-add" data-add="${side}" data-id="${esc(i.id)}" title="${side==="B"?"Add to “You get”":"Add to “You give”"}" aria-label="Add to trade">+</button>`:""}</li>`}
+function plTile(i,side,tags){return `<li class="pt" style="--rc:${RC[i.cat]}"><button class="pt-open" data-open="${esc(i.id)}"><span class="mi">${miniArt(i)}</span><span class="pn">${esc(i.name)}<small>${i.cat} · ${fmt(i.val)}${tags?tags(i):""}</small></span></button>${side?`<button class="pt-add" data-add="${side}" data-id="${esc(i.id)}" title="${side==="B"?"Add to “You get”":"Add to “You give”"}" aria-label="Add to trade">+</button>`:""}</li>`}
 
 /* your profile card */
 function renderMe(){const el=$("plMe");const fb=window.FB;
@@ -1831,46 +1921,88 @@ function renderMe(){const el=$("plMe");const fb=window.FB;
   ["plName","plDisc"].forEach(id=>$(id).addEventListener("change",()=>{if($("plPub").checked)apply()}));
   if(me.pub){$("plCopy").addEventListener("click",()=>{navigator.clipboard.writeText(link).then(()=>msg("Link copied."),()=>msg(link))});$("plView").addEventListener("click",()=>openProfile(me.uid))}}
 
-/* trade offers inbox */
+/* trade offers inbox (live), chat, ratings, counter-offers, notifications */
+const SEENKEY="mm2-seen-v1";let seen={};try{seen=JSON.parse(localStorage.getItem(SEENKEY)||"{}")||{}}catch(e){}
+const saveSeen=()=>{try{localStorage.setItem(SEENKEY,JSON.stringify(seen))}catch(e){}};
+let offWatch=null,myRates=null,chatOpen=new Set(),chatCache={},prevOffers=null;
 const offerTotal=l=>l.reduce((s,x)=>{const i=byId.get(x.id);return s+((i&&i.val)||0)*x.q},0);
 const offerList=l=>l.map(x=>{const i=byId.get(x.id);if(!i)return"";return `<li class="pt" style="--rc:${RC[i.cat]}"><button class="pt-open" data-open="${esc(i.id)}"><span class="mi">${miniArt(i)}</span><span class="pn">${x.q>1?x.q+"× ":""}${esc(i.name)}<small>${i.cat} · ${fmt(i.val)}${!owned.has(i.id)?' · <span class="need">needed</span>':""}</small></span></button></li>`}).join("")||`<li class="pl-note">nothing</li>`;
-async function loadOffers(){const fb=window.FB;if(!fb||!fb.me()){offers=null;drawOffers();return}
-  try{offers=await fb.listOffers()}catch(e){offers={err:e.code||e.message}}drawOffers()}
-function drawOffers(){const el=$("plOffers");const me=fbMe();const badge=$("vPlayN");
-  if(!me||!offers){el.innerHTML="";if(badge)badge.hidden=true;return}
+const unreadChat=o=>{const me=fbMe();return !!(me&&o.lastMsgAt&&o.lastMsgBy!==me.uid&&o.lastMsgAt>(seen["c:"+o.id]||0))};
+const unreadOffer=o=>{const me=fbMe();return !!(me&&o.to===me.uid&&o.status==="open"&&!seen["o:"+o.id])};
+function loadOffers(){const fb=window.FB;const me=fb&&fb.me();
+  if(!me){if(offWatch){offWatch();offWatch=null}offers=null;prevOffers=null;drawOffers();return}
+  if(offWatch)return;
+  offWatch=fb.watchOffers(list=>{notifyChanges(list);offers=list;drawOffers();chatOpen.forEach(id=>{const o=list.find(x=>x.id===id);if(o&&o.lastMsgAt&&o.lastMsgAt!==(chatCache[id]||{}).at)loadChat(id)})},e=>{offers={err:e.code||e.message};drawOffers()});
+  if(!myRates)fb.myRatings().then(r=>{myRates=r;drawOffers()}).catch(()=>{myRates={}})}
+function notifyChanges(list){const me=fbMe();if(!me)return;const old=prevOffers;prevOffers=new Map(list.map(o=>[o.id,o]));if(!old)return;
+  for(const o of list){const p=old.get(o.id);let t=null;
+    if(!p&&o.to===me.uid&&o.status==="open")t=[`New trade offer from ${o.fromName||"someone"}`,o.counterOf?"It's a counter-offer to your trade.":"Open MM2 Collection Tracker to answer."];
+    else if(p&&p.status!==o.status&&o.from===me.uid&&o.status!=="cancelled")t=[`${o.toName||"They"} ${o.status==="countered"?"sent a counter-offer":o.status} your trade`,o.status==="accepted"?"Meet in MM2 to trade.":""];
+    else if(p&&o.lastMsgAt&&o.lastMsgAt!==p.lastMsgAt&&o.lastMsgBy!==me.uid)t=[`New message from ${o.from===me.uid?o.toName:o.fromName}`,"In your trade chat."];
+    if(t)notify(t[0],t[1])}}
+function notify(title,body){try{if(window.Notification&&Notification.permission==="granted"&&document.hidden){const n=new Notification(title,{body,tag:"mm2-trade"});n.onclick=()=>{window.focus();showView("players");n.close()}}}catch(e){}}
+function updateBadge(){const me=fbMe();const n=me&&offers&&!offers.err?offers.filter(o=>unreadOffer(o)||unreadChat(o)).length:0;const b=$("vPlayN");if(b){b.hidden=!n;b.textContent=n}
+  const base=document.title.replace(/^\(\d+\) /,"");document.title=n?`(${n}) ${base}`:base}
+function drawOffers(){const el=$("plOffers");const me=fbMe();updateBadge();
+  if(!me||!offers){el.innerHTML="";return}
   if(offers.err){el.innerHTML=`<p class="pl-note">Couldn't load trade offers (${esc(offers.err)}).</p>`;return}
+  const wasOpen=el.querySelector("details")?el.querySelector("details").open:null;
   const inc=offers.filter(o=>o.to===me.uid),out=offers.filter(o=>o.from===me.uid);
-  const openIn=inc.filter(o=>o.status==="open").length;if(badge){badge.hidden=!openIn;badge.textContent=openIn}
-  if(!offers.length){el.innerHTML=`<p class="pl-note">No trade offers yet. Open a player's profile and press <b>Propose trade</b> to send one.</p>`;return}
+  const nNew=offers.filter(o=>unreadOffer(o)||unreadChat(o)).length;
+  const canNotify=window.Notification&&Notification.permission!=="granted"&&Notification.permission!=="denied";
   const card=o=>{const incoming=o.to===me.uid;const youGive=incoming?o.get:o.give,youGet=incoming?o.give:o.get;
     const g=offerTotal(youGive),r=offerTotal(youGet),pct=g?(r-g)/g:(r?1:0);const k=pct>=.05?"win":pct<=-.05?"lose":"fair";
     const other=incoming?o.fromName:o.toName,otherUid=incoming?o.from:o.to;
-    const st={open:incoming?"Waiting for your answer":"Waiting for their answer",accepted:"Accepted · meet in MM2 to trade",declined:"Declined",cancelled:"Cancelled"}[o.status]||o.status;
-    return `<article class="ofr ofr-${o.status}" data-oid="${esc(o.id)}"><header><button class="ofr-who" data-uid="${esc(otherUid)}"><span class="pl-av">${av(other)}</span><span>${incoming?"From":"To"} <b>${esc(other||"Unnamed")}</b><small>${ago(o.created||0)} · ${st}</small></span></button><span class="vbadge sm ${k}">${k.toUpperCase()}</span></header>
+    const st={open:incoming?"Waiting for your answer":"Waiting for their answer",accepted:"Accepted · meet in MM2 to trade",declined:"Declined",cancelled:"Cancelled",countered:incoming?"You sent a counter-offer":"They sent a counter-offer"}[o.status]||o.status;
+    const rated=myRates&&o.id in myRates?myRates[o.id]:null;
+    const rate=o.status==="accepted"?(rated!=null?`<span class="ofr-rated">You rated this trade ${rated>0?"👍":"👎"}</span>`:`<span class="ofr-rate">Did the trade go well? <button class="pbtn" data-rate="1" aria-label="Good trade">👍</button><button class="pbtn" data-rate="-1" aria-label="Bad trade">👎</button></span>`):"";
+    const uc=unreadChat(o);
+    return `<article class="ofr ofr-${o.status}${unreadOffer(o)?" ofr-new":""}" data-oid="${esc(o.id)}"><header><button class="ofr-who" data-uid="${esc(otherUid)}"><span class="pl-av">${av(other)}</span><span>${incoming?"From":"To"} <b>${esc(other||"Unnamed")}</b>${o.counterOf?' <span class="tg wl">counter-offer</span>':""}<small>${ago(o.created||0)} · ${st}</small></span></button><span class="vbadge sm ${k}">${k.toUpperCase()}</span></header>
       ${o.msg?`<p class="ofr-msg">“${esc(o.msg)}”</p>`:""}
       ${incoming&&o.fromDiscord?`<p class="ofr-msg">Discord: <code>${esc(o.fromDiscord)}</code></p>`:""}
       <div class="ofr-cols"><div><h4>You give <small>${fmt(g)}</small></h4><ul class="ptiles one">${offerList(youGive)}</ul></div><div><h4>You get <small>${fmt(r)}</small></h4><ul class="ptiles one">${offerList(youGet)}</ul></div></div>
-      <footer>${o.status==="open"?(incoming?`<button class="pbtn ok" data-act="accepted">Accept</button><button class="pbtn" data-act="declined">Decline</button>`:`<button class="pbtn" data-act="cancelled">Cancel offer</button>`):""}<button class="pbtn" data-act="load">Open in trade checker</button>${o.status!=="open"?`<button class="pbtn" data-act="delete">Remove</button>`:""}</footer></article>`};
-  const openFirst=(a,b)=>(a.status==="open"?0:1)-(b.status==="open"?0:1)||(b.created||0)-(a.created||0);
-  el.innerHTML=`<details class="pl-card" ${openIn?"open":""}><summary><h2>Trade offers</h2>${openIn?`<span class="pl-st on">${openIn} new</span>`:`<span class="pl-st">${offers.length}</span>`}</summary>
-    ${inc.length?`<h3 class="ofr-h">Received</h3>${inc.sort(openFirst).map(card).join("")}`:""}
-    ${out.length?`<h3 class="ofr-h">Sent</h3>${out.sort(openFirst).map(card).join("")}`:""}</details>`}
+      ${rate}
+      <footer>${o.status==="open"?(incoming?`<button class="pbtn ok" data-act="accepted">Accept</button><button class="pbtn" data-act="counter">Counter</button><button class="pbtn" data-act="declined">Decline</button>`:`<button class="pbtn" data-act="cancelled">Cancel offer</button>`):""}<button class="pbtn${uc?" on":""}" data-act="chat">💬 Chat${uc?" · new":""}</button><button class="pbtn" data-act="load">Open in trade checker</button>${o.status!=="open"?`<button class="pbtn" data-act="delete">Remove</button>`:""}</footer>
+      <div class="chat" ${chatOpen.has(o.id)?"":"hidden"}><ul class="chat-list" id="chat-${esc(o.id)}">${chatHTML(o.id)}</ul><form class="chat-form"><input maxlength="300" placeholder="Write a message…" aria-label="Message"><button class="pbtn ok">Send</button></form></div></article>`};
+  const sortF=(a,b)=>(a.status==="open"?0:1)-(b.status==="open"?0:1)||Math.max(b.created||0,b.lastMsgAt||0)-Math.max(a.created||0,a.lastMsgAt||0);
+  const keepInput={};el.querySelectorAll(".chat-form input").forEach(i=>{if(i.value)keepInput[i.closest("[data-oid]").dataset.oid]=i.value});
+  el.innerHTML=`<details class="pl-card" ${wasOpen??(nNew>0)?"open":""}><summary><h2>Trade offers</h2>${nNew?`<span class="pl-st on">${nNew} new</span>`:`<span class="pl-st">${offers.length}</span>`}</summary>
+    ${canNotify?`<p class="pl-note"><button class="pbtn" id="notifBtn">🔔 Notify me about new offers</button> Works while this page is open in a tab.</p>`:""}
+    ${!offers.length?`<p class="pl-note">No trade offers yet. Open a player's profile and press <b>Propose trade</b> to send one.</p>`:""}
+    ${inc.length?`<h3 class="ofr-h">Received</h3>${inc.sort(sortF).map(card).join("")}`:""}
+    ${out.length?`<h3 class="ofr-h">Sent</h3>${out.sort(sortF).map(card).join("")}`:""}</details>`;
+  for(const id in keepInput){const i=el.querySelector(`[data-oid="${CSS.escape(id)}"] .chat-form input`);if(i)i.value=keepInput[id]}
+  if($("notifBtn"))$("notifBtn").addEventListener("click",()=>Notification.requestPermission().then(()=>drawOffers()));
+  const d=el.querySelector("details");d.addEventListener("toggle",()=>{if(d.open){offers.forEach(o=>{if(unreadOffer(o))seen["o:"+o.id]=1});saveSeen();updateBadge()}})}
+function chatHTML(id){const c=chatCache[id];const me=fbMe();if(!c)return `<li class="chat-empty">Loading…</li>`;
+  if(!c.list.length)return `<li class="chat-empty">No messages yet. Say hi and agree on a server to meet in MM2.</li>`;
+  return c.list.map(m=>`<li class="${m.by===me.uid?"me":""}"><b>${esc(m.name||"")}</b><span>${esc(m.text)}</span><small>${ago(m.at)}</small></li>`).join("")}
+async function loadChat(id){try{const list=await window.FB.chatList(id);chatCache[id]={list,at:list.length?list.at(-1).at:0};seen["c:"+id]=Date.now();saveSeen();
+  const ul=$("chat-"+id);if(ul){ul.innerHTML=chatHTML(id);ul.scrollTop=ul.scrollHeight}updateBadge();
+  const btn=document.querySelector(`[data-oid="${CSS.escape(id)}"] [data-act="chat"]`);if(btn){btn.classList.remove("on");btn.textContent="💬 Chat"}}catch(e){const ul=$("chat-"+id);if(ul)ul.innerHTML=`<li class="chat-empty">Couldn't load chat (${esc(e.code||e.message)}).</li>`}}
+$("plOffers").addEventListener("submit",async e=>{e.preventDefault();const f=e.target.closest(".chat-form");if(!f)return;const inp=f.querySelector("input");const t=inp.value.trim();if(!t)return;
+  const id=f.closest("[data-oid]").dataset.oid;inp.value="";inp.disabled=true;try{await window.FB.chatSend(id,t.slice(0,300));await loadChat(id)}catch(err){inp.value=t;alert("Couldn't send: "+(err.code||err.message))}inp.disabled=false;inp.focus()});
 $("plOffers").addEventListener("click",async e=>{const w=e.target.closest("[data-uid]");if(w){openProfile(w.dataset.uid);return}
   const op=e.target.closest("[data-open]");if(op){openItem(op.dataset.open);return}
-  const b=e.target.closest("[data-act]");if(!b)return;const oid=b.closest("[data-oid]").dataset.oid;const o=offers.find(x=>x.id===oid);if(!o)return;const me=fbMe();
-  if(b.dataset.act==="load"){const incoming=o.to===me.uid;trade={A:{},B:{}};(incoming?o.get:o.give).forEach(x=>trade.A[x.id]=x.q);(incoming?o.give:o.get).forEach(x=>trade.B[x.id]=x.q);saveTrade();showView("trade");return}
-  b.disabled=true;try{if(b.dataset.act==="delete")await window.FB.deleteOffer(oid);else await window.FB.setOfferStatus(oid,b.dataset.act);await loadOffers()}catch(err){b.disabled=false;alert("Couldn't update the offer: "+(err.code||err.message))}});
+  const art=e.target.closest("[data-oid]");if(!art)return;const oid=art.dataset.oid;const o=offers.find(x=>x.id===oid);if(!o)return;const me=fbMe();const incoming=o.to===me.uid;
+  const rb=e.target.closest("[data-rate]");if(rb){rb.disabled=true;try{await window.FB.rate(oid,incoming?o.from:o.to,+rb.dataset.rate);myRates={...(myRates||{}),[oid]:+rb.dataset.rate};drawOffers()}catch(err){rb.disabled=false;alert("Couldn't save rating: "+(err.code||err.message))}return}
+  const b=e.target.closest("[data-act]");if(!b)return;const act=b.dataset.act;
+  if(act==="chat"){const box=art.querySelector(".chat");box.hidden=!box.hidden;if(box.hidden)chatOpen.delete(oid);else{chatOpen.add(oid);loadChat(oid);box.querySelector("input").focus()}return}
+  const fill=()=>{trade={A:{},B:{}};(incoming?o.get:o.give).forEach(x=>trade.A[x.id]=x.q);(incoming?o.give:o.get).forEach(x=>trade.B[x.id]=x.q);saveTrade()};
+  if(act==="load"){fill();showView("trade");return}
+  if(act==="counter"){fill();setPartner({uid:o.from,name:o.fromName||"Unnamed",counterOf:o.id});showView("trade");return}
+  b.disabled=true;try{if(act==="delete")await window.FB.deleteOffer(oid);else await window.FB.setOfferStatus(oid,act)}catch(err){b.disabled=false;alert("Couldn't update the offer: "+(err.code||err.message))}});
 
 /* propose a trade: partner banner in the trade checker */
 function setPartner(p){partner=p;drawPartner()}
-function drawPartner(){const el=$("tPartner");if(!el)return;if(!partner){el.hidden=true;return}el.hidden=false;
-  el.innerHTML=`<span class="pl-av">${av(partner.name)}</span><div class="tp-txt"><b>Trade offer for ${esc(partner.name)}</b><small>“You give” is what you offer, “You get” is what you want from them. Add items on both sides, then send.</small></div>
-  <input id="tpMsg" maxlength="200" placeholder="Message (optional)"><button class="pbtn ok" id="tpSend">Send offer</button><button class="pbtn" id="tpX" aria-label="Stop proposing">✕</button><p class="pl-msg" id="tpInfo" role="status"></p>`;
+function drawPartner(){const el=$("tPartner");if(!el)return;if(!partner){el.hidden=true;return}el.hidden=false;const c=!!partner.counterOf;
+  el.innerHTML=`<span class="pl-av">${av(partner.name)}</span><div class="tp-txt"><b>${c?"Counter-offer":"Trade offer"} for ${esc(partner.name)}</b><small>${c?"Change the items, then send. Their original offer gets marked as countered.":"“You give” is what you offer, “You get” is what you want from them. Add items on both sides, then send."}</small></div>
+  <input id="tpMsg" maxlength="200" placeholder="Message (optional)"><button class="pbtn ok" id="tpSend">Send ${c?"counter-offer":"offer"}</button><button class="pbtn" id="tpX" aria-label="Stop proposing">✕</button><p class="pl-msg" id="tpInfo" role="status"></p>`;
   $("tpX").addEventListener("click",()=>setPartner(null));
   $("tpSend").addEventListener("click",async()=>{const give=Object.entries(trade.A).map(([id,q])=>({id,q})),get=Object.entries(trade.B).map(([id,q])=>({id,q}));
     if(!give.length&&!get.length){$("tpInfo").textContent="Add items first.";return}
     $("tpSend").disabled=true;$("tpInfo").textContent="Sending…";
-    try{await window.FB.sendOffer(partner,give,get,$("tpMsg").value.trim().slice(0,200));$("tpInfo").textContent="Sent! "+partner.name+" sees it under Players → Trade offers.";loadOffers();setTimeout(()=>setPartner(null),2500)}
+    try{await window.FB.sendOffer(partner,give,get,$("tpMsg").value.trim().slice(0,200),partner.counterOf);$("tpInfo").textContent="Sent! "+partner.name+" sees it under Players → Trade offers.";setTimeout(()=>setPartner(null),2500)}
     catch(e){$("tpSend").disabled=false;$("tpInfo").textContent="Couldn't send: "+(e.code||e.message)}})}
 
 /* players list */
@@ -1884,9 +2016,9 @@ function playerRow(p,extra){const pct=p.total?Math.floor(p.count/p.total*100):0;
   const nw=f&&me.follows[p.uid]!=null&&p.count>me.follows[p.uid]?p.count-me.follows[p.uid]:0;
   return `<li><button class="pl-row${f?" fol":""}" data-uid="${esc(p.uid)}"><span class="pl-av">${av(p.name)}</span><span class="pl-n"><span>${f?'<i class="star" aria-label="Following">★</i> ':""}${esc(p.name||"Unnamed")}${nw?`<em class="new">+${nw} new</em>`:""}</span><small>${extra||`${p.count} / ${p.total} · updated ${ago(p.updated||0)}`}</small></span><span class="pl-bar"><i style="width:${pct}%"></i></span><span class="pl-v">${fmt(p.value||0)}</span></button></li>`}
 function drawPlayers(){const L=$("plList");const q=$("plQ").value.trim().toLowerCase();const me=fbMe();
-  if(plBest){$("plHint").innerHTML=`<b>Best trade partners</b>: players who own the most of what you're missing. <button class="pbtn" id="plClr">show all players</button>`;
+  if(plBest){$("plHint").innerHTML=`<b>Best trade partners</b>: who owns what you're missing. Spares and your ★ wishlist count extra. <button class="pbtn" id="plClr">show all players</button>`;
     $("plClr").addEventListener("click",()=>{plBest=null;drawPlayers()});
-    L.innerHTML=plBest.length?plBest.map(x=>playerRow(x.p,`has <b>${x.hn}</b> you need (${fmt(x.hv)} value) · needs <b>${x.gn}</b> of yours`)).join(""):`<li class="empty">Nobody owns anything you're missing yet.</li>`;return}
+    L.innerHTML=plBest.length?plBest.map(x=>playerRow(x.p,`has <b>${x.hn}</b> you need (${fmt(x.hv)})${x.hs?` · <b>${x.hs}</b> as spares`:""}${x.hw?` · <b class="gold">${x.hw}★</b> from your wishlist`:""}${x.gs?` · wants <b>${x.gs}</b> of your spares${x.gw?` (${x.gw}★)`:""}`:""}`)).join(""):`<li class="empty">Nobody owns anything you're missing yet.</li>`;return}
   let ps=(plCache||[]).filter(p=>!me||p.uid!==me.uid||true);
   if(plFilter)ps=ps.filter(p=>plFilter.uids.has(p.uid));else if(q)ps=ps.filter(p=>(p.name||"").toLowerCase().includes(q));
   ps=[...ps].sort((a,b)=>(isFollowing(b.uid)?1:0)-(isFollowing(a.uid)?1:0));
@@ -1897,9 +2029,12 @@ function drawPlayers(){const L=$("plList");const q=$("plQ").value.trim().toLower
 $("plList").addEventListener("click",e=>{const b=e.target.closest("[data-uid]");if(b)openProfile(b.dataset.uid)});
 $("plBestBtn").addEventListener("click",async()=>{const b=$("plBestBtn");b.disabled=true;b.textContent="Comparing collections…";
   try{if(!plCache)plCache=await window.FB.list();const all=await window.FB.allItems();const me=fbMe();const info=new Map(plCache.map(p=>[p.uid,p]));
-    const need=tradeable.filter(i=>!owned.has(i.id));const mine=tradeable.filter(i=>owned.has(i.id));
-    plBest=Object.entries(all).filter(([uid])=>info.has(uid)&&(!me||uid!==me.uid)).map(([uid,list])=>{const s=new Set(list);const hn=need.filter(i=>s.has(i.id));
-      return{p:info.get(uid),hn:hn.length,hv:hn.reduce((t,i)=>t+(i.val||0),0),gn:mine.filter(i=>!s.has(i.id)).length}}).filter(x=>x.hn>0).sort((a,b)=>b.hv-a.hv||b.hn-a.hn).slice(0,30);
+    const need=tradeable.filter(i=>!owned.has(i.id));const mySp=new Set(spares());
+    plBest=Object.entries(all).filter(([uid])=>info.has(uid)&&(!me||uid!==me.uid)).map(([uid,d])=>{const s=new Set(d.owned),sp=new Set(d.spare),tw=new Set(d.wish);
+      const hn=need.filter(i=>s.has(i.id));const hs=hn.filter(i=>sp.has(i.id)).length,hw=hn.filter(i=>wish.has(i.id)).length;
+      const canGive=tradeable.filter(i=>owned.has(i.id)&&!s.has(i.id));const gs=canGive.filter(i=>mySp.has(i.id)).length,gw=canGive.filter(i=>mySp.has(i.id)&&tw.has(i.id)).length;
+      const score=hn.reduce((t,i)=>t+(i.val||1)*(sp.has(i.id)?2:1)*(wish.has(i.id)?3:1),0)+canGive.reduce((t,i)=>t+(mySp.has(i.id)?(i.val||1)*(tw.has(i.id)?2:1):0),0)*.5;
+      return{p:info.get(uid),hn:hn.length,hv:hn.reduce((t,i)=>t+(i.val||0),0),hs,hw,gs,gw,score}}).filter(x=>x.hn>0).sort((a,b)=>b.score-a.score).slice(0,30);
     plFilter=null;$("plQ").value="";drawPlayers()}
   catch(e){$("plHint").textContent="Couldn't compare ("+(e.code||e.message)+")."}
   b.disabled=false;b.textContent="★ Find my best trade partners"});
@@ -1922,31 +2057,73 @@ async function openProfile(uid){showView("players",true);$("plMain").hidden=true
   if(!p){P.innerHTML=`<p class="pl-note">This profile is private or doesn't exist. <button class="pbtn" id="plBack">Back to players</button></p>`;$("plBack").addEventListener("click",()=>openPlayers());return}
   curProfile=p;const me=fbMe();
   if(me&&isFollowing(uid)&&me.follows[uid]!==p.count)window.FB.follow(uid,p.count).catch(()=>{});
-  const theirs=new Set(p.owned||[]);const isMe=me&&me.uid===uid;
-  const haveNeed=tradeable.filter(i=>theirs.has(i.id)&&!owned.has(i.id)).sort((a,b)=>(b.val??-1)-(a.val??-1));
-  const giveNeed=tradeable.filter(i=>owned.has(i.id)&&!theirs.has(i.id)).sort((a,b)=>(b.val??-1)-(a.val??-1));
+  const theirs=new Set(p.owned||[]),tSp=new Set(p.spare||[]),tW=new Set(p.wish||[]);const isMe=me&&me.uid===uid;const mySp=new Set(spares());
+  const rank=(a,b,f)=>f(b)-f(a)||(b.val??-1)-(a.val??-1);
+  const haveNeed=tradeable.filter(i=>theirs.has(i.id)&&!owned.has(i.id)).sort((a,b)=>rank(a,b,i=>(wish.has(i.id)?2:0)+(tSp.has(i.id)?1:0)));
+  const giveNeed=tradeable.filter(i=>owned.has(i.id)&&!theirs.has(i.id)).sort((a,b)=>rank(a,b,i=>(tW.has(i.id)?2:0)+(mySp.has(i.id)?1:0)));
+  const tagHN=i=>(tSp.has(i.id)?' · <span class="tg sp">spare</span>':"")+(wish.has(i.id)?' · <span class="tg wl">★ your wishlist</span>':"");
+  const tagGN=i=>(mySp.has(i.id)?' · <span class="tg sp">your spare</span>':"")+(tW.has(i.id)?' · <span class="tg wl">★ their wishlist</span>':"");
+  const theirSp=items.filter(i=>tSp.has(i.id)).sort((a,b)=>(b.val??-1)-(a.val??-1));
+  const theirW=items.filter(i=>tW.has(i.id)).sort((a,b)=>(b.val??-1)-(a.val??-1));
   const theirItems=items.filter(i=>theirs.has(i.id));
   const pct=p.total?(p.count/p.total*100):0;
-  const sec=(id,title,list,side,empty)=>`<section class="pl-sec"><h3>${title} <small>${list.length}</small></h3>${list.length?`<ul class="ptiles" id="${id}">${list.slice(0,60).map(i=>plTile(i,side)).join("")}</ul>${list.length>60?`<button class="pbtn pl-more" data-more="${id}">Show all ${list.length}</button>`:""}`:`<p class="pl-note">${empty}</p>`}</section>`;
+  const sec=(id,title,list,side,empty,tags)=>`<section class="pl-sec"><h3>${title} <small>${list.length}</small></h3>${list.length?`<ul class="ptiles" id="${id}">${list.slice(0,60).map(i=>plTile(i,side,tags)).join("")}</ul>${list.length>60?`<button class="pbtn pl-more" data-more="${id}">Show all ${list.length}</button>`:""}`:`<p class="pl-note">${empty}</p>`}</section>`;
   const byCat=CATS.filter(c=>c!==EVC&&!EXTRA.has(c)).map(c=>{const all=items.filter(i=>i.cat===c&&counted(i));const h=all.filter(i=>theirs.has(i.id)).length;return all.length?`<li style="--rc:${RC[c]}"><span>${c}</span><b>${h} / ${all.length}</b></li>`:""}).join("");
   const acts=isMe?"":me?`<div class="pl-acts"><button class="pbtn${isFollowing(uid)?" on":""}" id="plFollow">${isFollowing(uid)?"★ Following":"☆ Follow"}</button><button class="pbtn ok" id="plPropose">Propose trade</button></div>`:`<p class="pl-note">Sign in to follow ${esc(p.name||"this player")} or send a trade offer.</p>`;
   P.innerHTML=`<button class="pbtn" id="plBack">← All players</button>
   <div class="pl-head"><span class="pl-av big">${av(p.name)}</span><div><h2>${esc(p.name||"Unnamed")}</h2><p>${p.count} / ${p.total} items · ${pct.toFixed(1)}% · inventory value <b>${fmt(p.value||0)}</b> · updated ${ago(p.updated||0)}</p>
+  <p class="pl-rep" id="plRep"></p>
   ${p.discord?`<p class="pl-disc">Discord: <code>${esc(p.discord)}</code> <button class="pbtn" id="plDcopy">Copy</button></p>`:""}</div></div>
   ${acts}
   <ul class="pl-cats">${byCat}</ul>
   ${isMe?`<p class="pl-note">This is your public profile. Others see it like this.</p>`:
-   sec("plHN","They have, you need",haveNeed,"B","They don't have anything you're missing.")+
-   sec("plGN","You have, they need",giveNeed,"A","You don't have anything they're missing.")}
+   sec("plHN","They have, you need",haveNeed,"B","They don't have anything you're missing.",tagHN)+
+   sec("plGN","You have, they need",giveNeed,"A","You don't have anything they're missing.",tagGN)}
+  ${theirSp.length?sec("plSP","Spares for trade",theirSp,isMe?"":"B","",i=>owned.has(i.id)?"":' · <span class="need">needed</span>'):""}
+  ${theirW.length?sec("plWL","Wishlist",theirW,isMe?"":"A","",i=>owned.has(i.id)?(mySp.has(i.id)?' · <span class="tg sp">you have a spare</span>':' · you have it'):""):""}
   ${sec("plAll","Their collection",theirItems.sort((a,b)=>(b.val??-1)-(a.val??-1)),"",`Nothing checked yet.`)}`;
   $("plBack").addEventListener("click",()=>openPlayers());
+  window.FB.ratingsFor(uid).then(r=>{const el=$("plRep");if(!el||curProfile!==p)return;const n=r.up+r.down;
+    el.innerHTML=n?`<b>${Math.round(r.up/n*100)}% positive</b> · 👍 ${r.up} · 👎 ${r.down} from ${n} trade${n>1?"s":""}`:"No trade ratings yet."}).catch(()=>{});
   if($("plDcopy"))$("plDcopy").addEventListener("click",e=>{navigator.clipboard.writeText(p.discord).then(()=>{e.target.textContent="Copied"})});
   if($("plFollow"))$("plFollow").addEventListener("click",async e=>{const b=e.target;b.disabled=true;try{if(isFollowing(uid))await window.FB.unfollow(uid);else await window.FB.follow(uid,p.count);b.classList.toggle("on",isFollowing(uid));b.textContent=isFollowing(uid)?"★ Following":"☆ Follow"}catch(err){alert("Couldn't save: "+(err.code||err.message))}b.disabled=false});
   if($("plPropose"))$("plPropose").addEventListener("click",()=>{setPartner({uid,name:p.name||"Unnamed"});showView("trade")});
-  const lists={plHN:[haveNeed,"B"],plGN:[giveNeed,"A"],plAll:[theirItems,""]};
-  P.querySelectorAll("[data-more]").forEach(b=>b.addEventListener("click",()=>{const[l,s]=lists[b.dataset.more];$(b.dataset.more).innerHTML=l.map(i=>plTile(i,s)).join("");b.remove()}))}
+  const lists={plHN:[haveNeed,"B",tagHN],plGN:[giveNeed,"A",tagGN],plSP:[theirSp,isMe?"":"B"],plWL:[theirW,isMe?"":"A"],plAll:[theirItems,""]};
+  P.querySelectorAll("[data-more]").forEach(b=>b.addEventListener("click",()=>{const[l,s,t]=lists[b.dataset.more];$(b.dataset.more).innerHTML=l.map(i=>plTile(i,s,t)).join("");b.remove()}))}
 $("plProf").addEventListener("click",e=>{const a=e.target.closest("[data-add]");if(a){addTrade(a.dataset.add,a.dataset.id);if(curProfile&&!partner&&fbMe()&&fbMe().uid!==curProfile.uid)setPartner({uid:curProfile.uid,name:curProfile.name||"Unnamed"});a.textContent="✓";a.disabled=true;return}
   const o=e.target.closest("[data-open]");if(o)openItem(o.dataset.open)});
+
+/* ---------- share image ---------- */
+function shareCanvas(){const W=1200,H=675,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+  const D='"Bungee","Arial Black",sans-serif',B='"Rubik",system-ui,sans-serif',M='"JetBrains Mono",monospace';
+  const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,"#1d1640");g.addColorStop(1,"#0e0c18");x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.fillStyle="rgba(255,255,255,.05)";for(let i=0;i<W;i+=28)for(let j=0;j<H;j+=28){x.beginPath();x.arc(i,j,1.2,0,7);x.fill()}
+  const s=catStats("All"),me=fbMe(),name=(me&&me.name)||who||"";const val=items.filter(i=>counted(i)&&owned.has(i.id)).reduce((t,i)=>t+(i.val||0)*(qty[i.id]||1),0);
+  x.fillStyle="#ffc94d";x.font=`600 22px ${M}`;x.fillText("MURDER MYSTERY 2 · COLLECTION",60,78);
+  x.fillStyle="#f3f0ff";x.font=`58px ${D}`;x.fillText(name?name.slice(0,18):"My collection",60,150);
+  // ring
+  const cx=230,cy=360,r=130;x.lineWidth=26;x.strokeStyle="rgba(255,255,255,.08)";x.beginPath();x.arc(cx,cy,r,0,7);x.stroke();
+  const rg=x.createLinearGradient(cx-r,cy-r,cx+r,cy+r);rg.addColorStop(0,"#ffc94d");rg.addColorStop(1,"#3fe3a3");x.strokeStyle=rg;x.lineCap="round";
+  if(s.h){x.beginPath();x.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*Math.max(s.p,.01));x.stroke()}
+  x.textAlign="center";x.fillStyle="#f3f0ff";x.font=`64px ${D}`;x.fillText((s.p>0&&s.p<.1?(s.p*100).toFixed(1):Math.floor(s.p*100))+"%",cx,cy+18);
+  x.fillStyle="#9a93b8";x.font=`500 22px ${M}`;x.fillText(`${s.h} / ${s.n} items`,cx,cy+58);x.textAlign="left";
+  // stats
+  const st=[["Inventory value",fmt(val),"#ffc94d"],["Spares for trade",String(spares().reduce((t,id)=>t+qty[id]-1,0)),"#3fe3a3"],["Wishlist",String(wish.size),"#ff9a52"]];
+  st.forEach((v,k)=>{const y=560;const X=60+k*190;x.fillStyle="#9a93b8";x.font=`500 17px ${B}`;x.fillText(v[0],X,y);x.fillStyle=v[2];x.font=`30px ${D}`;x.fillText(v[1],X,y+40)});
+  // category bars
+  const cats=CATS.filter(c=>c!==EVC&&!EXTRA.has(c));const bx=640,bw=480;let y=200;
+  x.fillStyle="#f3f0ff";x.font=`26px ${D}`;x.fillText("By rarity",bx,160);
+  for(const ct of cats){const t=catStats(ct);x.fillStyle="#c9c3e6";x.font=`600 20px ${B}`;x.fillText(ct,bx,y);x.textAlign="right";x.fillStyle="#9a93b8";x.font=`500 18px ${M}`;x.fillText(`${t.h}/${t.n}`,bx+bw,y);x.textAlign="left";
+    x.fillStyle="rgba(255,255,255,.08)";x.fillRect(bx,y+10,bw,10);x.fillStyle=RC[ct];x.fillRect(bx,y+10,Math.max(bw*t.p,t.h?4:0),10);y+=46}
+  x.fillStyle="#6f6890";x.font=`500 18px ${M}`;x.fillText("mm2inventory.netlify.app",60,H-36);x.textAlign="right";x.fillText(new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),W-60,H-36);x.textAlign="left";
+  return c}
+async function openShare(){try{await document.fonts.ready}catch(e){}const c=shareCanvas();const url=c.toDataURL("image/png");lastFocus=document.activeElement;cur=null;
+  const mc=$("mcard");mc.style.setProperty("--rc","var(--gold)");mc.className="mcard shotcard";
+  $("mbody").innerHTML=`<div class="shot"><h3 id="mtitle">Share your collection</h3><img src="${url}" alt="Image of your collection progress"><div class="mlinks"><a class="b" id="shotDl" download="mm2-collection.png" href="${url}">Download PNG</a>${navigator.clipboard&&window.ClipboardItem?'<button class="b" id="shotCp">Copy image</button>':""}<button class="b" id="shotSh" hidden>Share…</button></div><p class="mnote" id="shotMsg">Post it on Discord or TikTok. Make your profile public under Players so people can open your full list.</p></div>`;
+  if($("shotCp"))$("shotCp").addEventListener("click",()=>c.toBlob(b=>navigator.clipboard.write([new ClipboardItem({"image/png":b})]).then(()=>$("shotMsg").textContent="Image copied. Paste it into Discord with Ctrl+V.",()=>$("shotMsg").textContent="Couldn't copy. Use Download instead.")));
+  c.toBlob(b=>{const file=new File([b],"mm2-collection.png",{type:"image/png"});if(navigator.canShare&&navigator.canShare({files:[file]})){const s=$("shotSh");s.hidden=false;s.addEventListener("click",()=>navigator.share({files:[file],title:"My MM2 collection"}).catch(()=>{}))}});
+  $("modal").hidden=false;document.body.style.overflow="hidden";$("mclose").focus()}
+$("shotBtn").addEventListener("click",openShare);
 tabs();setView(view);render();acct("wait");
 /* ---------- live values (updated by the GitHub Action) ---------- */
 (async()=>{try{
@@ -1955,12 +2132,12 @@ tabs();setView(view);render();acct("wait");
   if(v&&v.v){for(const[id,x]of Object.entries(v.v)){const i=byId.get(id);if(!i||x[0]==null)continue;i.val=x[0];i.dem=x[1];i.stab=x[2]}
     if(v.updated){VDATE=new Date(v.updated+"T12:00:00Z").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"});document.querySelectorAll(".vdate").forEach(e=>e.textContent=VDATE)}}
   if(h)for(const[id,a]of Object.entries(h))if(a&&a.length)VALHIST[id]=a;
-  if(v||h){render();if(!$("tradeView").hidden)renderTrade();if(cur&&!$("modal").hidden)openItem(cur)}
+  if(v||h){render();if(!$("tradeView").hidden)renderTrade();if(!$("mkView").hidden)renderMarket();if(cur&&!$("modal").hidden)openItem(cur)}
 }catch(e){}})();
-if(location.hash==="#trade")showView("trade");else if(location.hash==="#players")showView("players");
+if(location.hash==="#trade")showView("trade");else if(location.hash==="#players")showView("players");else if(location.hash==="#market")showView("market");
 else if(location.hash.startsWith("#u/")){const uid=decodeURIComponent(location.hash.slice(3));showView("players",true);$("plMain").hidden=true;$("plProf").hidden=false;$("plProf").innerHTML='<p class="pl-note">Loading profile…</p>';
   const go=()=>openProfile(uid);if(window.FB&&window.FB.ready)go();else{window.addEventListener("fbready",go,{once:true});setTimeout(()=>{if(!window.FB)go()},6000)}}
-window.MM={getOwned:()=>[...owned],setOwned:a=>{owned=new Set(a);try{localStorage.setItem(KEY,JSON.stringify([...owned]))}catch(e){}render()},setCloud:(c,name)=>{cloud=c;who=name||""},save:()=>save(),acct:s=>acct(s),summary:()=>mySummary(),refreshPlayers:()=>{loadOffers();if(!$("playView").hidden&&!$("plMain").hidden){plCache=null;openPlayers()}else renderMe()}};
+window.MM={getState:()=>({owned:[...owned],qty:{...qty},wish:[...wish]}),setState:s=>{owned=new Set(s.owned||[]);qty=s.qty||{};wish=new Set(s.wish||[]);save();render()},spares:()=>spares(),wishList:()=>[...wish],getOwned:()=>[...owned],setOwned:a=>{owned=new Set(a);try{localStorage.setItem(KEY,JSON.stringify([...owned]))}catch(e){}render()},setCloud:(c,name)=>{cloud=c;who=name||""},save:()=>save(),acct:s=>acct(s),summary:()=>mySummary(),refreshPlayers:()=>{loadOffers();if(!$("playView").hidden&&!$("plMain").hidden){plCache=null;openPlayers()}else renderMe()}};
 </script>
 
 <script type="module">
@@ -1972,7 +2149,7 @@ const firebaseConfig = {
 };
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, query, where, orderBy, limit, getDocs, writeBatch, deleteField } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, query, where, orderBy, limit, getDocs, writeBatch, deleteField, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const MM = window.MM;
 if (!firebaseConfig.apiKey) { MM.acct("setup"); }
 else {
@@ -1986,7 +2163,7 @@ else {
     const p = { name: me.name, count: sum.count, total: sum.total, value: sum.value, updated: Date.now() };
     if (me.discord) p.discord = me.discord;
     b.set(doc(fs, "profiles", me.uid), p);
-    b.set(doc(fs, "pitems", me.uid), { owned });
+    b.set(doc(fs, "pitems", me.uid), { owned, spare: MM.spares(), wish: MM.wishList() });
     await b.commit();
   }
 
@@ -2007,11 +2184,12 @@ else {
     async get(uid) {
       const [p, i] = await Promise.all([getDoc(doc(fs, "profiles", uid)), getDoc(doc(fs, "pitems", uid))]);
       if (!p.exists()) return null;
-      return { uid, ...p.data(), owned: i.exists() ? i.data().owned || [] : [] };
+      const d = i.exists() ? i.data() : {};
+      return { uid, ...p.data(), owned: d.owned || [], spare: d.spare || [], wish: d.wish || [] };
     },
     async allItems() {
       const s = await getDocs(query(collection(fs, "pitems"), limit(300)));
-      const o = {}; s.docs.forEach(d => o[d.id] = d.data().owned || []); return o;
+      const o = {}; s.docs.forEach(d => { const x = d.data(); o[d.id] = { owned: x.owned || [], spare: x.spare || [], wish: x.wish || [] }; }); return o;
     },
     async follow(uid, count) {
       me.follows = { ...(me.follows || {}), [uid]: count };
@@ -2021,11 +2199,39 @@ else {
       const f = { ...(me.follows || {}) }; delete f[uid]; me.follows = f;
       await updateDoc(doc(fs, "users", me.uid), { ["follows." + uid]: deleteField() });
     },
-    async sendOffer(to, give, get, msg) {
+    async sendOffer(to, give, get, msg, counterOf) {
       const o = { from: me.uid, fromName: me.name || auth.currentUser.displayName || "Someone", to: to.uid, toName: to.name, give, get, status: "open", created: Date.now(), updated: Date.now() };
       if (msg) o.msg = msg;
       if (me.discord) o.fromDiscord = me.discord;
+      if (counterOf) o.counterOf = counterOf;
       await addDoc(collection(fs, "offers"), o);
+      if (counterOf) await updateDoc(doc(fs, "offers", counterOf), { status: "countered", updated: Date.now() });
+    },
+    watchOffers(cb, onErr) {
+      let a = [], b = [], n = 0;
+      const emit = () => { if (n >= 2) cb([...a, ...b]); };
+      const map = s => s.docs.map(d => ({ id: d.id, ...d.data() }));
+      const u1 = onSnapshot(query(collection(fs, "offers"), where("to", "==", me.uid), limit(60)), s => { a = map(s); if (n < 2) n++; emit(); }, onErr);
+      const u2 = onSnapshot(query(collection(fs, "offers"), where("from", "==", me.uid), limit(60)), s => { b = map(s); if (n < 2) n++; emit(); }, onErr);
+      return () => { u1(); u2(); };
+    },
+    async chatList(id) {
+      const s = await getDocs(query(collection(fs, "offers", id, "msgs"), orderBy("at"), limit(200)));
+      return s.docs.map(d => ({ id: d.id, ...d.data() }));
+    },
+    async chatSend(id, text) {
+      const at = Date.now();
+      await addDoc(collection(fs, "offers", id, "msgs"), { by: me.uid, name: me.name || auth.currentUser.displayName || "Someone", text, at });
+      await updateDoc(doc(fs, "offers", id), { lastMsgAt: at, lastMsgBy: me.uid });
+    },
+    rate: (offer, target, v) => setDoc(doc(fs, "ratings", offer + "_" + me.uid), { offer, by: me.uid, target, v, at: Date.now() }),
+    async myRatings() {
+      const s = await getDocs(query(collection(fs, "ratings"), where("by", "==", me.uid), limit(200)));
+      const o = {}; s.docs.forEach(d => o[d.data().offer] = d.data().v); return o;
+    },
+    async ratingsFor(uid) {
+      const s = await getDocs(query(collection(fs, "ratings"), where("target", "==", uid), limit(500)));
+      let up = 0, down = 0; s.docs.forEach(d => d.data().v > 0 ? up++ : down++); return { up, down };
     },
     async listOffers() {
       const [a, b] = await Promise.all([
@@ -2056,9 +2262,15 @@ else {
       const data = snap.exists() ? snap.data() : {};
       me = { uid: u.uid, name: data.pname || "", pub: !!data.pub, discord: data.discord || "", follows: data.follows || {} };
       const remote = Array.isArray(data.owned) ? data.owned : [];
-      const merged = [...new Set([...remote, ...MM.getOwned()])];
-      MM.setOwned(merged);
-      if (merged.length > remote.length || me.pub) MM.save(); else MM.acct("ok");
+      const loc = MM.getState();
+      const merged = [...new Set([...remote, ...loc.owned])];
+      const rq = data.qty || {}, q = { ...rq };
+      for (const k in loc.qty) q[k] = Math.max(q[k] || 0, loc.qty[k]);
+      const rw = Array.isArray(data.wish) ? data.wish : [];
+      const w = [...new Set([...rw, ...loc.wish])];
+      MM.setState({ owned: merged, qty: q, wish: w });
+      const changed = merged.length > remote.length || w.length > rw.length || JSON.stringify(q) !== JSON.stringify(rq);
+      if (changed || me.pub) MM.save(); else MM.acct("ok");
     } catch (e) { me = { uid: u.uid, name: "", pub: false, discord: "", follows: {} }; MM.acct("err"); }
     ready(); MM.refreshPlayers();
   });
