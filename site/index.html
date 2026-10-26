@@ -285,6 +285,32 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
 .pl-more{margin-top:8px}
 .pt .mi{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;overflow:hidden;flex:none;color:var(--dim);background:radial-gradient(70% 70% at 50% 55%,color-mix(in srgb,var(--rc) 35%,transparent),transparent 72%)}.pt .mi img{width:90%;height:90%;object-fit:contain}.pt .mi svg{width:18px;height:18px}
 @media (max-width:560px){.pl-row{grid-template-columns:auto 1fr auto}.pl-bar{display:none}}
+
+.pbtn.ok{background:var(--gold);color:#241a00;border-color:var(--gold);font-weight:700}.pbtn.on{border-color:var(--gold);color:var(--gold)}.pbtn:disabled{opacity:.6;cursor:default}
+.pl-card summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none}.pl-card summary::-webkit-details-marker{display:none}
+.pl-card summary::after{content:"▾";margin-left:auto;color:var(--muted)}.pl-card[open] summary::after{content:"▴"}
+.pl-st{font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--line);border-radius:99px;padding:2px 8px;color:var(--muted)}.pl-st.on{color:#06281a;background:var(--owned);border-color:var(--owned)}
+.pl-fields{display:flex;flex-wrap:wrap;gap:10px}.pl-name small{color:var(--dim)}
+#plMain,#plProf{display:grid;gap:12px;align-content:start}.pl-tools{display:flex;flex-wrap:wrap;gap:8px}
+.vbn{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:99px;background:var(--danger);color:#fff;font-size:.7rem;font-weight:700;padding:0 5px;margin-left:4px}
+.pl-row.fol{border-color:color-mix(in srgb,var(--gold) 50%,var(--line))}.star{color:var(--gold);font-style:normal}
+.pl-n .new{font-style:normal;font-size:.72rem;font-weight:700;color:#06281a;background:var(--owned);border-radius:99px;padding:1px 7px;margin-left:6px}
+.pl-acts{display:flex;flex-wrap:wrap;gap:8px}
+.pl-disc{margin:6px 0 0;font-size:.85rem;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}.pl-disc code,.ofr-msg code{font-family:var(--f-mono);font-size:.8rem;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
+.ofr-h{font-family:var(--f-display);font-weight:400;font-size:.95rem;margin:6px 0 0;color:var(--muted)}
+.ofr{border:1px solid var(--line);border-radius:12px;background:var(--bg2);padding:12px;display:grid;gap:10px}.ofr-open{border-color:color-mix(in srgb,var(--gold) 45%,var(--line))}.ofr-declined,.ofr-cancelled{opacity:.65}
+.ofr header{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.ofr-who{display:flex;gap:10px;align-items:center;text-align:left;font:inherit;color:var(--ink);background:none;border:0;padding:0;cursor:pointer;min-width:0}.ofr-who small{display:block;color:var(--muted);font-size:.76rem}
+.ofr-msg{margin:0;font-size:.88rem;color:var(--muted)}
+.ofr-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ofr-cols h4{margin:0 0 6px;font-size:.85rem;display:flex;justify-content:space-between}.ofr-cols h4 small{font-family:var(--f-mono);color:var(--gold)}
+.ptiles.one{grid-template-columns:1fr}.pt .need{color:var(--owned)}
+.ofr footer{display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:0;border:0;font-size:inherit;color:inherit}
+.vbadge.sm{font-size:.75rem;padding:3px 9px;min-width:0;height:auto;border-radius:8px}
+.tpartner{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--gold);border-radius:var(--r);padding:12px 14px;margin-bottom:16px}
+.tp-txt{display:grid;flex:1 1 240px;min-width:0}.tp-txt small{color:var(--muted);font-size:.8rem}
+.tpartner input{font:inherit;font-size:.88rem;color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;flex:1 1 200px;min-width:0}
+.tpartner .pl-msg{flex-basis:100%}
+@media (max-width:560px){.ofr-cols{grid-template-columns:1fr}}
 </style>
 
 <header class="hero">
@@ -294,7 +320,7 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
       <h1>MM2 Collection<span>Tracker</span></h1>
       <p class="lede">Every knife, gun and pet from Ancient to Common. Tick what you own, and whatever is left is your trade list.</p>
       <div class="acctrow"><p class="acct" id="acct">Connecting…</p><button class="gbtn" id="authBtn" hidden><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span>Sign in with Google</span></button></div>
-      <div class="views" role="group" aria-label="Section"><button id="vCol" aria-pressed="true">Collection</button><button id="vTrade" aria-pressed="false">Trade checker</button><button id="vPlay" aria-pressed="false">Players</button></div>
+      <div class="views" role="group" aria-label="Section"><button id="vCol" aria-pressed="true">Collection</button><button id="vTrade" aria-pressed="false">Trade checker</button><button id="vPlay" aria-pressed="false">Players <span class="vbn" id="vPlayN" hidden></span></button></div>
     </div>
     <div class="ringbox">
       <div class="ring" aria-hidden="true">
@@ -344,6 +370,7 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
 </div>
 
 <section class="wrap tc" id="tradeView" hidden aria-label="Trade checker">
+  <div class="tpartner" id="tPartner" hidden></div>
   <div class="tc-grid">
     <div class="side" id="sideA"><h2>You give <small id="cntA">0 items</small></h2>
       <div class="picker"><input type="search" id="pickA" placeholder="Add an item you give…" aria-label="Add an item you give" autocomplete="off"><ul class="sugg" id="suggA" hidden></ul></div>
@@ -361,6 +388,8 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
 <section class="wrap pl" id="playView" hidden aria-label="Players">
   <div id="plMe"></div>
   <div id="plMain">
+    <div id="plOffers"></div>
+    <div class="pl-tools" id="plTools"><button class="pbtn ok" id="plBestBtn">★ Find my best trade partners</button></div>
     <div class="picker pl-search"><input type="search" id="plQ" placeholder="Search a player, or an item to see who owns it…" aria-label="Search players or items" autocomplete="off"><ul class="sugg" id="plSugg" hidden></ul></div>
     <p class="pl-hint" id="plHint"></p>
     <ul class="plist" id="plList"></ul>
@@ -1773,71 +1802,150 @@ $("vCol").addEventListener("click",()=>showView("col"));$("vTrade").addEventList
 
 /* ---------- players / public profiles ---------- */
 const PROFILE_URL="https://mm2inventory.netlify.app/";
-let plCache=null,plFilter=null;
+let plCache=null,plFilter=null,plBest=null,offers=null,partner=null;
 function mySummary(){const c=items.filter(counted);const mine=c.filter(i=>owned.has(i.id));
   return{count:mine.length,total:c.length,value:mine.reduce((s,i)=>s+(i.val||0),0)}}
 function ago(t){const d=(Date.now()-t)/864e5;return d<1/24?"just now":d<1?Math.round(d*24)+"h ago":Math.round(d)+"d ago"}
+const av=n=>esc((n||"?")[0].toUpperCase());
+const fbMe=()=>window.FB&&window.FB.me();
+const isFollowing=uid=>{const m=fbMe();return !!(m&&m.follows&&uid in m.follows)};
 function plTile(i,side){return `<li class="pt" style="--rc:${RC[i.cat]}"><button class="pt-open" data-open="${esc(i.id)}"><span class="mi">${miniArt(i)}</span><span class="pn">${esc(i.name)}<small>${i.cat} · ${fmt(i.val)}</small></span></button>${side?`<button class="pt-add" data-add="${side}" data-id="${esc(i.id)}" title="${side==="B"?"Add to “You get”":"Add to “You give”"}" aria-label="Add to trade">+</button>`:""}</li>`}
+
+/* your profile card */
 function renderMe(){const el=$("plMe");const fb=window.FB;
-  if(!fb){el.innerHTML=`<p class="pl-note">Player profiles work on <a href="${PROFILE_URL}#players" target="_blank" rel="noopener">mm2inventory.netlify.app</a> (sign in with Google there).</p>`;return}
+  if(!fb){el.innerHTML=`<p class="pl-note">Player profiles, trade offers and friends work on <a href="${PROFILE_URL}#players" target="_blank" rel="noopener">mm2inventory.netlify.app</a> (sign in with Google there).</p>`;return}
   const me=fb.me();
-  if(!me){el.innerHTML=`<p class="pl-note">Sign in with Google (top of the page) to get your own public profile and a link you can share on Discord.</p>`;return}
+  if(!me){el.innerHTML=`<p class="pl-note">Sign in with Google (top of the page) to get your own public profile, send trade offers and follow friends.</p>`;return}
   const link=PROFILE_URL+"#u/"+me.uid;
-  el.innerHTML=`<div class="pl-card"><h2>Your profile</h2>
-    <label class="pl-name">Roblox name <input id="plName" maxlength="24" value="${esc(me.name||"")}" placeholder="e.g. Txrqen"></label>
+  el.innerHTML=`<details class="pl-card"${me.pub?"":" open"}><summary><h2>Your profile</h2><span class="pl-st ${me.pub?"on":""}">${me.pub?"Public":"Private"}</span></summary>
+    <div class="pl-fields"><label class="pl-name">Roblox name <input id="plName" maxlength="24" value="${esc(me.name||"")}" placeholder="e.g. Txrqen"></label>
+    <label class="pl-name">Discord <small>(optional)</small> <input id="plDisc" maxlength="40" value="${esc(me.discord||"")}" placeholder="e.g. txrqen"></label></div>
     <label class="pl-pub"><input type="checkbox" id="plPub" ${me.pub?"checked":""}> Make my collection public</label>
-    <p class="pl-sub">${me.pub?`Anyone with the link can see what you own. <span class="pl-link"><code>${esc(link)}</code><button id="plCopy">Copy link</button><button id="plView">View</button></span>`:"Your collection is private. Turn this on to show up in the player list."}</p>
-    <p class="pl-msg" id="plMsg" role="status"></p></div>`;
+    <p class="pl-sub">${me.pub?`Anyone with the link can see what you own${me.discord?" and your Discord name":""}. <span class="pl-link"><code>${esc(link)}</code><button class="pbtn" id="plCopy">Copy link</button><button class="pbtn" id="plView">View</button></span>`:"Your collection is private. Turn this on to show up in the player list and get trade offers."}</p>
+    <p class="pl-msg" id="plMsg" role="status"></p></details>`;
   const msg=t=>{$("plMsg").textContent=t};
-  const apply=async()=>{const n=$("plName").value.trim().slice(0,24);const on=$("plPub").checked;if(on&&!n){msg("Enter your Roblox name first.");$("plPub").checked=false;return}
-    msg("Saving…");try{await fb.setPublic(on,n,[...owned],mySummary());plCache=null;renderMe();openPlayers()}catch(e){msg("Couldn't save: "+(e.code||e.message))}};
+  const apply=async()=>{const n=$("plName").value.trim().slice(0,24),d=$("plDisc").value.trim().slice(0,40);const on=$("plPub").checked;
+    if(on&&!n){msg("Enter your Roblox name first.");$("plPub").checked=false;return}
+    msg("Saving…");try{await fb.setPublic(on,n,d,[...owned],mySummary());plCache=null;plBest=null;renderMe();if(!$("plMain").hidden)openPlayers()}catch(e){msg("Couldn't save: "+(e.code||e.message))}};
   $("plPub").addEventListener("change",apply);
-  $("plName").addEventListener("change",()=>{if($("plPub").checked)apply()});
+  ["plName","plDisc"].forEach(id=>$(id).addEventListener("change",()=>{if($("plPub").checked)apply()}));
   if(me.pub){$("plCopy").addEventListener("click",()=>{navigator.clipboard.writeText(link).then(()=>msg("Link copied."),()=>msg(link))});$("plView").addEventListener("click",()=>openProfile(me.uid))}}
+
+/* trade offers inbox */
+const offerTotal=l=>l.reduce((s,x)=>{const i=byId.get(x.id);return s+((i&&i.val)||0)*x.q},0);
+const offerList=l=>l.map(x=>{const i=byId.get(x.id);if(!i)return"";return `<li class="pt" style="--rc:${RC[i.cat]}"><button class="pt-open" data-open="${esc(i.id)}"><span class="mi">${miniArt(i)}</span><span class="pn">${x.q>1?x.q+"× ":""}${esc(i.name)}<small>${i.cat} · ${fmt(i.val)}${!owned.has(i.id)?' · <span class="need">needed</span>':""}</small></span></button></li>`}).join("")||`<li class="pl-note">nothing</li>`;
+async function loadOffers(){const fb=window.FB;if(!fb||!fb.me()){offers=null;drawOffers();return}
+  try{offers=await fb.listOffers()}catch(e){offers={err:e.code||e.message}}drawOffers()}
+function drawOffers(){const el=$("plOffers");const me=fbMe();const badge=$("vPlayN");
+  if(!me||!offers){el.innerHTML="";if(badge)badge.hidden=true;return}
+  if(offers.err){el.innerHTML=`<p class="pl-note">Couldn't load trade offers (${esc(offers.err)}).</p>`;return}
+  const inc=offers.filter(o=>o.to===me.uid),out=offers.filter(o=>o.from===me.uid);
+  const openIn=inc.filter(o=>o.status==="open").length;if(badge){badge.hidden=!openIn;badge.textContent=openIn}
+  if(!offers.length){el.innerHTML=`<p class="pl-note">No trade offers yet. Open a player's profile and press <b>Propose trade</b> to send one.</p>`;return}
+  const card=o=>{const incoming=o.to===me.uid;const youGive=incoming?o.get:o.give,youGet=incoming?o.give:o.get;
+    const g=offerTotal(youGive),r=offerTotal(youGet),pct=g?(r-g)/g:(r?1:0);const k=pct>=.05?"win":pct<=-.05?"lose":"fair";
+    const other=incoming?o.fromName:o.toName,otherUid=incoming?o.from:o.to;
+    const st={open:incoming?"Waiting for your answer":"Waiting for their answer",accepted:"Accepted · meet in MM2 to trade",declined:"Declined",cancelled:"Cancelled"}[o.status]||o.status;
+    return `<article class="ofr ofr-${o.status}" data-oid="${esc(o.id)}"><header><button class="ofr-who" data-uid="${esc(otherUid)}"><span class="pl-av">${av(other)}</span><span>${incoming?"From":"To"} <b>${esc(other||"Unnamed")}</b><small>${ago(o.created||0)} · ${st}</small></span></button><span class="vbadge sm ${k}">${k.toUpperCase()}</span></header>
+      ${o.msg?`<p class="ofr-msg">“${esc(o.msg)}”</p>`:""}
+      ${incoming&&o.fromDiscord?`<p class="ofr-msg">Discord: <code>${esc(o.fromDiscord)}</code></p>`:""}
+      <div class="ofr-cols"><div><h4>You give <small>${fmt(g)}</small></h4><ul class="ptiles one">${offerList(youGive)}</ul></div><div><h4>You get <small>${fmt(r)}</small></h4><ul class="ptiles one">${offerList(youGet)}</ul></div></div>
+      <footer>${o.status==="open"?(incoming?`<button class="pbtn ok" data-act="accepted">Accept</button><button class="pbtn" data-act="declined">Decline</button>`:`<button class="pbtn" data-act="cancelled">Cancel offer</button>`):""}<button class="pbtn" data-act="load">Open in trade checker</button>${o.status!=="open"?`<button class="pbtn" data-act="delete">Remove</button>`:""}</footer></article>`};
+  const openFirst=(a,b)=>(a.status==="open"?0:1)-(b.status==="open"?0:1)||(b.created||0)-(a.created||0);
+  el.innerHTML=`<details class="pl-card" ${openIn?"open":""}><summary><h2>Trade offers</h2>${openIn?`<span class="pl-st on">${openIn} new</span>`:`<span class="pl-st">${offers.length}</span>`}</summary>
+    ${inc.length?`<h3 class="ofr-h">Received</h3>${inc.sort(openFirst).map(card).join("")}`:""}
+    ${out.length?`<h3 class="ofr-h">Sent</h3>${out.sort(openFirst).map(card).join("")}`:""}</details>`}
+$("plOffers").addEventListener("click",async e=>{const w=e.target.closest("[data-uid]");if(w){openProfile(w.dataset.uid);return}
+  const op=e.target.closest("[data-open]");if(op){openItem(op.dataset.open);return}
+  const b=e.target.closest("[data-act]");if(!b)return;const oid=b.closest("[data-oid]").dataset.oid;const o=offers.find(x=>x.id===oid);if(!o)return;const me=fbMe();
+  if(b.dataset.act==="load"){const incoming=o.to===me.uid;trade={A:{},B:{}};(incoming?o.get:o.give).forEach(x=>trade.A[x.id]=x.q);(incoming?o.give:o.get).forEach(x=>trade.B[x.id]=x.q);saveTrade();showView("trade");return}
+  b.disabled=true;try{if(b.dataset.act==="delete")await window.FB.deleteOffer(oid);else await window.FB.setOfferStatus(oid,b.dataset.act);await loadOffers()}catch(err){b.disabled=false;alert("Couldn't update the offer: "+(err.code||err.message))}});
+
+/* propose a trade: partner banner in the trade checker */
+function setPartner(p){partner=p;drawPartner()}
+function drawPartner(){const el=$("tPartner");if(!el)return;if(!partner){el.hidden=true;return}el.hidden=false;
+  el.innerHTML=`<span class="pl-av">${av(partner.name)}</span><div class="tp-txt"><b>Trade offer for ${esc(partner.name)}</b><small>“You give” is what you offer, “You get” is what you want from them. Add items on both sides, then send.</small></div>
+  <input id="tpMsg" maxlength="200" placeholder="Message (optional)"><button class="pbtn ok" id="tpSend">Send offer</button><button class="pbtn" id="tpX" aria-label="Stop proposing">✕</button><p class="pl-msg" id="tpInfo" role="status"></p>`;
+  $("tpX").addEventListener("click",()=>setPartner(null));
+  $("tpSend").addEventListener("click",async()=>{const give=Object.entries(trade.A).map(([id,q])=>({id,q})),get=Object.entries(trade.B).map(([id,q])=>({id,q}));
+    if(!give.length&&!get.length){$("tpInfo").textContent="Add items first.";return}
+    $("tpSend").disabled=true;$("tpInfo").textContent="Sending…";
+    try{await window.FB.sendOffer(partner,give,get,$("tpMsg").value.trim().slice(0,200));$("tpInfo").textContent="Sent! "+partner.name+" sees it under Players → Trade offers.";loadOffers();setTimeout(()=>setPartner(null),2500)}
+    catch(e){$("tpSend").disabled=false;$("tpInfo").textContent="Couldn't send: "+(e.code||e.message)}})}
+
+/* players list */
 async function openPlayers(){$("plProf").hidden=true;$("plMain").hidden=false;renderMe();
   try{history.replaceState(null,"","#players")}catch(e){}
-  const fb=window.FB;const L=$("plList");if(!fb){L.innerHTML="";$("plHint").textContent="";return}
+  const fb=window.FB;const L=$("plList");if(!fb){L.innerHTML="";$("plHint").textContent="";$("plTools").hidden=true;return}
+  $("plTools").hidden=false;loadOffers();
   if(!plCache){L.innerHTML=`<li class="empty">Loading players…</li>`;try{plCache=await fb.list()}catch(e){L.innerHTML=`<li class="empty">Couldn't load players (${esc(e.code||e.message)}).</li>`;return}}
   drawPlayers()}
-function drawPlayers(){const L=$("plList");const q=$("plQ").value.trim().toLowerCase();
-  let ps=plCache||[];if(plFilter)ps=ps.filter(p=>plFilter.uids.has(p.uid));else if(q)ps=ps.filter(p=>(p.name||"").toLowerCase().includes(q));
-  $("plHint").innerHTML=plFilter?`Players who own <b>${esc(plFilter.name)}</b> (${ps.length}) <button class="pbtn" id="plClr">show all</button>`:`${(plCache||[]).length} public collection${(plCache||[]).length===1?"":"s"}. Search a name, or pick an item to see who owns it.`;
+function playerRow(p,extra){const pct=p.total?Math.floor(p.count/p.total*100):0;const me=fbMe();const f=isFollowing(p.uid);
+  const nw=f&&me.follows[p.uid]!=null&&p.count>me.follows[p.uid]?p.count-me.follows[p.uid]:0;
+  return `<li><button class="pl-row${f?" fol":""}" data-uid="${esc(p.uid)}"><span class="pl-av">${av(p.name)}</span><span class="pl-n"><span>${f?'<i class="star" aria-label="Following">★</i> ':""}${esc(p.name||"Unnamed")}${nw?`<em class="new">+${nw} new</em>`:""}</span><small>${extra||`${p.count} / ${p.total} · updated ${ago(p.updated||0)}`}</small></span><span class="pl-bar"><i style="width:${pct}%"></i></span><span class="pl-v">${fmt(p.value||0)}</span></button></li>`}
+function drawPlayers(){const L=$("plList");const q=$("plQ").value.trim().toLowerCase();const me=fbMe();
+  if(plBest){$("plHint").innerHTML=`<b>Best trade partners</b>: players who own the most of what you're missing. <button class="pbtn" id="plClr">show all players</button>`;
+    $("plClr").addEventListener("click",()=>{plBest=null;drawPlayers()});
+    L.innerHTML=plBest.length?plBest.map(x=>playerRow(x.p,`has <b>${x.hn}</b> you need (${fmt(x.hv)} value) · needs <b>${x.gn}</b> of yours`)).join(""):`<li class="empty">Nobody owns anything you're missing yet.</li>`;return}
+  let ps=(plCache||[]).filter(p=>!me||p.uid!==me.uid||true);
+  if(plFilter)ps=ps.filter(p=>plFilter.uids.has(p.uid));else if(q)ps=ps.filter(p=>(p.name||"").toLowerCase().includes(q));
+  ps=[...ps].sort((a,b)=>(isFollowing(b.uid)?1:0)-(isFollowing(a.uid)?1:0));
+  const n=(plCache||[]).length;
+  $("plHint").innerHTML=plFilter?`Players who own <b>${esc(plFilter.name)}</b> (${ps.length}) <button class="pbtn" id="plClr">show all</button>`:`${n} public collection${n===1?"":"s"}. Players you follow are at the top.`;
   if($("plClr"))$("plClr").addEventListener("click",()=>{plFilter=null;$("plQ").value="";drawPlayers()});
-  L.innerHTML=ps.length?ps.map(p=>{const pct=p.total?Math.floor(p.count/p.total*100):0;return `<li><button class="pl-row" data-uid="${esc(p.uid)}"><span class="pl-av">${esc((p.name||"?")[0].toUpperCase())}</span><span class="pl-n">${esc(p.name||"Unnamed")}<small>${p.count} / ${p.total} · updated ${ago(p.updated||0)}</small></span><span class="pl-bar"><i style="width:${pct}%"></i></span><span class="pl-v">${fmt(p.value||0)}</span></button></li>`}).join(""):`<li class="empty">${plFilter?"Nobody with a public profile owns this yet.":"No players found."}</li>`}
+  L.innerHTML=ps.length?ps.map(p=>playerRow(p)).join(""):`<li class="empty">${plFilter?"Nobody with a public profile owns this yet.":"No players found."}</li>`}
 $("plList").addEventListener("click",e=>{const b=e.target.closest("[data-uid]");if(b)openProfile(b.dataset.uid)});
+$("plBestBtn").addEventListener("click",async()=>{const b=$("plBestBtn");b.disabled=true;b.textContent="Comparing collections…";
+  try{if(!plCache)plCache=await window.FB.list();const all=await window.FB.allItems();const me=fbMe();const info=new Map(plCache.map(p=>[p.uid,p]));
+    const need=tradeable.filter(i=>!owned.has(i.id));const mine=tradeable.filter(i=>owned.has(i.id));
+    plBest=Object.entries(all).filter(([uid])=>info.has(uid)&&(!me||uid!==me.uid)).map(([uid,list])=>{const s=new Set(list);const hn=need.filter(i=>s.has(i.id));
+      return{p:info.get(uid),hn:hn.length,hv:hn.reduce((t,i)=>t+(i.val||0),0),gn:mine.filter(i=>!s.has(i.id)).length}}).filter(x=>x.hn>0).sort((a,b)=>b.hv-a.hv||b.hn-a.hn).slice(0,30);
+    plFilter=null;$("plQ").value="";drawPlayers()}
+  catch(e){$("plHint").textContent="Couldn't compare ("+(e.code||e.message)+")."}
+  b.disabled=false;b.textContent="★ Find my best trade partners"});
 (function(){const inp=$("plQ"),ul=$("plSugg");let res=[],sel=0,bt;
   const draw=()=>{ul.innerHTML=res.map((i,n)=>`<li role="option" aria-selected="${n===sel}" data-id="${esc(i.id)}"><span class="mi">${miniArt(i)}</span><span class="sn">Who owns ${esc(i.name)}?<small>${i.cat}</small></span><span class="sv">${fmt(i.val)}</span></li>`).join("");ul.hidden=!res.length};
-  const pick=async id=>{const i=byId.get(id);res=[];draw();inp.value=i.name;$("plHint").textContent="Searching…";
+  const pick=async id=>{const i=byId.get(id);res=[];draw();inp.value=i.name;plBest=null;$("plHint").textContent="Searching…";
     try{const uids=await window.FB.whoHas(id);plFilter={name:i.name,uids:new Set(uids)};drawPlayers()}catch(e){$("plHint").textContent="Search failed ("+(e.code||e.message)+")."}};
-  inp.addEventListener("input",()=>{clearTimeout(bt);plFilter=null;const q=inp.value.trim().toLowerCase();sel=0;res=q.length>1&&window.FB?tradeable.filter(i=>i.name.toLowerCase().includes(q)).slice(0,8):[];draw();drawPlayers()});
+  inp.addEventListener("input",()=>{clearTimeout(bt);plFilter=null;plBest=null;const q=inp.value.trim().toLowerCase();sel=0;res=q.length>1&&window.FB?tradeable.filter(i=>i.name.toLowerCase().includes(q)).slice(0,8):[];draw();drawPlayers()});
   inp.addEventListener("keydown",e=>{if(ul.hidden)return;if(e.key==="ArrowDown"){sel=Math.min(sel+1,res.length-1);draw();e.preventDefault()}else if(e.key==="ArrowUp"){sel=Math.max(sel-1,0);draw();e.preventDefault()}else if(e.key==="Enter"&&res[sel]){pick(res[sel].id)}else if(e.key==="Escape"){res=[];draw()}});
   ul.addEventListener("mousedown",e=>{const li=e.target.closest("li");if(!li)return;e.preventDefault();pick(li.dataset.id)});
   inp.addEventListener("blur",()=>{bt=setTimeout(()=>{ul.hidden=true},120)});inp.addEventListener("focus",()=>clearTimeout(bt))})();
+
+/* one player's profile */
+let curProfile=null;
 async function openProfile(uid){showView("players",true);$("plMain").hidden=true;const P=$("plProf");P.hidden=false;renderMe();
   try{history.replaceState(null,"","#u/"+uid)}catch(e){}
   if(!window.FB){P.innerHTML=`<p class="pl-note">Open this profile on <a href="${PROFILE_URL}#u/${esc(uid)}" target="_blank" rel="noopener">mm2inventory.netlify.app</a>.</p>`;return}
   P.innerHTML=`<p class="pl-note">Loading profile…</p>`;let p;
   try{p=await window.FB.get(uid)}catch(e){P.innerHTML=`<p class="pl-note">Couldn't load this profile (${esc(e.code||e.message)}).</p>`;return}
   if(!p){P.innerHTML=`<p class="pl-note">This profile is private or doesn't exist. <button class="pbtn" id="plBack">Back to players</button></p>`;$("plBack").addEventListener("click",()=>openPlayers());return}
-  const theirs=new Set(p.owned||[]);const isMe=window.FB.me()&&window.FB.me().uid===uid;
-  const tr=tradeable.filter(i=>!i.lock);
-  const haveNeed=tr.filter(i=>theirs.has(i.id)&&!owned.has(i.id)).sort((a,b)=>(b.val??-1)-(a.val??-1));
-  const giveNeed=tr.filter(i=>owned.has(i.id)&&!theirs.has(i.id)).sort((a,b)=>(b.val??-1)-(a.val??-1));
+  curProfile=p;const me=fbMe();
+  if(me&&isFollowing(uid)&&me.follows[uid]!==p.count)window.FB.follow(uid,p.count).catch(()=>{});
+  const theirs=new Set(p.owned||[]);const isMe=me&&me.uid===uid;
+  const haveNeed=tradeable.filter(i=>theirs.has(i.id)&&!owned.has(i.id)).sort((a,b)=>(b.val??-1)-(a.val??-1));
+  const giveNeed=tradeable.filter(i=>owned.has(i.id)&&!theirs.has(i.id)).sort((a,b)=>(b.val??-1)-(a.val??-1));
   const theirItems=items.filter(i=>theirs.has(i.id));
   const pct=p.total?(p.count/p.total*100):0;
   const sec=(id,title,list,side,empty)=>`<section class="pl-sec"><h3>${title} <small>${list.length}</small></h3>${list.length?`<ul class="ptiles" id="${id}">${list.slice(0,60).map(i=>plTile(i,side)).join("")}</ul>${list.length>60?`<button class="pbtn pl-more" data-more="${id}">Show all ${list.length}</button>`:""}`:`<p class="pl-note">${empty}</p>`}</section>`;
   const byCat=CATS.filter(c=>c!==EVC&&!EXTRA.has(c)).map(c=>{const all=items.filter(i=>i.cat===c&&counted(i));const h=all.filter(i=>theirs.has(i.id)).length;return all.length?`<li style="--rc:${RC[c]}"><span>${c}</span><b>${h} / ${all.length}</b></li>`:""}).join("");
+  const acts=isMe?"":me?`<div class="pl-acts"><button class="pbtn${isFollowing(uid)?" on":""}" id="plFollow">${isFollowing(uid)?"★ Following":"☆ Follow"}</button><button class="pbtn ok" id="plPropose">Propose trade</button></div>`:`<p class="pl-note">Sign in to follow ${esc(p.name||"this player")} or send a trade offer.</p>`;
   P.innerHTML=`<button class="pbtn" id="plBack">← All players</button>
-  <div class="pl-head"><span class="pl-av big">${esc((p.name||"?")[0].toUpperCase())}</span><div><h2>${esc(p.name||"Unnamed")}</h2><p>${p.count} / ${p.total} items · ${pct.toFixed(1)}% · inventory value <b>${fmt(p.value||0)}</b> · updated ${ago(p.updated||0)}</p></div></div>
+  <div class="pl-head"><span class="pl-av big">${av(p.name)}</span><div><h2>${esc(p.name||"Unnamed")}</h2><p>${p.count} / ${p.total} items · ${pct.toFixed(1)}% · inventory value <b>${fmt(p.value||0)}</b> · updated ${ago(p.updated||0)}</p>
+  ${p.discord?`<p class="pl-disc">Discord: <code>${esc(p.discord)}</code> <button class="pbtn" id="plDcopy">Copy</button></p>`:""}</div></div>
+  ${acts}
   <ul class="pl-cats">${byCat}</ul>
   ${isMe?`<p class="pl-note">This is your public profile. Others see it like this.</p>`:
    sec("plHN","They have, you need",haveNeed,"B","They don't have anything you're missing.")+
    sec("plGN","You have, they need",giveNeed,"A","You don't have anything they're missing.")}
   ${sec("plAll","Their collection",theirItems.sort((a,b)=>(b.val??-1)-(a.val??-1)),"",`Nothing checked yet.`)}`;
   $("plBack").addEventListener("click",()=>openPlayers());
+  if($("plDcopy"))$("plDcopy").addEventListener("click",e=>{navigator.clipboard.writeText(p.discord).then(()=>{e.target.textContent="Copied"})});
+  if($("plFollow"))$("plFollow").addEventListener("click",async e=>{const b=e.target;b.disabled=true;try{if(isFollowing(uid))await window.FB.unfollow(uid);else await window.FB.follow(uid,p.count);b.classList.toggle("on",isFollowing(uid));b.textContent=isFollowing(uid)?"★ Following":"☆ Follow"}catch(err){alert("Couldn't save: "+(err.code||err.message))}b.disabled=false});
+  if($("plPropose"))$("plPropose").addEventListener("click",()=>{setPartner({uid,name:p.name||"Unnamed"});showView("trade")});
   const lists={plHN:[haveNeed,"B"],plGN:[giveNeed,"A"],plAll:[theirItems,""]};
   P.querySelectorAll("[data-more]").forEach(b=>b.addEventListener("click",()=>{const[l,s]=lists[b.dataset.more];$(b.dataset.more).innerHTML=l.map(i=>plTile(i,s)).join("");b.remove()}))}
-$("plProf").addEventListener("click",e=>{const a=e.target.closest("[data-add]");if(a){addTrade(a.dataset.add,a.dataset.id);a.textContent="✓";a.disabled=true;return}
+$("plProf").addEventListener("click",e=>{const a=e.target.closest("[data-add]");if(a){addTrade(a.dataset.add,a.dataset.id);if(curProfile&&!partner&&fbMe()&&fbMe().uid!==curProfile.uid)setPartner({uid:curProfile.uid,name:curProfile.name||"Unnamed"});a.textContent="✓";a.disabled=true;return}
   const o=e.target.closest("[data-open]");if(o)openItem(o.dataset.open)});
 tabs();setView(view);render();acct("wait");
 /* ---------- live values (updated by the GitHub Action) ---------- */
@@ -1852,7 +1960,7 @@ tabs();setView(view);render();acct("wait");
 if(location.hash==="#trade")showView("trade");else if(location.hash==="#players")showView("players");
 else if(location.hash.startsWith("#u/")){const uid=decodeURIComponent(location.hash.slice(3));showView("players",true);$("plMain").hidden=true;$("plProf").hidden=false;$("plProf").innerHTML='<p class="pl-note">Loading profile…</p>';
   const go=()=>openProfile(uid);if(window.FB&&window.FB.ready)go();else{window.addEventListener("fbready",go,{once:true});setTimeout(()=>{if(!window.FB)go()},6000)}}
-window.MM={getOwned:()=>[...owned],setOwned:a=>{owned=new Set(a);try{localStorage.setItem(KEY,JSON.stringify([...owned]))}catch(e){}render()},setCloud:(c,name)=>{cloud=c;who=name||""},save:()=>save(),acct:s=>acct(s),summary:()=>mySummary(),refreshPlayers:()=>{if(!$("playView").hidden&&!$("plMain").hidden){plCache=null;openPlayers()}else renderMe()}};
+window.MM={getOwned:()=>[...owned],setOwned:a=>{owned=new Set(a);try{localStorage.setItem(KEY,JSON.stringify([...owned]))}catch(e){}render()},setCloud:(c,name)=>{cloud=c;who=name||""},save:()=>save(),acct:s=>acct(s),summary:()=>mySummary(),refreshPlayers:()=>{loadOffers();if(!$("playView").hidden&&!$("plMain").hidden){plCache=null;openPlayers()}else renderMe()}};
 </script>
 
 <script type="module">
@@ -1864,7 +1972,7 @@ const firebaseConfig = {
 };
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, query, where, orderBy, limit, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, query, where, orderBy, limit, getDocs, writeBatch, deleteField } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const MM = window.MM;
 if (!firebaseConfig.apiKey) { MM.acct("setup"); }
 else {
@@ -1875,7 +1983,9 @@ else {
 
   async function writeProfile(owned, sum) {
     const b = writeBatch(fs);
-    b.set(doc(fs, "profiles", me.uid), { name: me.name, count: sum.count, total: sum.total, value: sum.value, updated: Date.now() });
+    const p = { name: me.name, count: sum.count, total: sum.total, value: sum.value, updated: Date.now() };
+    if (me.discord) p.discord = me.discord;
+    b.set(doc(fs, "profiles", me.uid), p);
     b.set(doc(fs, "pitems", me.uid), { owned });
     await b.commit();
   }
@@ -1883,10 +1993,10 @@ else {
   window.FB = {
     ready: false,
     me: () => me,
-    async setPublic(on, name, owned, sum) {
+    async setPublic(on, name, discord, owned, sum) {
       if (!me) throw new Error("not signed in");
-      me = { ...me, pub: on, name };
-      await setDoc(doc(fs, "users", me.uid), { pub: on, pname: name }, { merge: true });
+      me = { ...me, pub: on, name, discord };
+      await setDoc(doc(fs, "users", me.uid), { pub: on, pname: name, discord }, { merge: true });
       if (on) await writeProfile(owned, sum);
       else { const b = writeBatch(fs); b.delete(doc(fs, "profiles", me.uid)); b.delete(doc(fs, "pitems", me.uid)); await b.commit(); }
     },
@@ -1899,6 +2009,32 @@ else {
       if (!p.exists()) return null;
       return { uid, ...p.data(), owned: i.exists() ? i.data().owned || [] : [] };
     },
+    async allItems() {
+      const s = await getDocs(query(collection(fs, "pitems"), limit(300)));
+      const o = {}; s.docs.forEach(d => o[d.id] = d.data().owned || []); return o;
+    },
+    async follow(uid, count) {
+      me.follows = { ...(me.follows || {}), [uid]: count };
+      await setDoc(doc(fs, "users", me.uid), { follows: { [uid]: count } }, { merge: true });
+    },
+    async unfollow(uid) {
+      const f = { ...(me.follows || {}) }; delete f[uid]; me.follows = f;
+      await updateDoc(doc(fs, "users", me.uid), { ["follows." + uid]: deleteField() });
+    },
+    async sendOffer(to, give, get, msg) {
+      const o = { from: me.uid, fromName: me.name || auth.currentUser.displayName || "Someone", to: to.uid, toName: to.name, give, get, status: "open", created: Date.now(), updated: Date.now() };
+      if (msg) o.msg = msg;
+      if (me.discord) o.fromDiscord = me.discord;
+      await addDoc(collection(fs, "offers"), o);
+    },
+    async listOffers() {
+      const [a, b] = await Promise.all([
+        getDocs(query(collection(fs, "offers"), where("to", "==", me.uid), limit(60))),
+        getDocs(query(collection(fs, "offers"), where("from", "==", me.uid), limit(60)))]);
+      return [...a.docs, ...b.docs].map(d => ({ id: d.id, ...d.data() }));
+    },
+    setOfferStatus: (id, status) => updateDoc(doc(fs, "offers", id), { status, updated: Date.now() }),
+    deleteOffer: id => deleteDoc(doc(fs, "offers", id)),
     async whoHas(id) {
       const s = await getDocs(query(collection(fs, "pitems"), where("owned", "array-contains", id), limit(300)));
       return s.docs.map(d => d.id);
@@ -1918,12 +2054,12 @@ else {
     try {
       const snap = await getDoc(ref);
       const data = snap.exists() ? snap.data() : {};
-      me = { uid: u.uid, name: data.pname || "", pub: !!data.pub };
+      me = { uid: u.uid, name: data.pname || "", pub: !!data.pub, discord: data.discord || "", follows: data.follows || {} };
       const remote = Array.isArray(data.owned) ? data.owned : [];
       const merged = [...new Set([...remote, ...MM.getOwned()])];
       MM.setOwned(merged);
       if (merged.length > remote.length || me.pub) MM.save(); else MM.acct("ok");
-    } catch (e) { me = { uid: u.uid, name: "", pub: false }; MM.acct("err"); }
+    } catch (e) { me = { uid: u.uid, name: "", pub: false, discord: "", follows: {} }; MM.acct("err"); }
     ready(); MM.refreshPlayers();
   });
 }
