@@ -8,18 +8,19 @@
 <body>
 <title>MM2 Collection Tracker</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&display=swap">
 <style>
 /* Layout: night-lobby hero with progress ring, rarity chips that filter, sticky toolbar, image grid of item cards glowing in their rarity colour */
 :root{
-  --bg:#0e0c18; --bg2:#141127; --surface:#1a1631; --surface2:#221d3d; --line:#2f2950;
-  --ink:#f1edff; --muted:#9a93b8; --dim:#6c6589;
-  --gold:#ffc94d; --owned:#3fe3a3; --danger:#ff6b86;
-  --f-display:"Bungee","Arial Black",system-ui,sans-serif;
-  --f-body:"Rubik",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
-  --r:14px;
-  color-scheme:dark;
+  --bg:#E3E6EA; --bg2:#F2F3F5; --surface:#FFFFFF; --surface2:#ECEEF1; --line:#CBD0D7;
+  --ink:#1C2128; --muted:#59606A; --dim:#868C95;
+  --gold:#F0B429; --owned:#1F8A47; --danger:#C8323F;
+  --blue:#1D4F9E; --val:#8A5300;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --r:6px;
+  color-scheme:light;
 }
 *{box-sizing:border-box}
 html{background:var(--bg)}
@@ -399,26 +400,177 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
 .bt.hit{border-color:var(--owned);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--owned) 40%,transparent)}.bt.hit.sp,.bt.hit.wl{background:color-mix(in srgb,var(--owned) 14%,var(--bg2))}
 .bp footer{display:flex;gap:8px;padding:0;margin:0;border:0}
 @media (max-width:640px){.bd-cols{grid-template-columns:1fr}}
+
+/* ================= redesign: plain trader's binder ================= */
+body{font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums;background:var(--bg)}
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:700;letter-spacing:0}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.top{background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 24px;padding-block:22px 6px}
+.brand h1{font-size:clamp(2rem,4.6vw,2.9rem);line-height:1;margin:0;font-weight:800;color:var(--ink)}
+.brand .lede{margin:6px 0 0;color:var(--muted);font-size:1rem;max-width:56ch}
+.top .acctrow{margin:0}
+.acct::before{box-shadow:none!important}
+.acct[data-s="ok"]::before{background:var(--owned)}
+.gbtn{border-radius:var(--r);box-shadow:none;border:1px solid var(--line)}
+.gbtn.out{background:var(--surface);color:var(--ink)}
+.prog{margin-top:14px}
+.prog-txt{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;margin:0 0 6px;font-size:.98rem;color:var(--muted)}
+.prog-txt #pct{font-family:var(--f-display);font-size:1.6rem;font-weight:800;color:var(--ink);line-height:1}
+.prog-txt .mv{text-align:right}
+.prog-txt .mv b{display:inline;font-family:var(--f-display);font-size:1.15rem;font-weight:700;color:var(--val)}
+.pbar{display:flex;height:22px;background:var(--surface2);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.pbar i{display:block;height:100%;border-right:1px solid rgba(255,255,255,.55);transition:width .4s}
+.pbar i:last-child{border-right:0}
+.navrow{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:8px;margin-top:14px}
+.views{display:flex;gap:0;padding:0;margin:0;border:0;background:none;border-radius:0}
+.views button{font-family:var(--f-display);font-size:1.12rem;font-weight:700;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;border-radius:0;padding:8px 14px 9px}
+.views button:hover{color:var(--ink)}
+.views button[aria-pressed="true"]{background:none;color:var(--ink);border-bottom-color:var(--blue)}
+.shotbtn{margin:0 0 6px}
+.vbn{background:var(--danger)}
+.alerts{max-width:none;margin-top:12px;border-color:var(--gold);background:#FFF8E6}
+
+/* rarity filter */
+.chips{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;padding-block:16px 4px}
+.chip{border-radius:var(--r);padding:8px 10px 10px;transition:none;background:var(--surface)}
+.chip:hover{transform:none;border-color:var(--dim)}
+.chip[aria-pressed="true"]{background:var(--surface);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.chip .cn{font-size:.95rem}
+.chip .cn i{border-radius:2px;width:10px;height:10px}
+.chip .cc{font-family:var(--f-body);font-size:.8rem}
+.chip .cb{height:4px}
+.chip.c-Halloween{background:var(--surface)}
+.chip.x{border-style:dashed}
+
+/* toolbar */
+.bar{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:1px solid var(--line)}
+.search input,select,.tog,.seg,.tbtn,.picker input,.pbtn,.b,.swap,.qstep,.wishbtn,.ownbtn,.chat-form input,.tpartner input,.cv-row input,.bd-text,.pl-name input{border-radius:var(--r)}
+.search input,select,.tog,.seg{background:var(--surface)}
+.tbtn[aria-pressed="true"],.pbtn.ok,.b.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.pbtn.on{border-color:var(--blue);color:var(--blue)}
+
+/* groups + cards */
+.gh h2{font-size:1.45rem;color:var(--ink);display:flex;align-items:center;gap:8px}
+.gh h2::before{content:"";width:12px;height:12px;border-radius:2px;background:var(--rc)}
+.grp.c-Chroma .gh h2{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--ink)}
+.grp.c-Chroma .gh h2::before{background:linear-gradient(90deg,#e3465a,#f0a52b,#2fae6a,#2f7be0,#8e5ae0)}
+.gh .gl{background:var(--line)}
+.gh .gc{font-family:var(--f-body);font-size:.9rem}
+.cards{gap:8px}
+.card{border-radius:var(--r);border-top:4px solid var(--rc);transition:none}
+.card:hover{transform:none;box-shadow:none;border-color:var(--dim);border-top-color:var(--rc)}
+.card .open{border-radius:0}
+.art{border-radius:0;background:var(--bg2)}
+.art img{filter:none;transition:none}
+.card:hover .art img{transform:none}
+.nm{font-size:.95rem}
+.meta{font-size:.82rem}
+.meta .v,.sugg .sv,.ti .tv,.tile dd.vv,.hist1 b,.pl-v,.cv-name small,.ofr-cols h4 small,.gold{color:var(--val)}
+.meta .v{font-family:var(--f-display);font-size:1rem}
+.chk{border-radius:4px;border:2px solid #9AA1AB;background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none;transition:none}
+.chk:hover{transform:none;border-color:var(--owned)}
+.chk svg{color:#fff;transition:none}
+.card.own{background:#EEF7F0;border-color:#9ACBA9;border-top-color:var(--rc)}
+.card.own .art{background:#E2F0E6}
+.card.own .nm{color:var(--ink)}
+.card.own .chk{background:var(--owned);border-color:var(--owned)}
+.chroma,.chroma.own{background-clip:border-box;animation:none;border:1px solid var(--line);border-top:4px solid transparent;border-image:linear-gradient(90deg,#e3465a,#f0a52b,#2fae6a,#2f7be0,#8e5ae0) 1 / 4px 0 0 0;border-radius:0}
+.chroma{background:var(--surface)}.chroma.own{background:#EEF7F0}
+.list .card{border-top-width:1px;border-left:4px solid var(--rc)}
+.list .chroma{border-image:none;border-top:1px solid var(--line);border-left:4px solid #8e5ae0;border-radius:var(--r)}
+.list .art{border-radius:4px}
+.empty{border-radius:var(--r)}
+.qb{background:var(--owned);color:#fff;border-radius:3px}
+.wb{background:#fff;color:#B7791F;border:1px solid var(--line);border-radius:3px}
+
+/* trade checker */
+.side,.conv,.pl-card,.bp,.bd-mine,.ofr,.tpartner{border-radius:var(--r)}
+.side h2{font-size:1.3rem}
+.side h2 small{font-family:var(--f-body);font-size:.85rem}
+.sugg{border-radius:var(--r);box-shadow:0 8px 24px rgba(20,25,35,.18);background:var(--surface)}
+.sugg li[aria-selected="true"],.sugg li:hover{background:var(--surface2)}
+.ti{border-radius:var(--r);background:var(--surface)}
+.ti .mi,.pt .mi,.mk-row .mi,.alerts .mi,.cv-name .mi,.bt .mi{background:var(--bg2)!important;border-radius:4px}
+.vbadge{font-family:var(--f-display);font-weight:800;border-radius:var(--r);letter-spacing:.02em}
+.vbadge.win{background:var(--owned);border-color:var(--owned);color:#fff}
+.vbadge.lose{background:var(--danger);border-color:var(--danger);color:#fff}
+.vbadge.fair{background:var(--gold);border-color:var(--gold);color:#2b1d00}
+.vdiff{font-family:var(--f-display);font-size:1.1rem}
+.swap{border-radius:var(--r)}
+.qty button{background:var(--surface2)}
+.qty span{font-family:var(--f-body)}
+
+/* modal */
+.modal{background:rgba(28,33,40,.55);backdrop-filter:none;-webkit-backdrop-filter:none}
+.mcard{border-radius:8px;border:1px solid var(--line);border-top:5px solid var(--rc);box-shadow:0 20px 50px rgba(20,25,35,.3)}
+@media (prefers-reduced-motion:no-preference){.modal:not([hidden]) .mcard{animation:none}}
+#mclose{background:#fff;border-radius:4px}
+.mart{background:var(--bg2);border-bottom:1px solid var(--line)}
+.mart img{filter:none}
+.mrar{font-family:var(--f-body);font-size:.9rem;font-weight:600;letter-spacing:0;text-transform:none;color:var(--muted)}
+.mrar i{border-radius:2px}
+.mbody h3{font-size:2rem;font-weight:800}
+.tile{border-radius:var(--r)}
+.tile dt{font-size:.82rem;letter-spacing:0;text-transform:none;color:var(--muted)}
+.tile dd.vv{font-family:var(--f-display);font-size:1.4rem}
+.st-fluctuating{color:#B7791F}
+.tags span{border-radius:3px}
+.ownbtn{border-radius:var(--r);background:var(--surface)}
+.ownbtn[aria-pressed="true"]{color:#fff}
+.mbody h4{font-family:var(--f-display);font-size:1.15rem;letter-spacing:0;text-transform:none;color:var(--ink);font-weight:700}
+.hist1{font-family:var(--f-display)}
+.hchart path:first-child{fill:rgba(29,79,158,.10)}.hchart path:nth-child(2){stroke:var(--blue)}.hchart circle{fill:var(--blue)}
+
+/* players, offers, board, market */
+.pl-st{border-radius:3px;letter-spacing:0;text-transform:none;font-size:.8rem}
+.pl-st.on,.new,.bd-match{background:var(--owned);border-color:var(--owned);color:#fff}
+.pl-av{border-radius:4px;color:var(--blue);background:var(--surface2);font-family:var(--f-display);font-weight:800}
+.pl-row,.mk-row,.alerts li button{border-radius:var(--r)}
+.pl-row:hover,.mk-row:hover{border-color:var(--dim)}
+.pl-row.fol{border-color:#D9B45A}
+.star{color:#B7791F}
+.pl-bar{border-radius:2px}
+.pl-v,.mk-p,.mk-v{font-family:var(--f-display)}
+.ofr-new{box-shadow:inset 4px 0 0 var(--blue)}
+.chat-list li{border-radius:var(--r)}
+.chat-list li.me{background:#E6EEF9}
+.bchip,.bt{border-radius:4px}
+.pt{border-radius:var(--r);background:var(--surface)}
+.tg.wl,.gold{color:#9A6200}
+.pl-note a{color:var(--blue)}
+.mk-days button{font-family:var(--f-body)}
+.ofr-h,.mk-top h2,.conv h2,.pl-card h2,.pl-head h2,.pl-sec h3,.mk-grid h3{font-weight:700}
+.mk-top h2{font-size:1.6rem}
+.pl-sec h3 small,.cv-out small{font-family:var(--f-body)}
+.cv-name{border-color:var(--blue)}
+.tpartner{border-color:var(--blue);background:#F1F5FC}
+.gh h2,.side h2,.mk-top h2,.conv h2,.pl-card h2,.pl-head h2,.pl-sec h3,.mk-grid h3,.ofr-h,.shot h3{font-weight:700}
+.gh .gc{white-space:nowrap}
+footer{color:var(--muted)}
+@media (max-width:640px){
+  .shotbtn{padding:6px 10px;font-size:.85rem;margin:6px 0}
+  .gh h2{font-size:1.25rem}
+  .top-in{padding-top:16px}
+  .views{width:100%;overflow-x:auto;scrollbar-width:none}.views::-webkit-scrollbar{display:none}
+  .views button{font-size:1.02rem;padding:8px 10px 9px;white-space:nowrap}
+  .prog-txt .mv{text-align:left}
+  .chip{flex:0 0 110px}
+}
 </style>
 
-<header class="hero">
+<header class="top">
+  <div class="wrap top-in">
+    <div class="brand"><h1>MM2 Collection Tracker</h1><p class="lede">Tick off every knife, gun and pet you own. Whatever is left is your trade list.</p></div>
+    <div class="acctrow"><p class="acct" id="acct">Connecting…</p><button class="gbtn" id="authBtn" hidden><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span>Sign in with Google</span></button></div>
+  </div>
   <div class="wrap">
-    <div>
-      <p class="kicker">Murder Mystery 2 · Collection</p>
-      <h1>MM2 Collection<span>Tracker</span></h1>
-      <p class="lede">Every knife, gun and pet from Ancient to Common. Tick what you own, and whatever is left is your trade list.</p>
-      <div class="acctrow"><p class="acct" id="acct">Connecting…</p><button class="gbtn" id="authBtn" hidden><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span>Sign in with Google</span></button></div>
-      <div class="alerts" id="alerts" hidden></div>
-      <div class="views" role="group" aria-label="Section"><button id="vCol" aria-pressed="true">Collection</button><button id="vTrade" aria-pressed="false">Trade checker</button><button id="vMk" aria-pressed="false">Market</button><button id="vPlay" aria-pressed="false">Players <span class="vbn" id="vPlayN" hidden></span></button></div><button class="tbtn shotbtn" id="shotBtn">📸 Share image</button>
+    <div class="prog" aria-label="Collection progress">
+      <p class="prog-txt"><span><b id="pct">0%</b> done, <span id="pof">0 of 0 items</span></span><span class="mv" id="mvbox">Still missing <b id="mval">–</b> in value</span></p>
+      <div class="pbar" id="pbar"></div>
     </div>
-    <div class="ringbox">
-      <div class="ring" aria-hidden="true">
-        <svg viewBox="0 0 140 140"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3fe3a3"/><stop offset="1" stop-color="#ffc94d"/></linearGradient></defs>
-          <circle class="trk" cx="70" cy="70" r="58"/><circle class="val" id="ringv" cx="70" cy="70" r="58" stroke-dasharray="364.4" stroke-dashoffset="364.4"/></svg>
-        <div class="ctr"><div class="pct" id="pct">0%</div><div class="of" id="pof">0 / 0</div></div>
-      </div>
-      <div class="mv" id="mvbox">Missing value<b id="mval">–</b></div>
-    </div>
+    <div class="alerts" id="alerts" hidden></div>
+    <div class="navrow"><nav class="views" aria-label="Section"><button id="vCol" aria-pressed="true">Collection</button><button id="vTrade" aria-pressed="false">Trade checker</button><button id="vMk" aria-pressed="false">Market</button><button id="vPlay" aria-pressed="false">Players <span class="vbn" id="vPlayN" hidden></span></button></nav><button class="tbtn shotbtn" id="shotBtn">Share image</button></div>
   </div>
 </header>
 
@@ -433,8 +585,8 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
       <option value="name">Name A–Z</option>
     </select>
     <label class="tog"><input type="checkbox" id="missing"> Missing only</label>
-    <button class="tbtn" id="fWish" aria-pressed="false">★ Wishlist</button>
-    <button class="tbtn" id="fSpare" aria-pressed="false">×2 Spares</button>
+    <button class="tbtn" id="fWish" aria-pressed="false">Wishlist</button>
+    <button class="tbtn" id="fSpare" aria-pressed="false">Spares</button>
     <div class="seg" role="group" aria-label="View">
       <button id="vGrid" aria-pressed="true" aria-label="Grid view"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></button>
       <button id="vList" aria-pressed="false" aria-label="List view"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="18" height="4" rx="2"/><rect x="3" y="10" width="18" height="4" rx="2"/><rect x="3" y="16" width="18" height="4" rx="2"/></svg></button>
@@ -485,7 +637,7 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
 </section>
 
 <section class="wrap mk" id="mkView" hidden aria-label="Market">
-  <div class="mk-top"><h2>Trade board</h2><div class="bd-tools"><span class="pl-note" id="bdCount"></span><button class="tbtn" id="bdOnly" aria-pressed="false">Only posts that match me</button><button class="pbtn" id="bdRefresh">↻ Refresh</button></div></div>
+  <div class="mk-top"><h2>Trade board</h2><div class="bd-tools"><span class="pl-note" id="bdCount"></span><button class="tbtn" id="bdOnly" aria-pressed="false">Only posts that match me</button><button class="pbtn" id="bdRefresh">Refresh</button></div></div>
   <div id="bdMine"></div>
   <ul class="bd-list" id="bdList"></ul>
   <div class="mk-top"><h2>Biggest movers</h2><div class="seg mk-days" id="mkDays" role="group" aria-label="Period"><button data-d="1">24h</button><button data-d="7" aria-pressed="true">7 days</button><button data-d="30">30 days</button><button data-d="99999">All time</button></div></div>
@@ -498,7 +650,7 @@ footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
   <div id="plMe"></div>
   <div id="plMain">
     <div id="plOffers"></div>
-    <div class="pl-tools" id="plTools"><button class="pbtn ok" id="plBestBtn">★ Find my best trade partners</button></div>
+    <div class="pl-tools" id="plTools"><button class="pbtn ok" id="plBestBtn">Find my best trade partners</button></div>
     <div class="picker pl-search"><input type="search" id="plQ" placeholder="Search a player, or an item to see who owns it…" aria-label="Search players or items" autocomplete="off"><ul class="sugg" id="plSugg" hidden></ul></div>
     <p class="pl-hint" id="plHint"></p>
     <ul class="plist" id="plList"></ul>
@@ -1751,7 +1903,7 @@ const $=id=>document.getElementById(id);
 const fmt=v=>v==null?"–":v>=1000?(v/1000).toLocaleString("en-US",{maximumFractionDigits:1})+"K":v.toLocaleString("en-US");
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
-const RC={Ancient:"#ffc94d",Chroma:"#c9a7ff",Godly:"#ff5c7a",Vintage:"#d39565",Legendary:"#b97bff",Rare:"#58a6ff",Uncommon:"#4fd88a",Common:"#a7a2bd",Pets:"#ff9a52",Effects:"#ff6ad5",Emotes:"#3fd4d8",Radios:"#cdd45f","Halloween 2026":"#ff8a3d"};
+const RC={Ancient:"#E0A100",Chroma:"#8E5AE0",Godly:"#D9344F",Vintage:"#A8693B",Legendary:"#7E3FCF",Rare:"#2F7BE0",Uncommon:"#2BA35A",Common:"#8A9099",Pets:"#E06F22",Effects:"#CC3D9E",Emotes:"#1A9EA3",Radios:"#97A01A","Halloween 2026":"#E06F22"};
 const TYPE={K:"Knife",G:"Gun",P:"Pet",R:"Radio",F:"Effect",E:"Emote",X:"Item"};
 const EVC="Halloween 2026";
 function grpStats(c){const all=items.filter(i=>i.cat===c&&!i.lock&&(cat!==EVC||i.ev==="H26"));const h=all.filter(i=>owned.has(i.id)).length;return{h,n:all.length}}
@@ -1792,10 +1944,10 @@ function tabs(){
   $("tabs").innerHTML=["All",...CATS].map(c=>{const s=catStats(c);
     return `<button class="chip c-${c}${EXTRA.has(c)?" x":""}" style="--rc:${RC[c]||"var(--gold)"}" aria-pressed="${c===cat}" data-c="${c}"><span class="cn"><i></i>${c}</span><span class="cc">${s.h} / ${s.n}</span><span class="cb" style="width:${(s.p*100).toFixed(1)}%"></span></button>`}).join("")}
 function stats(){
-  const s=catStats("All");const C=364.4;
-  $("ringv").style.strokeDashoffset=(C*(1-s.p)).toFixed(1);
-  $("pct").textContent=(s.p>0&&s.p<.1?(s.p*100).toFixed(1):Math.floor(s.p*100))+"%";$("ringv").style.opacity=s.h?1:0;
-  $("pof").textContent=`${s.h.toLocaleString("en-US")} / ${s.n.toLocaleString("en-US")} items`;
+  const s=catStats("All");
+  $("pct").textContent=(s.p>0&&s.p<.1?(s.p*100).toFixed(1):Math.floor(s.p*100))+"%";
+  $("pof").textContent=`${s.h.toLocaleString("en-US")} of ${s.n.toLocaleString("en-US")} items`;
+  $("pbar").innerHTML=CATS.filter(c=>c!==EVC&&!EXTRA.has(c)).map(c=>{const h=items.filter(i=>i.cat===c&&counted(i)&&owned.has(i.id)).length;return h?`<i style="width:${(h/s.n*100).toFixed(2)}%;background:${c==="Chroma"?"linear-gradient(90deg,#e3465a,#f0a52b,#2fae6a,#2f7be0,#8e5ae0)":RC[c]}" title="${c}: ${h}"></i>`:""}).join("");
   const miss=items.filter(i=>counted(i)&&!owned.has(i.id)&&i.val!=null).reduce((a,i)=>a+i.val,0);
   $("mval").textContent=fmt(miss);
   document.querySelectorAll(".chip").forEach(b=>{const t=catStats(b.dataset.c);b.querySelector(".cc").textContent=`${t.h} / ${t.n}`;b.querySelector(".cb").style.width=(t.p*100).toFixed(1)+"%"});
@@ -2008,19 +2160,19 @@ function drawOffers(){const el=$("plOffers");const me=fbMe();updateBadge();
     const other=incoming?o.fromName:o.toName,otherUid=incoming?o.from:o.to;
     const st={open:incoming?"Waiting for your answer":"Waiting for their answer",accepted:"Accepted · meet in MM2 to trade",declined:"Declined",cancelled:"Cancelled",countered:incoming?"You sent a counter-offer":"They sent a counter-offer"}[o.status]||o.status;
     const rated=myRates&&o.id in myRates?myRates[o.id]:null;
-    const rate=o.status==="accepted"?(rated!=null?`<span class="ofr-rated">You rated this trade ${rated>0?"👍":"👎"}</span>`:`<span class="ofr-rate">Did the trade go well? <button class="pbtn" data-rate="1" aria-label="Good trade">👍</button><button class="pbtn" data-rate="-1" aria-label="Bad trade">👎</button></span>`):"";
+    const rate=o.status==="accepted"?(rated!=null?`<span class="ofr-rated">You rated this trade ${rated>0?"good":"bad"}</span>`:`<span class="ofr-rate">Did the trade go well? <button class="pbtn" data-rate="1">Good</button><button class="pbtn" data-rate="-1">Bad</button></span>`):"";
     const uc=unreadChat(o);
     return `<article class="ofr ofr-${o.status}${unreadOffer(o)?" ofr-new":""}" data-oid="${esc(o.id)}"><header><button class="ofr-who" data-uid="${esc(otherUid)}"><span class="pl-av">${av(other)}</span><span>${incoming?"From":"To"} <b>${esc(other||"Unnamed")}</b>${o.counterOf?' <span class="tg wl">counter-offer</span>':""}<small>${ago(o.created||0)} · ${st}</small></span></button><span class="vbadge sm ${k}">${k.toUpperCase()}</span></header>
       ${o.msg?`<p class="ofr-msg">“${esc(o.msg)}”</p>`:""}
       ${incoming&&o.fromDiscord?`<p class="ofr-msg">Discord: <code>${esc(o.fromDiscord)}</code></p>`:""}
       <div class="ofr-cols"><div><h4>You give <small>${fmt(g)}</small></h4><ul class="ptiles one">${offerList(youGive)}</ul></div><div><h4>You get <small>${fmt(r)}</small></h4><ul class="ptiles one">${offerList(youGet)}</ul></div></div>
       ${rate}
-      <footer>${o.status==="open"?(incoming?`<button class="pbtn ok" data-act="accepted">Accept</button><button class="pbtn" data-act="counter">Counter</button><button class="pbtn" data-act="declined">Decline</button>`:`<button class="pbtn" data-act="cancelled">Cancel offer</button>`):""}<button class="pbtn${uc?" on":""}" data-act="chat">💬 Chat${uc?" · new":""}</button><button class="pbtn" data-act="load">Open in trade checker</button>${o.status!=="open"?`<button class="pbtn" data-act="delete">Remove</button>`:""}</footer>
+      <footer>${o.status==="open"?(incoming?`<button class="pbtn ok" data-act="accepted">Accept</button><button class="pbtn" data-act="counter">Counter</button><button class="pbtn" data-act="declined">Decline</button>`:`<button class="pbtn" data-act="cancelled">Cancel offer</button>`):""}<button class="pbtn${uc?" on":""}" data-act="chat">Chat${uc?" (new)":""}</button><button class="pbtn" data-act="load">Open in trade checker</button>${o.status!=="open"?`<button class="pbtn" data-act="delete">Remove</button>`:""}</footer>
       <div class="chat" ${chatOpen.has(o.id)?"":"hidden"}><ul class="chat-list" id="chat-${esc(o.id)}">${chatHTML(o.id)}</ul><form class="chat-form"><input maxlength="300" placeholder="Write a message…" aria-label="Message"><button class="pbtn ok">Send</button></form></div></article>`};
   const sortF=(a,b)=>(a.status==="open"?0:1)-(b.status==="open"?0:1)||Math.max(b.created||0,b.lastMsgAt||0)-Math.max(a.created||0,a.lastMsgAt||0);
   const keepInput={};el.querySelectorAll(".chat-form input").forEach(i=>{if(i.value)keepInput[i.closest("[data-oid]").dataset.oid]=i.value});
   el.innerHTML=`<details class="pl-card" ${wasOpen??(nNew>0)?"open":""}><summary><h2>Trade offers</h2>${nNew?`<span class="pl-st on">${nNew} new</span>`:`<span class="pl-st">${offers.length}</span>`}</summary>
-    ${canNotify?`<p class="pl-note"><button class="pbtn" id="notifBtn">🔔 Notify me about new offers</button> Works while this page is open in a tab.</p>`:""}
+    ${canNotify?`<p class="pl-note"><button class="pbtn" id="notifBtn">Notify me about new offers</button> Works while this page is open in a tab.</p>`:""}
     ${!offers.length?`<p class="pl-note">No trade offers yet. Open a player's profile and press <b>Propose trade</b> to send one.</p>`:""}
     ${inc.length?`<h3 class="ofr-h">Received</h3>${inc.sort(sortF).map(card).join("")}`:""}
     ${out.length?`<h3 class="ofr-h">Sent</h3>${out.sort(sortF).map(card).join("")}`:""}</details>`;
@@ -2032,7 +2184,7 @@ function chatHTML(id){const c=chatCache[id];const me=fbMe();if(!c)return `<li cl
   return c.list.map(m=>`<li class="${m.by===me.uid?"me":""}"><b>${esc(m.name||"")}</b><span>${esc(m.text)}</span><small>${ago(m.at)}</small></li>`).join("")}
 async function loadChat(id){try{const list=await window.FB.chatList(id);chatCache[id]={list,at:list.length?list.at(-1).at:0};seen["c:"+id]=Date.now();saveSeen();
   const ul=$("chat-"+id);if(ul){ul.innerHTML=chatHTML(id);ul.scrollTop=ul.scrollHeight}updateBadge();
-  const btn=document.querySelector(`[data-oid="${CSS.escape(id)}"] [data-act="chat"]`);if(btn){btn.classList.remove("on");btn.textContent="💬 Chat"}}catch(e){const ul=$("chat-"+id);if(ul)ul.innerHTML=`<li class="chat-empty">Couldn't load chat (${esc(e.code||e.message)}).</li>`}}
+  const btn=document.querySelector(`[data-oid="${CSS.escape(id)}"] [data-act="chat"]`);if(btn){btn.classList.remove("on");btn.textContent="Chat"}}catch(e){const ul=$("chat-"+id);if(ul)ul.innerHTML=`<li class="chat-empty">Couldn't load chat (${esc(e.code||e.message)}).</li>`}}
 $("plOffers").addEventListener("submit",async e=>{e.preventDefault();const f=e.target.closest(".chat-form");if(!f)return;const inp=f.querySelector("input");const t=inp.value.trim();if(!t)return;
   const id=f.closest("[data-oid]").dataset.oid;inp.value="";inp.disabled=true;try{await window.FB.chatSend(id,t.slice(0,300));await loadChat(id)}catch(err){inp.value=t;alert("Couldn't send: "+(err.code||err.message))}inp.disabled=false;inp.focus()});
 $("plOffers").addEventListener("click",async e=>{const w=e.target.closest("[data-uid]");if(w){openProfile(w.dataset.uid);return}
@@ -2090,7 +2242,7 @@ $("plBestBtn").addEventListener("click",async()=>{const b=$("plBestBtn");b.disab
       return{p:info.get(uid),hn:hn.length,hv:hn.reduce((t,i)=>t+(i.val||0),0),hs,hw,gs,gw,score}}).filter(x=>x.hn>0).sort((a,b)=>b.score-a.score).slice(0,30);
     plFilter=null;$("plQ").value="";drawPlayers()}
   catch(e){$("plHint").textContent="Couldn't compare ("+(e.code||e.message)+")."}
-  b.disabled=false;b.textContent="★ Find my best trade partners"});
+  b.disabled=false;b.textContent="Find my best trade partners"});
 (function(){const inp=$("plQ"),ul=$("plSugg");let res=[],sel=0,bt;
   const draw=()=>{ul.innerHTML=res.map((i,n)=>`<li role="option" aria-selected="${n===sel}" data-id="${esc(i.id)}"><span class="mi">${miniArt(i)}</span><span class="sn">Who owns ${esc(i.name)}?<small>${i.cat}</small></span><span class="sv">${fmt(i.val)}</span></li>`).join("");ul.hidden=!res.length};
   const pick=async id=>{const i=byId.get(id);res=[];draw();inp.value=i.name;plBest=null;$("plHint").textContent="Searching…";
@@ -2137,7 +2289,7 @@ async function openProfile(uid){showView("players",true);$("plMain").hidden=true
   ${sec("plAll","Their collection",theirItems.sort((a,b)=>(b.val??-1)-(a.val??-1)),"",`Nothing checked yet.`)}`;
   $("plBack").addEventListener("click",()=>openPlayers());
   window.FB.ratingsFor(uid).then(r=>{const el=$("plRep");if(!el||curProfile!==p)return;const n=r.up+r.down;
-    el.innerHTML=n?`<b>${Math.round(r.up/n*100)}% positive</b> · 👍 ${r.up} · 👎 ${r.down} from ${n} trade${n>1?"s":""}`:"No trade ratings yet."}).catch(()=>{});
+    el.innerHTML=n?`<b>${Math.round(r.up/n*100)}% positive</b> from ${n} rated trade${n>1?"s":""} (${r.up} good, ${r.down} bad)`:"No trade ratings yet."}).catch(()=>{});
   if($("plDcopy"))$("plDcopy").addEventListener("click",e=>{navigator.clipboard.writeText(p.discord).then(()=>{e.target.textContent="Copied"})});
   if($("plFollow"))$("plFollow").addEventListener("click",async e=>{const b=e.target;b.disabled=true;try{if(isFollowing(uid))await window.FB.unfollow(uid);else await window.FB.follow(uid,p.count);b.classList.toggle("on",isFollowing(uid));b.textContent=isFollowing(uid)?"★ Following":"☆ Follow"}catch(err){alert("Couldn't save: "+(err.code||err.message))}b.disabled=false});
   if($("plPropose"))$("plPropose").addEventListener("click",()=>{setPartner({uid,name:p.name||"Unnamed"});showView("trade")});
@@ -2186,7 +2338,7 @@ function checkAlerts(){let last=null;try{last=JSON.parse(localStorage.getItem(LV
     else al.push({i,o,kind:wish.has(i.id)?"Wishlist item went up":"Your spare went down",good:false})}
   if(!al.length)return;
   const el=$("alerts");el.hidden=false;
-  el.innerHTML=`<div class="al-head"><b>🔔 Value alerts</b><small>since your last visit</small><button class="pbtn" id="alX" aria-label="Dismiss alerts">✕</button></div><ul>${al.map(a=>`<li><button data-open="${esc(a.i.id)}" class="${a.good?"good":"bad"}"><span class="mi">${miniArt(a.i)}</span><span class="pn"><span>${esc(a.i.name)}</span><small>${a.kind}</small></span><span class="mk-v">${fmt(a.o)} → <b>${fmt(a.i.val)}</b></span><span class="mk-p ${a.i.val>a.o?"up":"dn"}">${a.i.val>a.o?"▲":"▼"} ${Math.abs((a.i.val-a.o)/a.o*100).toFixed(0)}%</span></button></li>`).join("")}</ul>`;
+  el.innerHTML=`<div class="al-head"><b>Value alerts</b><small>since your last visit</small><button class="pbtn" id="alX" aria-label="Dismiss alerts">✕</button></div><ul>${al.map(a=>`<li><button data-open="${esc(a.i.id)}" class="${a.good?"good":"bad"}"><span class="mi">${miniArt(a.i)}</span><span class="pn"><span>${esc(a.i.name)}</span><small>${a.kind}</small></span><span class="mk-v">${fmt(a.o)} → <b>${fmt(a.i.val)}</b></span><span class="mk-p ${a.i.val>a.o?"up":"dn"}">${a.i.val>a.o?"▲":"▼"} ${Math.abs((a.i.val-a.o)/a.o*100).toFixed(0)}%</span></button></li>`).join("")}</ul>`;
   $("alX").addEventListener("click",()=>{el.hidden=true});
   el.addEventListener("click",e=>{const b=e.target.closest("[data-open]");if(b)openItem(b.dataset.open)});
   const good=al.filter(a=>a.good);if(good.length)notify(good.length===1?`${good[0].i.name}: ${good[0].kind.toLowerCase()}`:`${good.length} value alerts`,good.map(a=>`${a.i.name} ${fmt(a.o)} → ${fmt(a.i.val)}`).join(", "))}
@@ -2249,27 +2401,27 @@ $("bdRefresh").addEventListener("click",()=>{posts=null;loadBoard()});
 
 /* ---------- share image ---------- */
 function shareCanvas(){const W=1200,H=675,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
-  const D='"Bungee","Arial Black",sans-serif',B='"Rubik",system-ui,sans-serif',M='"JetBrains Mono",monospace';
-  const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,"#1d1640");g.addColorStop(1,"#0e0c18");x.fillStyle=g;x.fillRect(0,0,W,H);
-  x.fillStyle="rgba(255,255,255,.05)";for(let i=0;i<W;i+=28)for(let j=0;j<H;j+=28){x.beginPath();x.arc(i,j,1.2,0,7);x.fill()}
+  const D='"Barlow Condensed","Arial Narrow",sans-serif',B='"Barlow",system-ui,sans-serif',M=B;
+  const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,"#ffffff");g.addColorStop(1,"#ffffff");x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.fillStyle="#1D4F9E";x.fillRect(0,0,W,10);
   const s=catStats("All"),me=fbMe(),name=(me&&me.name)||who||"";const val=items.filter(i=>counted(i)&&owned.has(i.id)).reduce((t,i)=>t+(i.val||0)*(qty[i.id]||1),0);
-  x.fillStyle="#ffc94d";x.font=`600 22px ${M}`;x.fillText("MURDER MYSTERY 2 · COLLECTION",60,78);
-  x.fillStyle="#f3f0ff";x.font=`58px ${D}`;x.fillText(name?name.slice(0,18):"My collection",60,150);
+  x.fillStyle="#59606A";x.font=`600 24px ${B}`;x.fillText("MM2 Collection Tracker",60,78);
+  x.fillStyle="#1C2128";x.font=`800 66px ${D}`;x.fillText(name?name.slice(0,18):"My collection",60,150);
   // ring
-  const cx=230,cy=360,r=130;x.lineWidth=26;x.strokeStyle="rgba(255,255,255,.08)";x.beginPath();x.arc(cx,cy,r,0,7);x.stroke();
-  const rg=x.createLinearGradient(cx-r,cy-r,cx+r,cy+r);rg.addColorStop(0,"#ffc94d");rg.addColorStop(1,"#3fe3a3");x.strokeStyle=rg;x.lineCap="round";
+  const cx=230,cy=360,r=130;x.lineWidth=26;x.strokeStyle="#ECEEF1";x.beginPath();x.arc(cx,cy,r,0,7);x.stroke();
+  const rg=x.createLinearGradient(cx-r,cy-r,cx+r,cy+r);rg.addColorStop(0,"#1F8A47");rg.addColorStop(1,"#1F8A47");x.strokeStyle=rg;x.lineCap="butt";
   if(s.h){x.beginPath();x.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+Math.PI*2*Math.max(s.p,.01));x.stroke()}
-  x.textAlign="center";x.fillStyle="#f3f0ff";x.font=`64px ${D}`;x.fillText((s.p>0&&s.p<.1?(s.p*100).toFixed(1):Math.floor(s.p*100))+"%",cx,cy+18);
-  x.fillStyle="#9a93b8";x.font=`500 22px ${M}`;x.fillText(`${s.h} / ${s.n} items`,cx,cy+58);x.textAlign="left";
+  x.textAlign="center";x.fillStyle="#1C2128";x.font=`800 72px ${D}`;x.fillText((s.p>0&&s.p<.1?(s.p*100).toFixed(1):Math.floor(s.p*100))+"%",cx,cy+18);
+  x.fillStyle="#59606A";x.font=`500 24px ${B}`;x.fillText(`${s.h} of ${s.n} items`,cx,cy+58);x.textAlign="left";
   // stats
-  const st=[["Inventory value",fmt(val),"#ffc94d"],["Spares for trade",String(spares().reduce((t,id)=>t+qty[id]-1,0)),"#3fe3a3"],["Wishlist",String(wish.size),"#ff9a52"]];
-  st.forEach((v,k)=>{const y=560;const X=60+k*190;x.fillStyle="#9a93b8";x.font=`500 17px ${B}`;x.fillText(v[0],X,y);x.fillStyle=v[2];x.font=`30px ${D}`;x.fillText(v[1],X,y+40)});
+  const st=[["Inventory value",fmt(val),"#8A5300"],["Spares for trade",String(spares().reduce((t,id)=>t+qty[id]-1,0)),"#1F8A47"],["Wishlist",String(wish.size),"#1D4F9E"]];
+  st.forEach((v,k)=>{const y=560;const X=60+k*190;x.fillStyle="#59606A";x.font=`500 19px ${B}`;x.fillText(v[0],X,y);x.fillStyle=v[2];x.font=`700 38px ${D}`;x.fillText(v[1],X,y+40)});
   // category bars
   const cats=CATS.filter(c=>c!==EVC&&!EXTRA.has(c));const bx=640,bw=480;let y=200;
-  x.fillStyle="#f3f0ff";x.font=`26px ${D}`;x.fillText("By rarity",bx,160);
-  for(const ct of cats){const t=catStats(ct);x.fillStyle="#c9c3e6";x.font=`600 20px ${B}`;x.fillText(ct,bx,y);x.textAlign="right";x.fillStyle="#9a93b8";x.font=`500 18px ${M}`;x.fillText(`${t.h}/${t.n}`,bx+bw,y);x.textAlign="left";
-    x.fillStyle="rgba(255,255,255,.08)";x.fillRect(bx,y+10,bw,10);x.fillStyle=RC[ct];x.fillRect(bx,y+10,Math.max(bw*t.p,t.h?4:0),10);y+=46}
-  x.fillStyle="#6f6890";x.font=`500 18px ${M}`;x.fillText("mm2inventory.netlify.app",60,H-36);x.textAlign="right";x.fillText(new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),W-60,H-36);x.textAlign="left";
+  x.fillStyle="#1C2128";x.font=`700 30px ${D}`;x.fillText("By rarity",bx,160);
+  for(const ct of cats){const t=catStats(ct);x.fillStyle="#1C2128";x.font=`600 20px ${B}`;x.fillText(ct,bx,y);x.textAlign="right";x.fillStyle="#59606A";x.font=`500 19px ${B}`;x.fillText(`${t.h} of ${t.n}`,bx+bw,y);x.textAlign="left";
+    x.fillStyle="#ECEEF1";x.fillRect(bx,y+10,bw,10);x.fillStyle=RC[ct];x.fillRect(bx,y+10,Math.max(bw*t.p,t.h?4:0),10);y+=46}
+  x.fillStyle="#868C95";x.font=`500 19px ${B}`;x.fillText("mm2inventory.netlify.app",60,H-36);x.textAlign="right";x.fillText(new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),W-60,H-36);x.textAlign="left";
   return c}
 async function openShare(){try{await document.fonts.ready}catch(e){}const c=shareCanvas();const url=c.toDataURL("image/png");lastFocus=document.activeElement;cur=null;
   const mc=$("mcard");mc.style.setProperty("--rc","var(--gold)");mc.className="mcard shotcard";
