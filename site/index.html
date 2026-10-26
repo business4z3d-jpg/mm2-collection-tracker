@@ -1,0 +1,1775 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>MM2 Collection Tracker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: night-lobby hero with progress ring, rarity chips that filter, sticky toolbar, image grid of item cards glowing in their rarity colour */
+:root{
+  --bg:#0e0c18; --bg2:#141127; --surface:#1a1631; --surface2:#221d3d; --line:#2f2950;
+  --ink:#f1edff; --muted:#9a93b8; --dim:#6c6589;
+  --gold:#ffc94d; --owned:#3fe3a3; --danger:#ff6b86;
+  --f-display:"Bungee","Arial Black",system-ui,sans-serif;
+  --f-body:"Rubik",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --r:14px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);
+  background:
+    radial-gradient(60% 120% at 85% -10%, rgba(255,92,122,.22), transparent 60%),
+    radial-gradient(50% 100% at 10% 0%, rgba(124,92,255,.25), transparent 65%),
+    linear-gradient(180deg,var(--bg2),var(--bg))}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(rgba(255,255,255,.55) 1px,transparent 1.5px);background-size:46px 46px;
+  -webkit-mask-image:linear-gradient(180deg,#000,transparent 85%);mask-image:linear-gradient(180deg,#000,transparent 85%)}
+.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center;padding-block:34px 28px}
+.kicker{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 10px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(2rem,5.4vw,3.6rem);line-height:.95;margin:0;letter-spacing:.01em;text-wrap:balance}
+h1 span{display:block;color:transparent;-webkit-text-stroke:1.5px var(--ink)}
+.lede{color:var(--muted);max-width:52ch;margin:14px 0 0;font-size:1rem}
+.acctrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:18px}
+.acct{font-size:.85rem;color:var(--muted);margin:0;display:flex;gap:8px;align-items:center}
+.acct::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--dim);flex:none}
+.acct[data-s="ok"]{color:var(--ink)}.acct[data-s="ok"]::before{background:var(--owned);box-shadow:0 0 0 4px rgba(63,227,163,.18)}
+.acct[data-s="err"]{color:var(--danger)}.acct[data-s="err"]::before{background:var(--danger)}
+.gbtn{display:inline-flex;align-items:center;gap:8px;border:0;background:#fff;color:#1f1f1f;font-weight:600;font-size:.88rem;padding:9px 14px;border-radius:999px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.gbtn svg{width:16px;height:16px}
+.gbtn.out{background:var(--surface2);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+.gbtn.out svg{display:none}
+
+.ringbox{display:grid;justify-items:center;gap:10px}
+.ring{position:relative;width:176px;height:176px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .trk{fill:none;stroke:rgba(255,255,255,.08);stroke-width:12}
+.ring .val{fill:none;stroke:url(#rg);stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1)}
+.ring .ctr{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring .pct{font-family:var(--f-display);font-size:2.4rem;line-height:1}
+.ring .of{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);margin-top:6px}
+.mv{font-size:.8rem;color:var(--muted);text-align:center}
+.mv b{display:block;font-family:var(--f-mono);font-size:1.1rem;color:var(--gold)}
+
+/* ---------- rarity chips ---------- */
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px;padding-block:18px 6px}
+.chip{--rc:var(--muted);position:relative;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px 12px;cursor:pointer;overflow:hidden;transition:transform .15s,border-color .15s,background .15s}
+.chip:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--rc) 55%,var(--line))}
+.chip[aria-pressed="true"]{background:color-mix(in srgb,var(--rc) 16%,var(--surface));border-color:var(--rc)}
+.chip .cn{display:flex;align-items:center;gap:7px;font-weight:600;font-size:.88rem}
+.chip .cn i{width:9px;height:9px;border-radius:3px;background:var(--rc);flex:none}
+.chip .cc{font-family:var(--f-mono);font-size:.74rem;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+.chip .cb{position:absolute;left:0;bottom:0;height:3px;background:var(--rc);width:0;transition:width .4s}
+.chip.c-Chroma{--rc:#c9a7ff}
+.chip.x{border-style:dashed}
+.chip.c-Halloween{background:linear-gradient(135deg,color-mix(in srgb,#ff8a3d 22%,var(--surface)),var(--surface))}
+.chip.c-Chroma .cn i,.chip.c-Chroma .cb{background:linear-gradient(90deg,#ff5f6d,#ffc371,#5ee7a0,#5ab8ff,#b07bff)}
+
+/* ---------- toolbar ---------- */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:10px}
+.bar .wrap{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-block:10px}
+.search{flex:1 1 220px;min-width:0;position:relative}
+.search svg{position:absolute;left:12px;top:50%;width:16px;height:16px;transform:translateY(-50%);color:var(--dim)}
+.search input{width:100%;font:inherit;font-size:.92rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 12px 9px 36px}
+.search input::placeholder{color:var(--dim)}
+select{font:inherit;font-size:.88rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 10px}
+.tog{display:inline-flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted);cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 12px;user-select:none}
+.tog input{accent-color:var(--owned);width:16px;height:16px;margin:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:8px 10px;cursor:pointer;color:var(--muted);display:grid;place-items:center}
+.seg button svg{width:18px;height:18px}
+.seg button[aria-pressed="true"]{background:var(--surface2);color:var(--ink)}
+
+/* ---------- sections ---------- */
+main{padding-block:8px 40px}
+.grp{margin-top:26px;--rc:var(--muted)}
+.gh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.gh h2{font-family:var(--f-display);font-weight:400;font-size:1.25rem;margin:0;letter-spacing:.02em;color:var(--rc)}
+.grp.c-Chroma .gh h2{background:linear-gradient(90deg,#ff7b8a,#ffd27a,#7cf0b4,#78c4ff,#c49bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gh .gl{flex:1;height:1px;background:linear-gradient(90deg,color-mix(in srgb,var(--rc) 60%,transparent),transparent)}
+.gh .gc{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.gh .nt{font-size:.75rem;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+
+/* ---------- cards (grid view) ---------- */
+.cards{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:10px}
+.card{position:relative;border-radius:var(--r);background:var(--surface);border:1px solid var(--line);transition:transform .15s,border-color .15s,box-shadow .15s;min-width:0}
+.card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--rc) 60%,var(--line));box-shadow:0 10px 30px -12px color-mix(in srgb,var(--rc) 70%,transparent)}
+.card .open{display:flex;flex-direction:column;width:100%;border:0;background:none;padding:0;text-align:left;cursor:pointer;border-radius:var(--r)}
+.art{position:relative;aspect-ratio:1;max-width:100%;border-radius:calc(var(--r) - 1px) calc(var(--r) - 1px) 0 0;display:grid;place-items:center;overflow:hidden;color:var(--dim);
+  background:radial-gradient(70% 70% at 50% 55%,color-mix(in srgb,var(--rc) 30%,transparent),transparent 70%),var(--bg2)}
+.art img{width:82%;height:82%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));transition:transform .2s}
+.card:hover .art img{transform:scale(1.06) rotate(-3deg)}
+.art svg{width:38%;height:38%}
+.info{padding:9px 11px 11px;display:grid;gap:4px;min-width:0}
+.nm{font-weight:600;font-size:.88rem;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:.72rem;color:var(--muted)}
+.meta .v{font-family:var(--f-mono);font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.meta .v.na{color:var(--dim);font-weight:500}
+.lk{color:var(--danger)}
+.chk{position:absolute;top:8px;left:8px;z-index:2;width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(14,12,24,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);cursor:pointer;display:grid;place-items:center;padding:0;transition:background .15s,border-color .15s,transform .15s}
+.chk svg{width:16px;height:16px;opacity:0;transform:scale(.6);transition:opacity .15s,transform .15s;color:#06281b}
+.chk:hover{border-color:var(--owned);transform:scale(1.08)}
+.card.own{border-color:color-mix(in srgb,var(--owned) 55%,var(--line))}
+.card.own .chk{background:var(--owned);border-color:var(--owned)}
+.card.own .chk svg{opacity:1;transform:scale(1)}
+.card.own .nm{color:var(--owned)}
+.chroma{border-color:transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,conic-gradient(from var(--a,0deg),#ff5f6d,#ffc371,#5ee7a0,#5ab8ff,#b07bff,#ff5f6d) border-box}
+.chroma.own{background:linear-gradient(var(--surface),var(--surface)) padding-box,var(--owned) border-box}
+@property --a{syntax:"<angle>";initial-value:0deg;inherits:false}
+@media (prefers-reduced-motion:no-preference){.chroma{animation:spin 6s linear infinite}@keyframes spin{to{--a:360deg}}}
+.empty{grid-column:1/-1;padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r)}
+
+/* ---------- list view ---------- */
+.list .cards{grid-template-columns:1fr;gap:6px}
+.list .card .open{flex-direction:row;align-items:center;gap:12px;padding:6px 12px 6px 52px}
+.list .art{width:52px;height:52px;aspect-ratio:auto;border-radius:10px;flex:none}
+.list .info{grid-template-columns:1fr auto;align-items:center;padding:0;flex:1}
+.list .nm{-webkit-line-clamp:1;min-height:0}
+.list .meta{gap:14px}
+.list .chk{top:50%;transform:translateY(-50%)}
+.list .chk:hover{transform:translateY(-50%) scale(1.08)}
+.list .card:hover{transform:none}
+
+/* ---------- tools / footer ---------- */
+details.tools{margin-top:40px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+details.tools summary{cursor:pointer;font-weight:600}
+details.tools p{color:var(--muted);font-size:.88rem;max-width:65ch}
+textarea{width:100%;min-height:80px;font-family:var(--f-mono);font-size:.75rem;border:1px solid var(--line);border-radius:10px;background:var(--bg2);color:var(--ink);padding:10px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.b{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:10px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.b.pri{background:var(--gold);border-color:var(--gold);color:#241a00;font-weight:600}
+#msg{font-size:.85rem;color:var(--owned);min-height:1.2em;margin-top:6px}
+footer{padding-block:24px 40px;font-size:.78rem;color:var(--dim);max-width:75ch}
+
+
+/* ---------- view switch + trade checker ---------- */
+.views{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--line);background:var(--surface);border-radius:12px;margin-top:18px}
+.views button{border:0;background:none;color:var(--muted);font-weight:600;font-size:.9rem;padding:8px 14px;border-radius:9px;cursor:pointer}
+.views button[aria-pressed="true"]{background:var(--gold);color:#241a00}
+.tc{padding-block:22px 40px}
+.tc-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start}
+.side{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-width:0}
+.side h2{font-family:var(--f-display);font-weight:400;font-size:1.1rem;margin:0 0 10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.side h2 small{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.picker{position:relative}
+.picker input{width:100%;font:inherit;font-size:.9rem;border:1px solid var(--line);background:var(--bg2);color:var(--ink);border-radius:10px;padding:9px 12px}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:15;background:var(--surface2);border:1px solid var(--line);border-radius:12px;max-height:320px;overflow:auto;list-style:none;margin:0;padding:4px;box-shadow:0 20px 40px -10px rgba(0,0,0,.6)}
+.sugg li{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer}
+.sugg li:hover,.sugg li[aria-selected="true"]{background:var(--surface)}
+.sugg .mi{width:34px;height:34px;border-radius:8px;background:var(--bg2);display:grid;place-items:center;overflow:hidden;flex:none;color:var(--dim)}
+.sugg .mi img{width:90%;height:90%;object-fit:contain}.sugg .mi svg{width:18px;height:18px}
+.sugg .sn{flex:1;min-width:0;font-size:.88rem}.sugg .sn small{display:block;color:var(--muted);font-size:.72rem}
+.sugg .sv{font-family:var(--f-mono);color:var(--gold);font-size:.82rem}
+.tlist{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px;min-height:52px}
+.tlist .empty{padding:14px;font-size:.85rem}
+.ti{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:6px 8px;--rc:var(--muted)}
+.ti .mi{width:40px;height:40px;border-radius:8px;display:grid;place-items:center;overflow:hidden;color:var(--dim);background:radial-gradient(70% 70% at 50% 55%,color-mix(in srgb,var(--rc) 35%,transparent),transparent 72%)}
+.ti .mi img{width:90%;height:90%;object-fit:contain}.ti .mi svg{width:20px;height:20px}
+.ti .tn{min-width:0;font-size:.88rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ti .tn small{display:block;font-weight:400;color:var(--muted);font-size:.72rem}
+.ti .need{color:var(--owned)}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.qty button{border:0;background:var(--surface);width:26px;height:26px;cursor:pointer;font-weight:700}
+.qty span{min-width:26px;text-align:center;font-family:var(--f-mono);font-size:.82rem}
+.ti .tv{font-family:var(--f-mono);color:var(--gold);font-size:.85rem;text-align:right;min-width:52px}
+.ti .tv.na{color:var(--dim)}
+.sum{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted)}
+.sum b{font-family:var(--f-mono);font-size:1.25rem;color:var(--ink)}
+.clr{background:none;border:0;color:var(--dim);font-size:.78rem;cursor:pointer;text-decoration:underline;padding:0}
+.verdict{align-self:center;display:grid;justify-items:center;gap:8px;min-width:150px;text-align:center}
+.vbadge{font-family:var(--f-display);font-size:2.2rem;line-height:1;padding:16px 18px;border-radius:16px;border:1px solid var(--line);background:var(--surface);min-width:140px}
+.vbadge.win{color:#06281b;background:var(--owned);border-color:var(--owned)}
+.vbadge.lose{color:#2a0610;background:var(--danger);border-color:var(--danger)}
+.vbadge.fair{color:#241a00;background:var(--gold);border-color:var(--gold)}
+.vdiff{font-family:var(--f-mono);font-size:.9rem}
+.vnote{font-size:.78rem;color:var(--muted);max-width:22ch}
+.swap{font:inherit;font-size:.8rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+.tc-foot{margin-top:14px;font-size:.78rem;color:var(--dim);max-width:75ch}
+@media (max-width:820px){.tc-grid{grid-template-columns:1fr}.verdict{order:3;grid-auto-flow:row}}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;z-index:40;background:rgba(6,5,12,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:grid;place-items:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.mcard{--rc:var(--muted);position:relative;width:min(480px,100%);max-height:100%;overflow:auto;background:var(--surface);border:1px solid color-mix(in srgb,var(--rc) 45%,var(--line));border-radius:20px;box-shadow:0 30px 80px -20px color-mix(in srgb,var(--rc) 55%,transparent)}
+@media (prefers-reduced-motion:no-preference){.modal:not([hidden]) .mcard{animation:pop .22s cubic-bezier(.2,.9,.3,1.2)}@keyframes pop{from{transform:scale(.94) translateY(8px);opacity:0}}}
+#mclose{position:absolute;top:12px;right:12px;z-index:3;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:rgba(14,12,24,.6);color:var(--ink);cursor:pointer;font-size:1.2rem;line-height:1}
+.mart{position:relative;height:230px;display:grid;place-items:center;color:var(--dim);
+  background:radial-gradient(55% 75% at 50% 60%,color-mix(in srgb,var(--rc) 45%,transparent),transparent 72%),linear-gradient(180deg,var(--bg2),var(--surface))}
+.mart img{max-width:70%;max-height:78%;object-fit:contain;filter:drop-shadow(0 14px 24px rgba(0,0,0,.55))}
+.mart svg{width:72px;height:72px}
+.mbody{padding:4px 20px 20px}
+.mrar{display:inline-flex;align-items:center;gap:7px;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--rc)}
+.mrar i{width:9px;height:9px;border-radius:3px;background:var(--rc)}
+.mcard.c-Chroma .mrar i{background:linear-gradient(90deg,#ff5f6d,#ffc371,#5ee7a0,#5ab8ff,#b07bff)}
+.mbody h3{font-family:var(--f-display);font-weight:400;font-size:1.7rem;line-height:1.05;margin:6px 0 0;text-wrap:balance}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.tile{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.tile dt{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.tile dd{margin:4px 0 0;font-weight:600;font-size:.95rem;overflow-wrap:anywhere}
+.tile dd.vv{font-family:var(--f-mono);color:var(--gold);font-size:1.15rem}
+.tile dd small{color:var(--dim);font-weight:500;font-size:.75rem;margin-left:2px}
+.st{font-size:.85rem}.st-stable{color:var(--ink)}.st-doingwell,.st-underpaidfor{color:var(--owned)}.st-overpaidfor{color:var(--danger)}.st-fluctuating{color:var(--gold)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}.tags span{font-size:.72rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 9px}.tags .lk{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 45%,var(--line))}
+.how{margin-top:10px;font-size:.88rem;color:var(--muted)}.how b{color:var(--ink);font-weight:600}
+.ownbtn{margin-top:16px;width:100%;justify-content:center;padding:12px;font-weight:600;font-size:.95rem;border-radius:12px;border:1px solid var(--line);background:var(--surface2);cursor:pointer;display:flex;align-items:center;gap:8px}
+.ownbtn svg{width:18px;height:18px}
+.ownbtn[aria-pressed="true"]{background:var(--owned);border-color:var(--owned);color:#06281b}
+.mbody h4{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:20px 0 8px;font-weight:500}
+.hchart{width:100%;height:auto;display:block}
+.hist1{display:flex;align-items:baseline;gap:10px;font-family:var(--f-mono)}.hist1 b{color:var(--gold);font-size:1.3rem}.hist1 span{color:var(--muted);font-size:.8rem}
+.mnote{color:var(--muted);font-size:.8rem;margin:6px 0 0}
+.mlinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+
+@media (max-width:640px){
+  .hero .wrap{grid-template-columns:1fr;padding-block:26px 22px}
+  .ringbox{grid-auto-flow:column;justify-content:start;align-items:center;gap:18px}
+  .ring{width:120px;height:120px}.ring .pct{font-size:1.7rem}
+  .mv{text-align:left}
+  .chips{display:flex;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:10px;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px));scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 112px;scroll-snap-align:start}
+  .search{flex-basis:100%}
+  select,.tog{font-size:.82rem;padding:8px 9px}
+  .bar .wrap{gap:6px}
+  .cards{grid-template-columns:repeat(auto-fill,minmax(106px,1fr));gap:8px}
+  .info{padding:7px 8px 9px}.nm{font-size:.8rem}
+  .chk{width:26px;height:26px;top:6px;left:6px}
+  .mart{height:190px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <p class="kicker">Murder Mystery 2 · Collection</p>
+      <h1>MM2 Collection<span>Tracker</span></h1>
+      <p class="lede">Every knife, gun and pet from Ancient to Common. Tick what you own, and whatever is left is your trade list.</p>
+      <div class="acctrow"><p class="acct" id="acct">Connecting…</p><button class="gbtn" id="authBtn" hidden><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span>Sign in with Google</span></button></div>
+      <div class="views" role="group" aria-label="Section"><button id="vCol" aria-pressed="true">Collection</button><button id="vTrade" aria-pressed="false">Trade checker</button></div>
+    </div>
+    <div class="ringbox">
+      <div class="ring" aria-hidden="true">
+        <svg viewBox="0 0 140 140"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3fe3a3"/><stop offset="1" stop-color="#ffc94d"/></linearGradient></defs>
+          <circle class="trk" cx="70" cy="70" r="58"/><circle class="val" id="ringv" cx="70" cy="70" r="58" stroke-dasharray="364.4" stroke-dashoffset="364.4"/></svg>
+        <div class="ctr"><div class="pct" id="pct">0%</div><div class="of" id="pof">0 / 0</div></div>
+      </div>
+      <div class="mv" id="mvbox">Missing value<b id="mval">–</b></div>
+    </div>
+  </div>
+</header>
+
+<div id="colView">
+<div class="wrap"><nav class="chips" id="tabs" aria-label="Filter by rarity"></nav></div>
+
+<div class="bar">
+  <div class="wrap">
+    <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg><input type="search" id="q" placeholder="Search knives, guns, pets…" aria-label="Search items"></label>
+    <select id="sort" aria-label="Sort">
+      <option value="val">Highest value</option>
+      <option value="name">Name A–Z</option>
+    </select>
+    <label class="tog"><input type="checkbox" id="missing"> Missing only</label>
+    <div class="seg" role="group" aria-label="View">
+      <button id="vGrid" aria-pressed="true" aria-label="Grid view"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></button>
+      <button id="vList" aria-pressed="false" aria-label="List view"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="18" height="4" rx="2"/><rect x="3" y="10" width="18" height="4" rx="2"/><rect x="3" y="16" width="18" height="4" rx="2"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div id="groups"></div>
+
+  <details class="tools">
+    <summary>Back up or move your progress</summary>
+    <p id="toolsNote">When you're signed in, progress saves to your account automatically. This code is an extra backup: copy it somewhere safe, then paste it here and press Load to restore it.</p>
+    <textarea id="code" aria-label="Progress code"></textarea>
+    <div class="btns">
+      <button class="b pri" id="copy">Copy code</button>
+      <button class="b" id="load">Load code</button>
+      <button class="b" id="reset">Reset everything</button>
+    </div>
+    <div id="msg" role="status"></div>
+  </details>
+</main>
+
+</div>
+
+<section class="wrap tc" id="tradeView" hidden aria-label="Trade checker">
+  <div class="tc-grid">
+    <div class="side" id="sideA"><h2>You give <small id="cntA">0 items</small></h2>
+      <div class="picker"><input type="search" id="pickA" placeholder="Add an item you give…" aria-label="Add an item you give" autocomplete="off"><ul class="sugg" id="suggA" hidden></ul></div>
+      <ul class="tlist" id="listA"></ul>
+      <div class="sum"><span>Total value <button class="clr" data-clear="A">clear</button></span><b id="totA">0</b></div></div>
+    <div class="verdict"><div class="vbadge" id="vbadge">–</div><div class="vdiff" id="vdiff">Add items to both sides</div><div class="vnote" id="vnote"></div><button class="swap" id="swap">⇄ Swap sides</button></div>
+    <div class="side" id="sideB"><h2>You get <small id="cntB">0 items</small></h2>
+      <div class="picker"><input type="search" id="pickB" placeholder="Add an item you get…" aria-label="Add an item you get" autocomplete="off"><ul class="sugg" id="suggB" hidden></ul></div>
+      <ul class="tlist" id="listB"></ul>
+      <div class="sum"><span>Total value <button class="clr" data-clear="B">clear</button></span><b id="totB">0</b></div></div>
+  </div>
+  <p class="tc-foot">Values from MM2Values (<span class="vdate">Oct 25, 2026</span>). Win means you get at least 5% more value than you give, Lose means at least 5% less. Values are estimates, so check demand too: an item with high demand is easier to trade on later. Items marked “needed” are ones still missing from your collection.</p>
+</section>
+
+<div class="modal" id="modal" hidden><div class="mcard" id="mcard" role="dialog" aria-modal="true" aria-labelledby="mtitle"><button id="mclose" aria-label="Close">&times;</button><div id="mbody"></div></div></div>
+
+<footer class="wrap">Values, demand and trends from <a href="https://mm2values.com" target="_blank" rel="noopener" style="color:inherit">MM2Values</a> (updated <span class="vdate">Oct 25, 2026</span>), used with permission. Item images from MM2Values, Bloxodes and the MM2 Wiki (Fandom). New Halloween 2026 items have no settled value yet. Untradeable items, Effects, Emotes and Radios don't count toward your total. Fan project, not affiliated with Nikilis or Roblox.</footer>
+
+<script>
+// [name, category, type K/G/P/R/F/E, value (MM2Values), how to get, untradeable, demand, stability, mm2values image]
+const D=[["Gingerscope","Ancient","G",14250,"Christmas 2023 Pass",0,"5","Stable","",""],
+["Traveler's Axe","Ancient","K",7850,"Halloween 2023 Pass",0,"6","Stable","",""],
+["Celestial","Ancient","K",1950,"Christmas 2024 Pass",0,"4.5","Stable","",""],
+["Vampire's Axe","Ancient","K",1275,"Halloween 2024 Pass",0,"4","Stable","",""],
+["Harvester","Ancient","G",250,"Halloween 2021 Pass",0,"3","Stable","",""],
+["Icepiercer","Ancient","G",165,"Christmas 2022 Pass",0,"2.5","Stable","",""],
+["Icebreaker","Ancient","K",70,"Christmas 2020 Pass",0,"2","Stable","",""],
+["Swirly Axe","Ancient","K",40,"Christmas 2021 Pass",0,"2","Stable","",""],
+["Batwing","Ancient","K",45,"Gamepass 2018 (off sale)",0,"2","Stable","",""],
+["Elderwood Scythe","Ancient","K",40,"Halloween 2019 Pass",0,"2","Stable","",""],
+["Hallowscythe","Ancient","K",32,"Halloween 2020 Pass",0,"2","Stable","",""],
+["Logchopper","Ancient","K",20,"Christmas 2019 Pass",0,"1.5","Stable","",""],
+["Icewing","Ancient","K",15,"Gamepass 2018 (off sale)",0,"2","Stable","",""],
+["Emberbow","Ancient","G",1900,"Halloween 2026 Pass Tier 30 · active",0,"6","Doing Well","","H26"],
+["Emberscythe","Ancient","K",1450,"Halloween 2026 Cauldron · active",0,"4.5","Fluctuating","","H26"],
+["Reaver","Ancient","K",null,"EVO-Gamepass",1,"","","",""],
+["Icecrusher","Ancient","K",null,"EVO-Gamepass",1,"","","",""],
+["Gingerscythe","Ancient","K",null,"EVO-Gamepass",1,"","","",""],
+["Chroma Traveler's Gun","Chroma","G",140000,"2023 Halloween Box",0,"7","Stable","",""],
+["Chroma Evergun","Chroma","G",48000,"Christmas 2023 Gifting",0,"6","Underpaid For","",""],
+["Chroma Evergreen","Chroma","K",33000,"2023 Christmas Box",0,"6","Underpaid For","",""],
+["Chroma Bauble","Chroma","G",29000,"Christmas 2024 Gifting",0,"6","Stable","",""],
+["Chroma Vampire's Gun","Chroma","G",25000,"2024 Halloween Box",0,"6","Fluctuating","",""],
+["Chroma Constellation","Chroma","G",26000,"2024 Christmas Box",0,"6","Stable","",""],
+["Chroma Alienbeam","Chroma","K",23000,"2025 Halloween Box",0,"6","Stable","",""],
+["Chroma Raygun","Chroma","G",12500,"Halloween 2025 Pass",0,"5","Stable","",""],
+["Chroma Sunrise","Chroma","G",8500,"2025 Summer Box",0,"4.5","Underpaid For","",""],
+["Chroma Snowcannon","Chroma","G",7650,"Christmas 2025",0,"4","Stable","",""],
+["Chroma Blizzard","Chroma","K",5500,"Snowy Bundle",0,"5","Stable","",""],
+["Chroma Sunset","Chroma","K",5500,"Summer 2025 Pass",0,"4.5","Stable","",""],
+["Chroma Snowstorm","Chroma","K",4250,"Snowy Bundle",0,"4","Stable","",""],
+["Chroma Treat","Chroma","K",1800,"Valentines 2026",0,"4.5","Stable","",""],
+["Chroma Heart Wand","Chroma","K",3400,"Valentines 2026 Box",0,"4.5","Stable","",""],
+["Chroma Sweet","Chroma","K",1750,"Sweet Bundle",0,"4.5","Stable","",""],
+["Chroma Snow Dagger","Chroma","K",2400,"Christmas 2025 Box",0,"5","Stable","",""],
+["Chroma Watergun","Chroma","G",2350,"2024 Summer Box",0,"4","Stable","",""],
+["Chroma Ornament","Chroma","K",1800,"Christmas 2025 Gifting",0,"3","Stable","",""],
+["Chroma Darkbringer","Chroma","G",60,"Mystery Box 2",0,"2","Stable","",""],
+["Chroma Lightbringer","Chroma","K",55,"Mystery Box 2",0,"2","Stable","",""],
+["Chroma Candleflame","Chroma","K",40,"2021 Halloween Box",0,"1","Stable","",""],
+["Chroma Luger","Chroma","G",48,"Gun Box 1",0,"2","Stable","",""],
+["Chroma Elderwood Blade","Chroma","K",35,"2022 Halloween Box",0,"1","Stable","",""],
+["Chroma Swirly Gun","Chroma","G",35,"2021 Christmas Box",0,"1","Stable","",""],
+["Chroma Cookiecane","Chroma","K",30,"2022 Christmas Box",0,"1","Stable","",""],
+["Chroma Laser","Chroma","G",40,"Gun Box 3",0,"2","Stable","",""],
+["Chroma Deathshard","Chroma","K",35,"Knife Box 1",0,"1","Stable","",""],
+["Chroma Slasher","Chroma","K",33,"Knife Box 4",0,"2","Stable","",""],
+["Chroma Shark","Chroma","G",33,"Gun Box 2",0,"1.5","Stable","",""],
+["Chroma Fang","Chroma","K",33,"Knife Box 2",0,"1","Stable","",""],
+["Chroma Gemstone","Chroma","K",33,"Mystery Box 1",0,"1","Stable","",""],
+["Chroma Heat","Chroma","K",30,"Rainbow Box",0,"1","Stable","",""],
+["Chroma Seer","Chroma","K",25,"Crafting",0,"1","Stable","",""],
+["Chroma Saw","Chroma","K",22,"Knife Box 3",0,"1","Stable","",""],
+["Chroma Gingerblade","Chroma","K",25,"2018 Christmas Box",0,"1","Stable","",""],
+["Chroma Tides","Chroma","K",25,"Knife Box 5",0,"1","Stable","",""],
+["Chroma Boneblade","Chroma","K",20,"2018 Halloween Box",0,"1","Stable","",""],
+["Chroma Icecream","Chroma","K",1875,"2026 Summer Box",0,"5","Stable","",""],
+["Chroma Beachy","Chroma","K",1300,"Beach Bundle 2026",0,"5","Doing Well","",""],
+["Chroma Sands","Chroma","G",1350,"Beach Bundle 2026",0,"5","Doing Well","",""],
+["Chroma Embersickle","Chroma","K",1600,"2026 Halloween Box · active",0,"4","Underpaid For","","H26"],
+["Chroma Emberbow","Chroma","G",10000,"Halloween 2026 Pass (rare roll) · active",0,"7","Fluctuating","","H26"],
+["Chroma Emberscythe","Chroma","K",15500,"Halloween 2026 Cauldron · active",0,"8","Fluctuating","","H26"],
+["Chroma Mortal","Chroma","K",1800,"Halloween 2026 · source unclear",0,"5.5","Fluctuating","","H26"],
+["Chroma Immortal","Chroma","G",1800,"Halloween 2026 · source unclear",0,"5.5","Fluctuating","","H26"],
+["Traveler's Gun","Godly","G",5150,"2023 Halloween Box",0,"5","Stable","",""],
+["Evergun","Godly","G",3425,"Christmas 2023 Gifting",0,"5","Stable","",""],
+["Constellation","Godly","G",2475,"2024 Christmas Box",0,"5","Stable","",""],
+["Turkey","Godly","K",1850,"Thanksgiving 2023",0,"5","Stable","",""],
+["Vampire's Gun","Godly","G",1875,"2024 Halloween Box",0,"5","Stable","",""],
+["Alienbeam","Godly","K",1800,"2025 Halloween Box",0,"5","Stable","",""],
+["Darkshot","Godly","G",1650,"Darkness Bundle",0,"5","Underpaid For","",""],
+["Darksword","Godly","K",1625,"Darkness Bundle",0,"5","Underpaid For","",""],
+["Sakura","Godly","K",1150,"Sakura Bundle (off sale)",0,"4.5","Stable","",""],
+["Raygun","Godly","G",1775,"Halloween 2025 Pass",0,"5","Stable","",""],
+["Bauble","Godly","G",675,"Christmas 2024 Gifting",0,"4","Stable","",""],
+["Snowcannon","Godly","G",680,"Christmas 2025 Pass",0,"4.5","Stable","",""],
+["Soul","Godly","G",645,"Spirit & Soul Bundle",0,"5","Stable","",""],
+["Spirit","Godly","K",635,"Spirit & Soul Bundle",0,"5","Stable","",""],
+["Rainbow Gun","Godly","G",410,"Mystery Box 1",0,"5","Stable","",""],
+["Rainbow","Godly","K",400,"Mystery Box 1",0,"5","Stable","",""],
+["Flora","Godly","G",405,"Bloom Bundle",0,"4.5","Stable","",""],
+["Bloom","Godly","K",395,"Bloom Bundle",0,"4.5","Stable","",""],
+["Heart Wand","Godly","K",350,"Valentines 2026 Box",0,"4.5","Stable","",""],
+["Treat","Godly","G",155,"Sweet Bundle",0,"2.5","Stable","",""],
+["Sweet","Godly","K",150,"Sweet Bundle",0,"2.5","Stable","",""],
+["Flowerwood Gun","Godly","G",235,"Flowerwood Bundle (off sale)",0,"3.5","Stable","",""],
+["Flowerwood","Godly","K",230,"Flowerwood Bundle (off sale)",0,"3.5","Stable","",""],
+["Xenoshot","Godly","G",440,"Xenotech Bundle",0,"4.5","Stable","",""],
+["Snow Dagger","Godly","K",170,"Christmas 2025 Box",0,"2","Stable","",""],
+["Ocean","Godly","G",240,"Ocean Bundle (off sale)",0,"3.5","Stable","",""],
+["Waves","Godly","K",235,"Ocean Bundle (off sale)",0,"3.5","Stable","",""],
+["Blizzard","Godly","G",250,"Snowstorm Bundle",0,"3.5","Stable","",""],
+["Snowstorm","Godly","K",250,"Snowstorm Bundle",0,"3.5","Stable","",""],
+["Watergun","Godly","G",150,"2024 Summer Box",0,"2","Stable","",""],
+["Heartblade","Godly","K",65,"Gamepass (off sale)",0,"2","Stable","",""],
+["Candy","Godly","K",90,"2015 Christmas Box",0,"2","Stable","",""],
+["Borealis","Godly","G",140,"Australis & Borealis Bundle",0,"2.5","Stable","",""],
+["Australis","Godly","K",135,"Australis & Borealis Bundle",0,"2.5","Stable","",""],
+["Pearlshine","Godly","G",80,"Pearls Bundle",0,"2","Stable","",""],
+["Pearl","Godly","K",75,"Pearls Bundle",0,"2","Stable","",""],
+["Sugar","Godly","G",33,"2015 Christmas Gun Box",0,"1.5","Stable","",""],
+["Luger","Godly","G",17,"Gun Box 1",0,"1","Stable","",""],
+["Darkbringer","Godly","G",35,"Mystery Box 2",0,"2","Stable","",""],
+["Elderwood Revolver","Godly","G",35,"2019 Halloween Box",0,"2","Stable","",""],
+["Iceblaster","Godly","G",35,"2020 Christmas Box",0,"2","Stable","",""],
+["Red Luger","Godly","G",38,"Christmas 2015 Crafting",0,"2","Stable","",""],
+["Elderwood Blade","Godly","K",32,"2022 Halloween Box",0,"1","Stable","",""],
+["Phantom","Godly","K",37,"Ghost Bundle (off sale)",0,"1","Stable","",""],
+["Spectre","Godly","K",37,"Ghost Bundle (off sale)",0,"1","Stable","",""],
+["Lightbringer","Godly","K",33,"Mystery Box 2",0,"2","Stable","",""],
+["Swirly Gun","Godly","G",18,"2021 Christmas Box",0,"1","Stable","",""],
+["Ornament","Godly","K",60,"Christmas 2025 Gifting",0,"2","Stable","",""],
+["Green Luger","Godly","G",25,"Christmas 2015 Crafting",0,"2","Stable","",""],
+["Plasmabeam","Godly","G",20,"Plasma Bundle (off sale)",0,"1.5","Stable","",""],
+["Icebeam","Godly","G",20,"Ice Bundle (off sale)",0,"1.5","Stable","",""],
+["Hallowgun","Godly","G",22,"2020 Halloween Box",0,"2","Stable","",""],
+["Amerilaser","Godly","G",23,"American Pack (off sale)",0,"2","Stable","",""],
+["Shark","Godly","G",20,"Gun Box 2",0,"2","Stable","",""],
+["Plasmablade","Godly","K",17,"Plasma Bundle (off sale)",0,"1","Stable","",""],
+["Swirly Blade","Godly","K",13,"Christmas 2021 Gifting",0,"1","Stable","",""],
+["Iceflake","Godly","K",18,"Ice Bundle (off sale)",0,"1.5","Stable","",""],
+["Nightblade","Godly","K",20,"Shadow Pack (off sale)",0,"1.5","Stable","",""],
+["Blaster","Godly","G",17,"Futuristic Pack (off sale)",0,"1.5","Stable","",""],
+["Ginger Luger","Godly","G",18,"Christmas 2018 Crafting",0,"2","Stable","",""],
+["Pixel","Godly","K",18,"8-Bit Pack (off sale)",0,"1.5","Stable","",""],
+["Lugercane","Godly","G",15,"Christmas 2019 Gifting",0,"2","Stable","",""],
+["Slasher","Godly","K",15,"Knife Box 4",0,"1","Stable","",""],
+["Cookiecane","Godly","K",14,"2022 Christmas Box",0,"1","Stable","",""],
+["BattleAxe II","Godly","K",18,"Halloween 2018",0,"1.5","Stable","",""],
+["Old Glory","Godly","K",17,"American Pack (off sale)",0,"1.5","Stable","",""],
+["Gingermint","Godly","K",14,"Christmas 2022 Gifting",0,"1","Stable","",""],
+["Minty","Godly","K",15,"2019 Christmas Box",0,"1","Stable","",""],
+["Jinglegun","Godly","G",15,"Christmas 2020 Gifting",0,"2","Stable","",""],
+["Gingerblade","Godly","K",13,"2018 Christmas Box",0,"1","Stable","",""],
+["Virtual","Godly","K",15,"Futuristic Pack (off sale)",0,"1","Stable","",""],
+["Gemstone","Godly","K",13,"Mystery Box 1",0,"1","Stable","",""],
+["Eternalcane","Godly","K",13,"Merch 2019",0,"1.5","Stable","",""],
+["Vampire's Edge","Godly","K",15,"Vampire Pack (off sale)",0,"1","Stable","",""],
+["Nebula","Godly","K",13,"Gamepass (off sale)",0,"1","Stable","",""],
+["Deathshard","Godly","K",13,"Knife Box 1",0,"1","Stable","",""],
+["BattleAxe","Godly","K",13,"Halloween Pack (off sale)",0,"1","Stable","",""],
+["Tides","Godly","K",12,"Knife Box 5",0,"1","Stable","",""],
+["Heat","Godly","K",12,"Rainbow Box",0,"1","Stable","",""],
+["Eternal IV","Godly","K",10,"Merch",0,"1","Stable","",""],
+["Eternal III","Godly","K",10,"Merch",0,"1","Stable","",""],
+["Frostsaber","Godly","K",10,"Christmas 2017",0,"1","Stable","",""],
+["Spider","Godly","K",12,"Halloween 2015 Bingo",0,"1","Stable","",""],
+["Clockwork","Godly","K",12,"Clockwork Pack (off sale)",0,"1","Stable","",""],
+["Bioblade","Godly","K",10,"Gamepass (off sale)",0,"1","Stable","",""],
+["Fang","Godly","K",12,"Knife Box 2",0,"1","Stable","",""],
+["Chill","Godly","K",12,"Christmas 2015 Crafting",0,"1","Stable","",""],
+["Handsaw","Godly","K",9,"Christmas 2015",0,"1","Stable","",""],
+["Eternal","Godly","K",10,"Merch",0,"1","Stable","",""],
+["Eternal II","Godly","K",8,"Merch",0,"1","Stable","",""],
+["Hallow's Edge","Godly","K",9,"2016 Halloween Box",0,"1","Stable","",""],
+["Hallow's Blade","Godly","K",7,"Halloween 2017",0,"1","Stable","",""],
+["Xmas","Godly","K",10,"Christmas 2015",0,"1","Stable","",""],
+["Ice Shard","Godly","K",9,"Winter Pack (off sale)",0,"1","Stable","",""],
+["Ice Dragon","Godly","K",7,"Christmas 2016",0,"1","Stable","",""],
+["Ghostblade","Godly","K",8,"Ghostly Pack (off sale)",0,"1","Stable","",""],
+["Boneblade","Godly","K",8,"2018 Halloween Box",0,"1","Stable","",""],
+["Saw","Godly","K",8,"Knife Box 3",0,"1","Stable","",""],
+["Frostbite","Godly","K",7,"Frostbite Pack (off sale)",0,"1","Stable","",""],
+["Prismatic","Godly","K",5,"Gamepass (off sale)",0,"1","Stable","",""],
+["Pumpking","Godly","K",8,"2017 Halloween Box",0,"1","Stable","",""],
+["Eggblade","Godly","K",5,"Gamepass (off sale)",0,"1","Stable","",""],
+["Winter's Edge","Godly","K",7,"2017 Christmas Box",0,"1","Stable","",""],
+["Snowflake","Godly","K",5,"Christmas 2017",0,"1","Stable","",""],
+["Flames","Godly","K",7,"Crafting (old)",0,"1","Stable","",""],
+["Seer","Godly","K",3,"Crafting",0,"1","Stable","",""],
+["Blue Seer","Godly","K",3,"Crafting",0,"1","Stable","",""],
+["Red Seer","Godly","K",3,"Crafting",0,"1","Stable","",""],
+["Purple Seer","Godly","K",3,"Crafting",0,"1","Stable","",""],
+["Cookieblade","Godly","K",4,"Gamepass (off sale)",0,"1","Stable","",""],
+["Orange Seer","Godly","K",2,"Crafting",0,"1","Stable","",""],
+["Yellow Seer","Godly","K",2,"Crafting",0,"1","Stable","",""],
+["Xenoknife","Godly","K",435,"Xenotech Bundle",0,"4.5","Stable","",""],
+["Candleflame","Godly","K",35,"2021 Halloween Box",0,"2","Stable","",""],
+["Peppermint","Godly","K",4,"Gamepass (off sale)",0,"1","Stable","",""],
+["Bat","Godly","K",120,"Halloween 2022",0,"2","Stable","",""],
+["Evergreen","Godly","K",2700,"2023 Christmas Box",0,"6","Stable","",""],
+["Sunset","Godly","K",650,"Summer 2025 Pass",0,"4","Stable","",""],
+["Sunrise","Godly","G",775,"2025 Summer Box",0,"4","Stable","",""],
+["Icecream","Godly","K",155,"2026 Summer Box",0,"2","Stable","",""],
+["Beachy","Godly","K",95,"Beach Bundle 2026",0,"2.5","Stable","",""],
+["Sands","Godly","G",95,"Beach Bundle 2026",0,"2.5","Stable","",""],
+["Embersickle","Godly","K",100,"2026 Halloween Box · active",0,"3","Underpaid For","","H26"],
+["Mortal","Godly","K",140,"Gamepass Halloween 2026 · active",0,"3","Fluctuating","","H26"],
+["Immortal","Godly","G",140,"Gamepass Halloween 2026 · active",0,"3","Fluctuating","","H26"],
+["America","Vintage","G",8,"MM1",0,"1","Stable","",""],
+["Golden","Vintage","G",5,"MM1",0,"1","Stable","",""],
+["Laser","Vintage","G",8,"MM1",0,"1","Stable","",""],
+["Blood","Vintage","K",8,"MM1",0,"1","Stable","",""],
+["Phaser","Vintage","K",6,"MM1",0,"1","Stable","",""],
+["Prince","Vintage","K",6,"MM1",0,"1","Stable","",""],
+["Shadow","Vintage","K",7,"MM1",0,"1","Stable","",""],
+["Ghost","Vintage","K",10,"MM1",0,"1.5","Stable","",""],
+["Splitter","Vintage","K",3,"MM1",0,"1","Stable","",""],
+["Cowboy","Vintage","K",4,"MM1",0,"1","Stable","",""],
+["Zombie Dog","Pets","P",725,"Common · Halloween Event",0,"3.5","","",""],
+["Bat","Pets","P",1,"Legendary · Season 1 Pet Egg",0,"1","","",""],
+["Dogey","Pets","P",140,"Uncommon · Classic Pet Box",0,"3","","",""],
+["Piggy","Pets","P",65,"Common · Classic Pet Box",0,"2","","",""],
+["Seahorsey","Pets","P",1,"Uncommon · Classic Pet Box",0,"1","","",""],
+["Fairy","Pets","P",1,"Uncommon · Classic Pet Box",0,"1","","",""],
+["Pengy","Pets","P",1,"Common · Classic Pet Box",0,"1","","",""],
+["Chilly","Pets","P",1,"Uncommon · Classic Pet Box",0,"1","","",""],
+["Chroma Fire Cat","Pets","P",3,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Chroma Fire Dog","Pets","P",3,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Chroma Fire Fox","Pets","P",3,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Chroma Fire Pig","Pets","P",3,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Chroma Fire Bear","Pets","P",3,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Chroma Fire Bat","Pets","P",3,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Bunny","Pets","P",1,"Common · Season 1 Pet Egg",0,"1","","",""],
+["Skully","Pets","P",15,"Legendary · Halloween Event",0,"2","","",""],
+["UFO","Pets","P",1,"Common · Classic Pet Box",0,"1","","",""],
+["Lil' Alien","Pets","P",1,"Common · Halloween Event",0,"2","","",""],
+["Snowbear","Pets","P",1,"Common · Christmas Event",0,"2","","",""],
+["Carrot Bunny","Pets","P",3,"Common · Easter/Valentine's",0,"2","","",""],
+["Chroma Fire Bunny","Pets","P",3,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Traveller","Pets","P",3,"Godly · Item Pack",0,"1","","",""],
+["Mr. Snowman","Pets","P",25,"Common · Christmas Event",0,"2","","",""],
+["Fox","Pets","P",2,"Uncommon · Season 1 Pet Egg",0,"1","","",""],
+["Pig","Pets","P",2,"Uncommon · Season 1 Pet Egg",0,"1","","",""],
+["Shadow Pumpkin","Pets","P",3,"Uncommon · Halloween Event",0,"2","","",""],
+["Bear","Pets","P",2,"Rare · Season 1 Pet Egg",0,"2","","",""],
+["Green Pumpkin (2020)","Pets","P",10,"Rare · Halloween Event",0,"2","","",""],
+["Fire Cat","Pets","P",2,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Fire Dog","Pets","P",2,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Fire Fox","Pets","P",2,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Fire Pig","Pets","P",2,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Fire Bear","Pets","P",2,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Fire Bat","Pets","P",2,"Godly · Season 1 Pet Egg",0,"1","","",""],
+["Dog","Pets","P",1,"Common · Season 1 Pet Egg",0,"1","","",""],
+["Badger","Pets","P",1,"Common · Classic Pet Box",0,"1","","",""],
+["Scarecrow","Pets","P",1,"Rare · Halloween Event",0,"2","","",""],
+["Santa (2019)","Pets","P",40,"Rare · Christmas Event",0,"2","","",""],
+["Cat","Pets","P",1,"Season 1 Pet Egg",0,"1","","",""],
+["Nobledragon","Pets","P",3,"Classic Pet Box",0,"1.5","","",""],
+["Mechbug","Pets","P",1,"Classic Pet Box",0,"1","","",""],
+["Tankie","Pets","P",1,"Classic Pet Box",0,"1","","",""],
+["Deathspeaker","Pets","P",4,"Classic Pet Box",0,"1","","",""],
+["Eyeball","Pets","P",1,"Classic Pet Box",0,"1","","",""],
+["Jetstream","Pets","P",1,"Classic Pet Box",0,"1","","",""],
+["Black Cat","Pets","P",70,"Halloween Event",0,"2","","",""],
+["Vampire Bat","Pets","P",1,"Halloween Event",0,"1","","",""],
+["Pumpkin (2017)","Pets","P",50,"Halloween Event",0,"3","","",""],
+["Pumpkin (2018)","Pets","P",null,"Halloween Event",0,"","","",""],
+["Blue Pumpkin (2018)","Pets","P",210,"Halloween Event",0,"2","","",""],
+["Red Pumpkin (2018)","Pets","P",125,"Halloween Event",0,"2","","",""],
+["Green Pumpkin (2018)","Pets","P",70,"Halloween Event",0,"2","","",""],
+["Purple Pumpkin (2018)","Pets","P",5,"Halloween Event",0,"1","","",""],
+["Pumpkin (2019)","Pets","P",1,"Halloween Event",0,"2","","",""],
+["Red Pumpkin (2019)","Pets","P",2,"Halloween Event",0,"1","","",""],
+["Green Pumpkin (2019)","Pets","P",3,"Halloween Event",0,"1","","",""],
+["Blue Pumpkin (2019)","Pets","P",1,"Halloween Event",0,"1","","",""],
+["Pumpkin (2020)","Pets","P",2,"Halloween Event",0,"1","","",""],
+["Red Pumpkin (2020)","Pets","P",20,"Halloween Event",0,"2","","",""],
+["Blue Pumpkin (2020)","Pets","P",5,"Halloween Event",0,"2","","",""],
+["Pumpkin (2021)","Pets","P",2,"Halloween Event",0,"1","","",""],
+["Red Pumpkin (2021)","Pets","P",15,"Halloween Event",0,"2","","",""],
+["Green Pumpkin (2021)","Pets","P",8,"Halloween Event",0,"2","","",""],
+["Elf (2016)","Pets","P",28,"Christmas Event",0,"2","","",""],
+["Elf (2019)","Pets","P",650,"Christmas Event",0,"4","","",""],
+["Mr. Reindeer","Pets","P",55,"Christmas Event",0,"3","","",""],
+["Reindeer","Pets","P",1,"Christmas Event",0,"1","","",""],
+["Rudolph","Pets","P",1,"Christmas Event",0,"1","","",""],
+["Santa Dog","Pets","P",2,"Christmas Event",0,"1","","",""],
+["Frostbird","Pets","P",4,"Christmas Event",0,"1","","",""],
+["Snowman","Pets","P",2,"Christmas Event",0,"1","","",""],
+["<3","Pets","P",10,"Valentines 2016",0,"1.5","","",""],
+["Teddy","Pets","P",3,"Event",0,"2","","",""],
+["Icey","Pets","P",2,"Item Pack",0,"1","","",""],
+["Skelly","Pets","P",3,"Item Pack",0,"1","","",""],
+["Phoenix","Pets","P",4,"Item Pack",0,"1","","",""],
+["Sammy","Pets","P",4,"Item Pack",0,"1","","",""],
+["Electro","Pets","P",4,"Item Pack",0,"1","","",""],
+["Steambird","Pets","P",4,"Item Pack",0,"1","","",""],
+["Ice Phoenix","Pets","P",3,"Item Pack",0,"1","","",""],
+["Overseer Eye","Pets","P",1,"Shop (old)",0,"1","","",""],
+["Elitey","Pets","P",1,"Elite Gamepass",0,"1","","",""],
+["Ghosty","Pets","P",2,"Item Pack · untradeable",1,"1","","",""],
+["Default","Radios","R",null,"Radio-Gamepass",0,"","","",""],
+["Elite","Radios","R",null,"Elite-Gamepass",0,"","","",""],
+["Dubstep","Radios","R",null,"Shop 1.200 Coins",0,"","","",""],
+["Camo","Radios","R",null,"Shop 2.000 Coins",0,"","","",""],
+["Bluesteel","Radios","R",null,"Shop 3.200 Coins",0,"","","",""],
+["Boombastic","Radios","R",null,"Shop 3.600 Coins",0,"","","",""],
+["Golden","Radios","R",null,"Shop 12.000 Coins",0,"","","",""],
+["Candy","Radios","R",null,"Halloween Pass",0,"","","",""],
+["Jack-o-Radio","Radios","R",null,"Halloween Pass",0,"","","",""],
+["Elderwood","Radios","R",null,"Halloween 2019",0,"","","",""],
+["Ghost","Radios","R",null,"Halloween Pass",0,"","","",""],
+["Hallowradio","Radios","R",null,"Halloween",0,"","","",""],
+["Reaver","Radios","R",null,"Halloween 2021",0,"","","",""],
+["Vampire","Radios","R",null,"Halloween Pass",0,"","","",""],
+["Gingerbread","Radios","R",null,"Christmas 2016",0,"","","",""],
+["Candy Cane","Radios","R",null,"Christmas 2016",0,"","","",""],
+["Snowy","Radios","R",null,"Christmas 2016",0,"","","",""],
+["Ice","Radios","R",null,"Christmas 2017",0,"","","",""],
+["Coal","Radios","R",null,"Christmas 2017",0,"","","",""],
+["Green Candy Cane","Radios","R",null,"Christmas 2017",0,"","","",""],
+["Blue Candy Cane","Radios","R",null,"Christmas 2017",0,"","","",""],
+["Tree","Radios","R",null,"Christmas 2017",0,"","","",""],
+["Candy Cane '18","Radios","R",null,"Christmas 2018",0,"","","",""],
+["Blue Candy Cane '18","Radios","R",null,"Christmas 2018",0,"","","",""],
+["Minty","Radios","R",null,"Christmas",0,"","","",""],
+["Iceplayer","Radios","R",null,"Christmas",0,"","","",""],
+["Swirly","Radios","R",null,"Christmas 2021",0,"","","",""],
+["Boombox","Radios","R",null,"Summer Event",0,"","","",""],
+["Omega","Radios","R",null,"Shop 400 Diamonds",0,"","","",""],
+["Fade","Radios","R",null,"Shop 400 Diamonds",0,"","","",""],
+["Overseer","Radios","R",null,"Shop (retired)",0,"","","",""],
+["Rainbow","Radios","R",null,"Shop 800 Diamonds",0,"","","",""],
+["Flaming","Radios","R",null,"Shop 900 Diamonds",0,"","","",""],
+["Pink Sparkletime","Radios","R",null,"Shop 1.000 Diamonds",0,"","","",""],
+["Blue Sparkletime","Radios","R",null,"Shop 1.000 Diamonds",0,"","","",""],
+["Green Sparkletime","Radios","R",null,"Shop 1.000 Diamonds",0,"","","",""],
+["Red Sparkletime","Radios","R",null,"Shop 1.000 Diamonds",0,"","","",""],
+["Diamond","Radios","R",null,"Shop 2.500 Diamonds",0,"","","",""],
+["Blue Flaming Knife","Effects","F",null,"Shop",0,"","","",""],
+["Doge","Effects","F",null,"Shop (retired)",0,"","","",""],
+["Dual Wield","Effects","F",null,"Shop",0,"","","",""],
+["Electric Knife","Effects","F",null,"Shop",0,"","","",""],
+["Flaming Knife","Effects","F",null,"Shop",0,"","","",""],
+["Ghostify","Effects","F",null,"Shop",0,"","","",""],
+["Green Flaming Knife","Effects","F",null,"Shop",0,"","","",""],
+["Heartify","Effects","F",null,"Shop",0,"","","",""],
+["Knifeception","Effects","F",null,"Shop",0,"","","",""],
+["Monify","Effects","F",null,"Shop (retired)",0,"","","",""],
+["Musical","Effects","F",null,"Shop",0,"","","",""],
+["Pink Flaming Knife","Effects","F",null,"Shop",0,"","","",""],
+["Radioactive","Effects","F",null,"Shop",0,"","","",""],
+["Bats","Effects","F",null,"Halloween Pack",0,"","","",""],
+["Bitsplosion","Effects","F",null,"Item Pack",0,"","","",""],
+["Blizzard","Effects","F",null,"Winter Pack 2017",0,"","","",""],
+["Darkfire","Effects","F",null,"Shadow Pack",0,"","","",""],
+["Elite-ify","Effects","F",null,"Item Pack",0,"","","",""],
+["Ethereal","Effects","F",null,"Ghostly Pack 2019",0,"","","",""],
+["Frostbite","Effects","F",null,"Frostbite Pack 2019",0,"","","",""],
+["Gearstorm","Effects","F",null,"Clockwork Pack",0,"","","",""],
+["Ghostly","Effects","F",null,"Halloween Pack",0,"","","",""],
+["Ice Magic","Effects","F",null,"Christmas Pack",0,"","","",""],
+["Petals","Effects","F",null,"Valentines Pack",0,"","","",""],
+["Plasma","Effects","F",null,"Plasma Pack",0,"","","",""],
+["Rainbow","Effects","F",null,"Easter Pack",0,"","","",""],
+["Vampire","Effects","F",null,"Vampire Pack",0,"","","",""],
+["Darkswirl","Effects","F",null,"Halloween 2023 Pack",0,"","","",""],
+["Flow","Effects","F",null,"Summer 2023 Pack",0,"","","",""],
+["Aurora Lights","Effects","F",null,"Christmas 2024 Bundle",0,"","","",""],
+["Flowerwood","Effects","F",null,"Easter 2024 Bundle",0,"","","",""],
+["Glisten","Effects","F",null,"Summer 2024 Pack",0,"","","",""],
+["Wraith","Effects","F",null,"Halloween 2024 Pack",0,"","","",""],
+["Bloom","Effects","F",null,"Easter 2025 Pack",0,"","","",""],
+["Snowstorm","Effects","F",null,"Christmas 2025 Pack",0,"","","",""],
+["Xeno","Effects","F",null,"Halloween 2025 Pack",0,"","","",""],
+["Ocean","Effects","F",null,"Beach Bundle 2026",0,"","","",""],
+["Pixie Dust","Effects","F",null,"Sweet Bundle 2026",0,"","","",""],
+["Smolder","Effects","F",null,"Mortal Bundle 2026 · active",0,"","","","H26"],
+["Poison","Effects","F",null,"Halloween 2019 Pass",0,"","","",""],
+["Frostfire","Effects","F",null,"Christmas 2020 Pass",0,"","","",""],
+["Ghosts (2020)","Effects","F",null,"Halloween 2020 Pass",0,"","","",""],
+["Jingle","Effects","F",null,"Christmas 2020 Pass",0,"","","",""],
+["Snowfall","Effects","F",null,"Christmas 2020 Pass",0,"","","",""],
+["Aurora","Effects","F",null,"Christmas 2021 Pass",0,"","","",""],
+["Phantom","Effects","F",null,"Halloween 2021 Pass",0,"","","",""],
+["Snowflake","Effects","F",null,"Christmas 2021 Pass",0,"","","",""],
+["Starry","Effects","F",null,"Christmas 2021 Pass",0,"","","",""],
+["Wraithfire","Effects","F",null,"Halloween 2021 Pass",0,"","","",""],
+["Arctic","Effects","F",null,"Christmas 2022 Pass",0,"","","",""],
+["Candies (2022)","Effects","F",null,"Halloween 2022 Pass",0,"","","",""],
+["Chilly","Effects","F",null,"Christmas 2022 Pass",0,"","","",""],
+["Minty","Effects","F",null,"Christmas 2022 Pass",0,"","","",""],
+["Pumpkin (2022)","Effects","F",null,"Halloween 2022 Pass",0,"","","",""],
+["Stickers","Effects","F",null,"Christmas 2022 Pass",0,"","","",""],
+["Toxic","Effects","F",null,"Halloween 2022 Pass",0,"","","",""],
+["Versus","Effects","F",null,"Halloween 2022 Pass",0,"","","",""],
+["Candies (2023)","Effects","F",null,"Halloween 2023 Pass",0,"","","",""],
+["Fireworks","Effects","F",null,"Christmas 2023 Pass",0,"","","",""],
+["Ghosts (2023)","Effects","F",null,"Halloween 2023 Pass",0,"","","",""],
+["Glowy","Effects","F",null,"Halloween 2023 Pass",0,"","","",""],
+["Stars","Effects","F",null,"Christmas 2023 Pass",0,"","","",""],
+["Swirls","Effects","F",null,"Christmas 2023 Pass",0,"","","",""],
+["Traveler's Flame","Effects","F",null,"Halloween 2023 Pass",0,"","","",""],
+["Celestial","Effects","F",null,"Christmas 2024 Pass",0,"","","",""],
+["Cursed","Effects","F",null,"Halloween 2024 Pass",0,"","","",""],
+["Flowers","Effects","F",null,"Easter 2024 Pass",0,"","","",""],
+["Ghosts (2024)","Effects","F",null,"Halloween 2024 Pass",0,"","","",""],
+["Gifts","Effects","F",null,"Christmas 2024 Pass",0,"","","",""],
+["Snowy","Effects","F",null,"Christmas 2024 Pass",0,"","","",""],
+["Vampiric","Effects","F",null,"Halloween 2024 Pass",0,"","","",""],
+["Abduction","Effects","F",null,"Halloween 2025 Pass",0,"","","",""],
+["Aquatic","Effects","F",null,"Summer 2025 Pass",0,"","","",""],
+["Cat Eyes","Effects","F",null,"Halloween 2025 Pass",0,"","","",""],
+["Confetti","Effects","F",null,"Christmas 2025 Pass",0,"","","",""],
+["Flamingo","Effects","F",null,"Summer 2025 Pass",0,"","","",""],
+["Frost","Effects","F",null,"Christmas 2025 Pass",0,"","","",""],
+["Heatwave","Effects","F",null,"Summer 2025 Pass",0,"","","",""],
+["Retro","Effects","F",null,"Summer 2025 Pass",0,"","","",""],
+["Snowballs","Effects","F",null,"Christmas 2025 Pass",0,"","","",""],
+["Synthwave","Effects","F",null,"Summer 2025 Pass",0,"","","",""],
+["Treats","Effects","F",null,"Halloween 2025 Pass",0,"","","",""],
+["UFOs","Effects","F",null,"Halloween 2025 Pass",0,"","","",""],
+["Zombie","Effects","F",null,"Halloween 2026 Pass · active",0,"","","","H26"],
+["Zen","Emotes","E",null,"Shop",0,"","","",""],
+["Floss","Emotes","E",null,"Shop",0,"","","",""],
+["Spray Paint","Emotes","E",null,"Shop",0,"","","",""],
+["GG Sign","Emotes","E",null,"Shop",0,"","","",""],
+["Prank Bomb","Emotes","E",null,"Shop",0,"","","",""],
+["Dab","Emotes","E",null,"Shop",0,"","","",""],
+["Ninja Rest","Emotes","E",null,"Shop",0,"","","",""],
+["Firefly Jar","Emotes","E",null,"Shop",0,"","","",""],
+["Sit","Emotes","E",null,"Shop",0,"","","",""],
+["Teddy Bear","Emotes","E",null,"Shop",0,"","","",""],
+["Chocolate Milk","Emotes","E",null,"Shop",0,"","","",""],
+["Ice Cream","Emotes","E",null,"Shop",0,"","","",""],
+["Pizza","Emotes","E",null,"Shop",0,"","","",""],
+["Headless","Emotes","E",null,"Halloween 2018",0,"","","",""],
+["Zombie","Emotes","E",null,"Halloween 2018",0,"","","",""],
+["Zombie Friend","Emotes","E",null,"Halloween 2019",0,"","","",""],
+["Treat Bucket","Emotes","E",null,"Halloween 2019",0,"","","",""],
+["Toy Candy","Emotes","E",null,"Halloween 2019",0,"","","",""],
+["Key Toy","Emotes","E",null,"Halloween 2020",0,"","","",""],
+["Toy Candy 2","Emotes","E",null,"Halloween 2020",0,"","","",""],
+["BooSign","Emotes","E",null,"Halloween 2021",0,"","","",""],
+["Toy Candy 3","Emotes","E",null,"Halloween 2021",0,"","","",""],
+["Reaver Sign","Emotes","E",null,"Halloween 2021",0,"","","",""],
+["Candy Emote","Emotes","E",null,"Halloween 2022",0,"","","",""],
+["Survivor Sign","Emotes","E",null,"Halloween 2022",0,"","","",""],
+["Zombie Sign","Emotes","E",null,"Halloween 2022",0,"","","",""],
+["Pumpkin Toy (2023)","Emotes","E",null,"Halloween 2023",0,"","","",""],
+["Gravestone","Emotes","E",null,"Halloween 2024",0,"","","",""],
+["Spellbook","Emotes","E",null,"Halloween 2024",0,"","","",""],
+["Villager's Lantern","Emotes","E",null,"Halloween 2024",0,"","","",""],
+["Candle (2024)","Emotes","E",null,"Halloween 2024",0,"","","",""],
+["Alien Plush","Emotes","E",null,"Halloween 2025",0,"","","",""],
+["Candy Bucket","Emotes","E",null,"Halloween 2025",0,"","","",""],
+["Pumpkin (2025)","Emotes","E",null,"Halloween 2025",0,"","","",""],
+["Cauldron","Emotes","E",null,"Halloween 2026 Bingo · active",0,"","","","H26"],
+["Toy Token","Emotes","E",null,"Christmas 2019",0,"","","",""],
+["Snowball","Emotes","E",null,"Christmas 2020",0,"","","",""],
+["Cookie","Emotes","E",null,"Christmas 2023",0,"","","",""],
+["Santa (2024)","Emotes","E",null,"Christmas 2024",0,"","","",""],
+["Tree","Emotes","E",null,"Christmas 2024",0,"","","",""],
+["Snowglobe","Emotes","E",null,"Christmas 2024",0,"","","",""],
+["Snowman","Emotes","E",null,"Christmas 2024",0,"","","",""],
+["Bell","Emotes","E",null,"Christmas 2025",0,"","","",""],
+["Candle (2025)","Emotes","E",null,"Christmas 2025",0,"","","",""],
+["Santa Plushie (2025)","Emotes","E",null,"Christmas 2025",0,"","","",""],
+["Velvet Cake","Emotes","E",null,"Christmas 2025",0,"","","",""],
+["Egg Toy (2023)","Emotes","E",null,"Easter 2023",0,"","","",""],
+["Egg Toy (2024)","Emotes","E",null,"Easter 2024",0,"","","",""],
+["Bunny Toy","Emotes","E",null,"Easter 2024",0,"","","",""],
+["Rare Egg Toy (2024)","Emotes","E",null,"Easter 2024",0,"","","",""],
+["Egg Toy (2025)","Emotes","E",null,"Easter 2025",0,"","","",""],
+["Rare Egg Toy (2025)","Emotes","E",null,"Easter 2025",0,"","","",""],
+["Beach Ball","Emotes","E",null,"Summer 2023",0,"","","",""],
+["Coconut","Emotes","E",null,"Summer 2024",0,"","","",""],
+["Sand Bucket","Emotes","E",null,"Summer 2024",0,"","","",""],
+["Water Balloon","Emotes","E",null,"Summer 2024",0,"","","",""],
+["Ice Cream (2025)","Emotes","E",null,"Summer 2025",0,"","","",""],
+["Flamingo","Emotes","E",null,"Summer 2025",0,"","","",""],
+["Volleyball","Emotes","E",null,"Summer 2025",0,"","","",""],
+["Bubble Blower","Emotes","E",null,"Summer 2026",0,"","","",""],
+["RC Car (2026)","Emotes","E",null,"Summer 2026",0,"","","",""],
+["Pie","Emotes","E",null,"Thanksgiving 2023",0,"","","",""],
+["Latte","Emotes","E",null,"Thanksgiving 2025",0,"","","",""],
+["Heart","Emotes","E",null,"Valentines 2026",0,"","","",""],
+["Blossom","Godly","G",1160,"Trading",0,"4.5","Stable","",""],
+["Makeshift","Godly","G",33,"Trading",0,"1","Stable","",""],
+["Laser","Godly","G",23,"Trading",0,"2","Stable","",""],
+["Fire Bunny","Pets","P",2,"Trading",0,"1","","",""],
+["Latte Gun","Legendary","G",140,"",0,"2","","LatteGun.png",""],
+["Latte Knife","Legendary","K",140,"",0,"2","","LatteKnife.png",""],
+["Spectral Knife","Legendary","K",50,"",0,"2","","SpectralKnife.png",""],
+["Traveler Gun","Legendary","G",50,"",0,"2","","Traveler_Gun_2023.png",""],
+["Aurora Gun","Legendary","G",40,"",0,"2","","AuroraGun2021.png",""],
+["Vampire Gun","Legendary","G",40,"",0,"2","","Vampire_Gun_2022.png",""],
+["Cotton Candy","Legendary","K",35,"",0,"2","","CottoncandyUP.png",""],
+["Beach","Legendary","K",35,"",0,"2","","Beach_knife.png",""],
+["JD","Legendary","K",30,"",0,"2","","JDUP.png",""],
+["Bunnies","Legendary","K",15,"",0,"2","","BunniesKnife2025.png",""],
+["Arctic Gun","Legendary","G",12,"",0,"1.5","","ArcticGun22.png",""],
+["Golden","Legendary","K",10,"",0,"3","","Golden_knife_2.png",""],
+["Shadow","Legendary","G",10,"",0,"3","","Shadow_gun.png",""],
+["Cavern Knife","Legendary","K",8,"",0,"1.5","","Cavernknife19UP.png",""],
+["Broken","Legendary","K",7,"",0,"2","","Broken2023.png",""],
+["Icedriller","Legendary","K",6,"",0,"1","","icedriller.png",""],
+["Ghost Knife","Legendary","K",5,"",0,"1","","Ghostk2018UP.png",""],
+["Ginger Gun","Legendary","G",5,"",0,"1","","Ginger_gun_20182018UP.png",""],
+["Santas Spirit","Legendary","K",5,"",0,"1","","santasspirit.png",""],
+["Witched","Legendary","K",5,"",0,"1.5","","Witched19UP.png",""],
+["Santas Magic","Legendary","K",5,"",0,"1","","SantasMagicUP.png",""],
+["Green Elite","Legendary","K",4,"",0,"1","","GreenEliteUP1.png",""],
+["Scratch","Legendary","K",4,"",0,"1","","redscratch2016UP.png",""],
+["Blue Elite","Legendary","K",4,"",0,"1","","blueelite2017UP.png",""],
+["Blue Scratch","Legendary","K",3,"",0,"1","","Blue_Scratch2017UP.png",""],
+["Skulls","Legendary","K",3,"",0,"1.5","","SkullsUP19.png",""],
+["Traveler Knife","Legendary","K",3,"",0,"2.5","","TravellerKnife.png",""],
+["Frostfade Knife","Legendary","K",2,"",0,"1.5","","Frostfade2023.png",""],
+["Icecracker","Legendary","K",2,"",0,"1","","IcecrackerUP.png",""],
+["Red Fire","Legendary","K",2,"",0,"1","","Red_Fire2017UP.png",""],
+["Vampire Knife","Legendary","K",2,"",0,"2","","VampKnife2022.png",""],
+["Energized Gun","Legendary","G",2,"",0,"2","","EnergizedGun2025.png",""],
+["Web","Legendary","K",1,"",0,"1","","WebKnife_UP.png",""],
+["Rupture","Legendary","G",1,"",0,"1","","RuptureUP.png",""],
+["Tree (gun)","Legendary","G",1,"",0,"1","","TreeGun2015UP.png",""],
+["Tree (knife)","Legendary","K",1,"",0,"1","","tree2015UP.png",""],
+["Cursed (Knife)","Legendary","K",1,"",0,"1","","CursedKnife24.png",""],
+["Ghost Gun","Legendary","G",1,"",0,"1","","GhostGun2018UP.png",""],
+["Nightsky","Legendary","G",1,"",0,"1.5","","Nightsky2024.png",""],
+["Energized Knife","Legendary","K",1,"",0,"2","","EnergizedKnife2025.png",""],
+["Frozen Knife","Legendary","K",1,"",0,"2","","Frozen_Knife_2025.png",""],
+["Cavern Gun","Legendary","G",1,"",0,"1","","Cavern_GunUP.png",""],
+["Cupid","Legendary","K",1,"",0,"2.5","","Cupid_2026.png",""],
+["Predator (knife)","Legendary","K",4,"",0,"2.5","","PredatorKnifeUp.png",""],
+["Emerald","Legendary","K",4,"",0,"2","","EmeraldUP.png",""],
+["Overseer (gun)","Legendary","G",4,"",0,"2.5","","OverseergunUP.png",""],
+["Spectral Gun","Legendary","G",4,"",0,"2.5","","SpectralGun.png",""],
+["Chromatic Knife","Legendary","K",4,"",0,"2","","chromaticknife.png",""],
+["Ripper Knife","Legendary","K",4,"",0,"2","","RipperKnUP.png",""],
+["Frostfade Gun","Legendary","G",3,"",0,"2","","Frostfadegun.png",""],
+["Aurora Knife","Legendary","K",3,"",0,"2.5","","AuroraKnife2021.png",""],
+["Green Fire","Legendary","K",3,"",0,"1","","Green_Fire2017UP.png",""],
+["Sparkle","Legendary","G",3,"",0,"2","","SparkleUP.png",""],
+["Midnight","Legendary","K",3,"",0,"2","","MidnightUP.png",""],
+["Arctic Knife","Legendary","K",3,"",0,"3","","Arctic_knife22.png",""],
+["Chromatic Gun","Legendary","G",3,"",0,"2","","chromaticgun.png",""],
+["Ripper Gun","Legendary","G",3,"",0,"2","","RipperGunUp.png",""],
+["Palms Gun","Legendary","G",2,"",0,"2","","Palmsg.png",""],
+["Ginger Knife","Legendary","K",2,"",0,"2","","GingerK2018UP.png",""],
+["Nightstar","Legendary","K",2,"",0,"2","","NightskyKnife2024.png",""],
+["Aquarium Knife","Legendary","K",2,"",0,"1","","AquariumK25.png",""],
+["Aquarium Gun","Legendary","G",2,"",0,"1","","AquariumG25.png",""],
+["Frozen Gun","Legendary","G",2,"",0,"2","","Frozen_Gun_2025.png",""],
+["Bubbles","Legendary","K",2,"",0,"1","","Bubbles2026.png",""],
+["Cursed (Gun)","Legendary","G",1,"",0,"1","","CursedGun.png",""],
+["Overseer (knife)","Legendary","K",4,"",0,"3","","OverseerknifeUP.png",""],
+["Predator (gun)","Legendary","G",4,"",0,"3","","PredatorGunUP.png",""],
+["Elite","Legendary","K",3,"",0,"1","","EliteUP.png",""],
+["Shiny","Legendary","K",3,"",0,"2","","ShinyUP.png",""],
+["Fusion","Legendary","K",3,"",0,"2","","FusionUP.png",""],
+["Fade","Legendary","K",3,"",0,"2","","Fade_UP.png",""],
+["Splash","Legendary","K",3,"",0,"2","","SplashKUP.png",""],
+["Universe","Legendary","G",3,"",0,"2","","UniversegunUP.png",""],
+["Plasmite","Legendary","K",3,"",0,"2","","PlasmitekUP.png",""],
+["Viper","Legendary","G",3,"",0,"2","","ViperUP.png",""],
+["Rune","Legendary","K",3,"",0,"2","","RuneUP.png",""],
+["Splash Gun","Legendary","G",3,"",0,"1","","SplashgunUP.png",""],
+["Palms Knife","Legendary","K",2,"",0,"1","","PalmsKnfie.png",""],
+["Cane Knife","Rare","K",525,"",0,"4","","Cane_knife2018UP.png",""],
+["Dungeon","Rare","K",125,"",0,"2","","Dungeon19UP.png",""],
+["DarkKnife","Rare","K",65,"",0,"3","","Darkknife_Knife_2023.png",""],
+["Silent Night Knife","Rare","K",50,"",0,"1.5","","SilentNightKnife.png",""],
+["Makeshift Knife","Rare","K",35,"",0,"2","","MakeshiftKnifepass.png",""],
+["Zombified","Rare","K",30,"",0,"3","","Zombified_Knife_2022.png",""],
+["Starry Gun","Rare","G",20,"",0,"2","","StarryGun2021.png",""],
+["Watcher Gun","Rare","G",20,"",0,"3","","Watcher2021Gun.png",""],
+["Snowflakes","Rare","K",15,"",0,"2","","Snowflakes2020.png",""],
+["Silent Night Gun","Rare","G",15,"",0,"1.5","","SilentNightGun.png",""],
+["Swirl Knife","Rare","K",15,"",0,"2","","SwirlKnife2021.png",""],
+["Ghostfire","Rare","G",15,"",0,"2","","Ghostfire_Gun_2022.png",""],
+["Floral","Rare","K",12,"",0,"2","","Floral_knife.png",""],
+["Ghastly Gun","Rare","G",12,"",0,"2","","Ghastly_Gun_2023.png",""],
+["Prince","Rare","G",10,"",0,"3","","Prince_gun.png",""],
+["Vampire Gun","Rare","G",10,"",0,"1","","Vampire_gun2018UP.png",""],
+["Magma Gun","Rare","G",10,"",0,"2","","MagmaGun2021.png",""],
+["Cowboy","Rare","K",10,"",0,"3","","Cowboy_knife_2.png",""],
+["Laser","Rare","K",10,"",0,"3","","Laser_knife.png",""],
+["Phaser","Rare","K",10,"",0,"3","","Phaser_knife.png",""],
+["Toxic Knife","Rare","K",8,"",0,"1.5","","ToxicK2018UP.png",""],
+["Magma","Rare","K",7,"",0,"1.5","","Magma2017UP.png",""],
+["Aurora Knife","Rare","K",7,"",0,"1.5","","AuroraKUP.png",""],
+["Monster","Rare","G",4,"",0,"1","","MonsterUP.png",""],
+["Jack","Rare","K",3,"",0,"1.5","","jack15UP.png",""],
+["Bats","Rare","K",3,"",0,"1","","bats2016UP.png",""],
+["Icicles Gun","Rare","G",3,"",0,"1","","Icicles_gun2018UP.png",""],
+["Green Marble","Rare","K",3,"",0,"1","","Green_Marble2017UP.png",""],
+["Wraith Knife","Rare","K",3,"",0,"2","","Wraith_Knife_2022.png",""],
+["Snakebite Knife","Rare","K",3,"",0,"1","","SnakebiteKUP.png",""],
+["Orange Marble","Rare","K",2,"",0,"1","","orangemarble2016UP.png",""],
+["Vampire Knife","Rare","K",2,"",0,"1","","Vampire2018UP.png",""],
+["Toxic Gun","Rare","G",2,"",0,"1","","Toxic_Gun2018UP.png",""],
+["Aurora Gun","Rare","G",2,"",0,"2","","Aurora_GunUP.png",""],
+["Candy Swirl Gun","Rare","G",2,"",0,"1","","CandySwirlGunUP.png",""],
+["Starry Knife","Rare","K",1,"",0,"2","","Strarryknife.png",""],
+["Cane (Knife)","Rare","K",1,"",0,"1","","cane2015UP.png",""],
+["Cane (Gun)","Rare","G",1,"",0,"1","","CaneGun2015UP.png",""],
+["Candy Swirl Knife","Rare","K",1,"",0,"2","","CandySwirlUP.png",""],
+["Snakebite Gun","Rare","G",1,"",0,"1","","SnakebitegunUP.png",""],
+["Darkgun","Rare","G",1,"",0,"2.5","","Darkgun_Gun_2023.png",""],
+["GingerBread","Rare","K",4,"",0,"2","","Gingerbread2017UP.png",""],
+["Ghastly Knife","Rare","K",3,"",0,"2","","Ghastlyknife2023UP.png",""],
+["Mummy","Rare","G",3,"",0,"1","","MummyGun2015up.png",""],
+["Ginger (Knife)","Rare","K",3,"",0,"1","","ginger2015UP.png",""],
+["Ginger (Gun)","Rare","G",3,"",0,"1","","Ginger_gun2015UP.png",""],
+["Watcher Knife","Rare","K",3,"",0,"2","","Watcher2021KnifeUP.png",""],
+["Xeno Knife","Rare","K",3,"",0,"2","","XenoKnife2025.png",""],
+["Xeno Gun","Rare","G",3,"",0,"3","","XenoGun2025.png",""],
+["Hologram Knife","Rare","K",3,"",0,"3","","HologramKnife2025.png",""],
+["Cane Gun","Rare","G",2,"",0,"2","","Cane_gun_2018up.png",""],
+["Pop Art Gun","Rare","G",2,"",0,"2","","PopArtG25.png",""],
+["Molten (Gun)","Rare","G",2,"",0,"2","","MoltenGunUP.png",""],
+["Neon Gun (2025)","Rare","G",2,"",0,"2","","NeonG25.png",""],
+["Molten (Knife)","Rare","K",2,"",0,"2","","MoltenKUP.png",""],
+["Pop Art Knife","Rare","K",2,"",0,"2","","PopArtK25.png",""],
+["Nuclear","Rare","G",2,"",0,"2.5","","nuclear.png",""],
+["Snowy","Rare","K",1,"",0,"2","","Snowy2017UP.png",""],
+["Sunny","Rare","G",1,"",0,"1","","SunnyGun2025.png",""],
+["Icicles Knife","Rare","K",1,"",0,"2","","Icicles_knife2018up.png",""],
+["Heart","Rare","K",1,"",0,"2","","Heart2023.png",""],
+["Painted Knife","Rare","K",1,"",0,"2","","paintedknife.png",""],
+["Sunset","Rare","G",1,"",0,"2","","Sunset_gun.png",""],
+["Candleflame","Rare","G",4,"",0,"2","","cf24.png",""],
+["Spearmint Knife","Rare","K",4,"",0,"2","","Spearmint_Knife.png",""],
+["Gingercookie Gun","Rare","G",4,"",0,"2","","Gingercookie_Gun_2025.png",""],
+["Neon Gun (2023)","Rare","G",3,"",0,"2","","Neongun2023.png",""],
+["Tree Knife 23","Rare","K",3,"",0,"2","","Treeknife2023.png",""],
+["Logcutter","Rare","K",3,"",0,"2","","Logcutterknife2024.png",""],
+["Frostflame Knife","Rare","K",3,"",0,"2","","Frostflameknife2024.png",""],
+["Magma Knife","Rare","K",3,"",0,"2","","MagmaKnife2021.png",""],
+["Butterflies","Rare","G",3,"",0,"1","","ButterfliesGun2025.png",""],
+["Nether","Rare","K",3,"",0,"2","","NetherUP.png",""],
+["Spitfire","Rare","K",3,"",0,"2","","SpitfireUP.png",""],
+["Damp","Rare","K",3,"",0,"2","","DampUP.png",""],
+["Tropical Knife","Rare","K",3,"",0,"2","","TropicalK25.png",""],
+["Gingerbread Gun 2022","Rare","G",3,"",0,"2","","GingerbreadG2022.png",""],
+["Tree Knife 2022","Rare","K",3,"",0,"2","","TreeK2022.png",""],
+["Hologram Gun","Rare","G",3,"",0,"2","","HologramGun2025.png",""],
+["Tree Gun 2022","Rare","G",3,"",0,"2","","TreeG2022.png",""],
+["Biogel","Rare","G",3,"",0,"2","","biogel.png",""],
+["Portal Knife","Rare","K",3,"",0,"2","","PortalKUP.png",""],
+["Yummy Knife","Rare","K",3,"",0,"2","","Yummy_2026.png",""],
+["Heartbreak","Rare","K",3,"",0,"2","","Heartbreak26.png",""],
+["Snowflake Gun 23","Rare","G",2,"",0,"2","","Snowflake2023gun.png",""],
+["Snowglobe Knife","Rare","K",2,"",0,"2","","Snowglobe2023knife.png",""],
+["Robot Knife","Rare","K",2,"",0,"2","","Robot.png",""],
+["Spring Knife","Rare","K",2,"",0,"2","","Spring.png",""],
+["Ice Camo","Rare","G",2,"",0,"2","","IceCamoGun.png",""],
+["Storm","Rare","K",2,"",0,"1","","Storm.png",""],
+["Curse Knife","Rare","K",2,"",0,"2","","CurseKnife.png",""],
+["Wraith Gun","Rare","G",2,"",0,"2","","Wraith_Gun_2022.png",""],
+["Gingerbread Knife 2022","Rare","K",2,"",0,"2","","GingerbreadK2022.png",""],
+["Spearmint Gun","Rare","G",2,"",0,"2","","spearmingun.png",""],
+["Gingercookie Knife","Rare","K",2,"",0,"1","","Gingercookie_Knife.png",""],
+["Bones","Rare","K",2,"",0,"2","","Bones_Knife2020UP.png",""],
+["Ghosts","Rare","G",2,"",0,"2","","Ghosts_GunUP.png",""],
+["Sharkie Knife","Rare","K",1,"",0,"2","","Sharkie.png",""],
+["Kraken","Rare","K",1,"",0,"1","","Kraken.png",""],
+["Ritual","Rare","G",1,"",0,"1","","Ritual.png",""],
+["Frostflame Gun","Rare","G",1,"",0,"2","","FrostflameGun2024.png",""],
+["Sleigh","Rare","K",1,"",0,"2","","Sleigh2024.png",""],
+["Black","Rare","K",4,"",0,"2","","BlackUP.png",""],
+["Galaxy","Rare","K",3,"",0,"2","","GalaxyUP.png",""],
+["Rainbow","Rare","K",3,"",0,"2","","RainbowKup.png",""],
+["Imbued","Rare","G",3,"",0,"2","","ImbuedGunUP.png",""],
+["Galactic","Rare","G",3,"",0,"2","","GalacticUP.png",""],
+["Krypto","Rare","K",3,"",0,"2","","KryptoKnifeUP.png",""],
+["Spectrum","Rare","K",3,"",0,"2","","SpectrumUP.png",""],
+["iRevolver","Rare","G",3,"",0,"2","","IRevolverIUP.png",""],
+["Hacker","Rare","G",3,"",0,"2","","HackerUP.png",""],
+["Nova","Rare","K",3,"",0,"2","","NovaUP.png",""],
+["Vortex","Rare","K",3,"",0,"2","","VortexUP.png",""],
+["Ace","Rare","G",3,"",0,"2","","AceUP.png",""],
+["Bacon","Rare","G",3,"",0,"2","","BaconUP.png",""],
+["Korblox","Rare","K",3,"",0,"2","","KorbloxKnifeUp.png",""],
+["Squire","Rare","K",3,"",0,"2","","SquireUp.png",""],
+["Abstract","Rare","K",3,"",0,"2","","Abstract_UP.png",""],
+["Musical","Rare","K",3,"",0,"2","","MusicalUP.png",""],
+["Purple","Rare","K",3,"",0,"2","","PurpleUP.png",""],
+["Rainbow (Gun)","Rare","G",3,"",0,"2","","RainbowgunUP.png",""],
+["Space","Rare","K",3,"",0,"2","","SpaceUP.png",""],
+["Deep Sea","Rare","K",3,"",0,"2","","DeepSeaUp.png",""],
+["Nightfire","Rare","G",3,"",0,"2","","NightfireUp.png",""],
+["Waves Knife","Rare","K",2,"",0,"1","","Waves24.png",""],
+["Floral Gun","Rare","G",2,"",0,"1","","Floragun.png",""],
+["Sunset Gun","Rare","G",2,"",0,"1","","SunsetGun2026.png",""],
+["Pier","Rare","K",2,"",0,"1","","Pier2026.png",""],
+["Bones Gun","Uncommon","G",195,"",0,"2.5","","bonesgun.png",""],
+["Brains 2019","Uncommon","K",125,"",0,"2.5","","2019brains.png",""],
+["Zombified Knife","Uncommon","K",125,"",0,"3","","zombifiedknife.png",""],
+["Gingerbread Knife (2019)","Uncommon","K",90,"",0,"2.5","","2019gbknife.png",""],
+["Sweater Knife (2018)","Uncommon","K",75,"",0,"2.5","","Sweater_knife2018UP.png",""],
+["Branches","Uncommon","K",55,"",0,"3","","branches.png",""],
+["Snowflake Knife","Uncommon","K",55,"",0,"3","","Snowflake_knife_2018up.png",""],
+["Mummy (Knife)","Uncommon","K",35,"",0,"3","","Mummy_Knife2017UP.png",""],
+["Wrap Gun","Uncommon","G",20,"",0,"2","","wrapgun2020.png",""],
+["ZombifiedGun","Uncommon","G",20,"",0,"2","","zombifiedgun.png",""],
+["Wrap Knife","Uncommon","K",18,"",0,"2","","wrapknife2020.png",""],
+["Skulls","Uncommon","G",17,"",0,"2","","Skulls2021UP.png",""],
+["Void","Uncommon","K",15,"",0,"2","","Void.png",""],
+["Gingerbread Knife (2020)","Uncommon","K",13,"",0,"2","","Gingerbreadknife2020.png",""],
+["Zombie","Uncommon","K",13,"",0,"2","","Zombie2021.png",""],
+["Ghost","Uncommon","G",10,"",0,"3","","Ghost_gun.png",""],
+["Steel Gun","Uncommon","G",7,"",0,"2","","Steel_Gun_2023.png",""],
+["Zombie Gun","Uncommon","G",6,"",0,"1","","ZombieGun2018UP.png",""],
+["Frozen Gun","Uncommon","G",5,"",0,"1","","frozengun.png",""],
+["Gothic Gun","Uncommon","G",5,"",0,"2","","GothicGun.png",""],
+["Mummy Gun","Uncommon","G",5,"",0,"1","","MummyG2018UP.png",""],
+["Potion Knife","Uncommon","K",5,"",0,"1","","PotionKnife_2018UP.png",""],
+["Snowman Gun","Uncommon","G",4,"",0,"2","","SnowmanGun2021.png",""],
+["Gingerbread Gun (2019)","Uncommon","G",4,"",0,"1","","2019gbgun.png",""],
+["Gingerbread Gun (2020)","Uncommon","G",3,"",0,"2","","GingerbreadGun2020.png",""],
+["Tree Knife","Uncommon","K",3,"",0,"2","","TreeKnife2021.png",""],
+["Wraiths Knife","Uncommon","K",3,"",0,"2","","WraithsKnife.png",""],
+["Hazard Gun","Uncommon","G",3,"",0,"2","","Hazard_Gun_2022.png",""],
+["Lights Gun","Uncommon","G",3,"",0,"1","","lightsgun.png",""],
+["Moons (2016)","Uncommon","K",3,"",0,"1","","moons2016UP.png",""],
+["Potion","Uncommon","K",3,"",0,"1","","Potion2017UP.png",""],
+["Webs","Uncommon","K",3,"",0,"1","","Webs2017UP.png",""],
+["Holly Gun","Uncommon","G",3,"",0,"1","","Holly_gun2018UP.png",""],
+["Frozen Knife","Uncommon","K",2,"",0,"1","","FrozenKnife.png",""],
+["Lantern Knife","Uncommon","K",2,"",0,"2","","Lantern_Knife_2022.png",""],
+["Wolf","Uncommon","K",2,"",0,"1","","Wolf2016UP.png",""],
+["Vampire","Uncommon","K",2,"",0,"1","","vampire2016UP.png",""],
+["Lights Knife","Uncommon","K",2,"",0,"1","","lightsknife.png",""],
+["Zombie Knife (2018)","Uncommon","K",2,"",0,"1","","ZombieKnife2018UP.png",""],
+["Potion Gun","Uncommon","G",2,"",0,"1","","PotionGun2018UP.png",""],
+["Moonlight Gun","Uncommon","G",1,"",0,"2","","Moonlight_Gun_2022.png",""],
+["Gifted","Uncommon","K",1,"",0,"1","","gifted.png",""],
+["Snowman (Knife)","Uncommon","K",1,"",0,"1","","snowman2015UP.png",""],
+["Snowman (Gun)","Uncommon","G",1,"",0,"1","","SnowmanGun2015UP.png",""],
+["Snowy","Uncommon","K",1,"",0,"1","","snowy2015UP.png",""],
+["Nutcracker","Uncommon","G",1,"",0,"1","","Nutcracker2015UP.png",""],
+["Wrapped (Knife)","Uncommon","K",1,"",0,"1","","wrapped2015UP.png",""],
+["Wrapped (Gun)","Uncommon","G",1,"",0,"1","","Wrappedgun2015UP.png",""],
+["Mummy Knife","Uncommon","K",1,"",0,"1","","Mummy_2018UP.png",""],
+["Eyes","Uncommon","G",3,"",0,"4","","EyesGun2025.png",""],
+["Treats Gun","Uncommon","G",3,"",0,"3","","TreatsGun2025.png",""],
+["Pumpkin (2025)","Uncommon","K",3,"",0,"4","","PumpinKnife2025.png",""],
+["Lava Gun","Uncommon","G",1,"",0,"2","","LavaG25.png",""],
+["Retro Knife","Uncommon","K",1,"",0,"2","","RetroK25.png",""],
+["Soda Knife","Uncommon","K",1,"",0,"2","","SodaK25.png",""],
+["Lava Knife","Uncommon","K",1,"",0,"2.5","","LavaK25.png",""],
+["Soda Gun","Uncommon","G",1,"",0,"2","","SodaG25.png",""],
+["Treats knife","Uncommon","K",1,"",0,"3","","TreatsKnife2025.png",""],
+["Pumpkin Patch","Uncommon","G",1,"",0,"3","","PumpkinPatchGun2025.png",""],
+["Abduction","Uncommon","K",1,"",0,"3","","AbductionKnife2025.png",""],
+["Tree","Uncommon","K",1,"",0,"2","","Tree2017UP.png",""],
+["Pumpkin Pie","Uncommon","K",1,"",0,"2","","PumpkinPie.png",""],
+["Frosty","Uncommon","K",4,"",0,"2","","Frosty2017UP.png",""],
+["Snowflake Gun","Uncommon","G",4,"",0,"2","","snowflakeg19.png",""],
+["Zombie Knife (2023)","Uncommon","K",4,"",0,"2","","Zombie_Knife_2023.png",""],
+["Cookie Knife","Uncommon","K",3,"",0,"2","","Cookieknife2021.png",""],
+["Polar Bear Knife","Uncommon","K",3,"",0,"2","","Polar_Bear_2025.png",""],
+["Stars Knife","Uncommon","K",2,"",0,"2","","Starsknife2023.png",""],
+["Gothic Knife","Uncommon","K",2,"",0,"2","","gothicknife.png",""],
+["Wraiths Gun","Uncommon","G",2,"",0,"2","","WraithsGun.png",""],
+["Pool Knife","Uncommon","K",2,"",0,"2","","PoolK25.png",""],
+["Sweater","Uncommon","K",2,"",0,"2","","Sweater2017UP.png",""],
+["Rose","Uncommon","K",2,"",0,"2","","Rose2023.png",""],
+["Sweater Gun (2018)","Uncommon","G",2,"",0,"2","","Sweater_2018up.png",""],
+["Holly Knife","Uncommon","K",2,"",0,"2","","Holly2018UP.png",""],
+["Gingerbread Gun (2025)","Uncommon","G",2,"",0,"2","","Gingerbread_2025.png",""],
+["Sweater Knife (2025)","Uncommon","K",2,"",0,"2","","Sweater_Knife_2025.png",""],
+["Melon (Gun)","Uncommon","G",2,"",0,"2","","Melon_gun.png",""],
+["Pool Noodle","Uncommon","K",2,"",0,"2","","Pool_Noodle_knife.png",""],
+["Meltdown","Uncommon","K",2,"",0,"2","","Meltdown_Knife_2023.png",""],
+["Snowman Gun 23","Uncommon","G",1,"",0,"2","","Snowmangun2023.png",""],
+["Fireplace","Uncommon","K",1,"",0,"2","","Fireplace2023.png",""],
+["Canes Gun","Uncommon","G",1,"",0,"2","","Canesgun2023.png",""],
+["Stars Gun","Uncommon","G",1,"",0,"2","","Stars2023gun.png",""],
+["Forrest Gun","Uncommon","G",1,"",0,"2","","Forestgun2024.png",""],
+["Gingerheart","Uncommon","K",1,"",0,"2","","Gingerheartknife2024.png",""],
+["Wrapped Gun 24","Uncommon","G",1,"",0,"2","","Wrappedgunxmas2024.png",""],
+["Night","Uncommon","G",1,"",0,"2","","night.png",""],
+["Future","Uncommon","K",1,"",0,"2","","future.png",""],
+["Checkers","Uncommon","K",1,"",0,"2","","checker.png",""],
+["Donut","Uncommon","K",1,"",0,"2","","donut.png",""],
+["Stockings 2022","Uncommon","K",1,"",0,"2","","StockingsK2022.png",""],
+["Mistletoe Gun","Uncommon","G",1,"",0,"2","","MistletoeGun.png",""],
+["Snowflake Knife 2022","Uncommon","K",1,"",0,"2","","SnowflakeKnife22.png",""],
+["Gingerbread Knife (2025)","Uncommon","K",1,"",0,"2","","Gingermint_Knife_2025.png",""],
+["Ornaments Knife","Uncommon","K",1,"",0,"2","","Ornaments_Knife_2025.png",""],
+["Sweater Gun (2025)","Uncommon","G",1,"",0,"2","","Sweater_Gun_2025.png",""],
+["Carrot","Uncommon","K",1,"",0,"2","","carrot23.png",""],
+["Paws Gun","Uncommon","G",1,"",0,"2","","Paws_2026.png",""],
+["Blossom Knife","Uncommon","K",1,"",0,"2","","Blossom_2026.png",""],
+["Starry Knife","Uncommon","K",1,"",0,"1","","Starryknife26.png",""],
+["Bones","Uncommon","K",4,"",0,"1","","Bones2024.png",""],
+["Mistletoe Knife","Uncommon","K",4,"",0,"2","","MistletoeKnife.png",""],
+["Canes Knife","Uncommon","K",3,"",0,"2","","Canesknife2023.png",""],
+["Cookie Gun","Uncommon","G",3,"",0,"2","","CookieGun2021.png",""],
+["Monster","Uncommon","K",3,"",0,"1","","Monster.png",""],
+["Moons (2024)","Uncommon","K",3,"",0,"1","","Moons24.png",""],
+["Clown","Uncommon","G",3,"",0,"1","","Clown2024.png",""],
+["Wrapped Knife 24","Uncommon","K",3,"",0,"2","","WrappedKnife2024.png",""],
+["Wreaths 2024","Uncommon","K",3,"",0,"2","","Wreaths2024.png",""],
+["Decorated","Uncommon","K",3,"",0,"1","","DecoratedKnife2025.png",""],
+["Meadow","Uncommon","G",3,"",0,"1","","MeadowGun2025.png",""],
+["Stockings Gun 2022","Uncommon","G",3,"",0,"2","","StockingsG2022.png",""],
+["Snowflake Gun 2022","Uncommon","G",3,"",0,"2","","SnowflakeGun.png",""],
+["Marble","Uncommon","K",3,"",0,"2","","marbleknife23.png",""],
+["Painted Gun","Uncommon","G",3,"",0,"2","","painted.png",""],
+["Popsicle","Uncommon","K",3,"",0,"2","","Popsicle_knife.png",""],
+["Steel Knife","Uncommon","K",3,"",0,"2","","Steel.png",""],
+["Glowy","Uncommon","K",3,"",0,"2","","Glowy.png",""],
+["Eclipse","Uncommon","K",3,"",0,"2","","Eclipse.png",""],
+["Carrot Knife","Uncommon","K",2,"",0,"2","","Carrotknife24.png",""],
+["Carrot Gun","Uncommon","G",2,"",0,"2","","Carrot_gun.png",""],
+["Snowman Knife","Uncommon","K",2,"",0,"2","","snowmanknife2021.png",""],
+["Gingerbread Gun (2021)","Uncommon","G",2,"",0,"2","","GingerbreadGun2021.png",""],
+["Pumpkin (2020)","Uncommon","K",2,"",0,"1","","Pumpkinknife2020.png",""],
+["Fall Camo","Uncommon","G",2,"",0,"2","","FallCamoGun.png",""],
+["Snowman Knife 24","Uncommon","K",2,"",0,"2","","Snowmanknife2024.png",""],
+["Brains Gun","Uncommon","G",2,"",0,"2","","Brains_Gun_2022.png",""],
+["Ghostly","Uncommon","K",2,"",0,"2","","GhostlyKnife.png",""],
+["Hazard Knife","Uncommon","K",2,"",0,"2","","Hazard_Knife_2022.png",""],
+["Witchbrew","Uncommon","K",2,"",0,"2","","Witchbrew.png",""],
+["Mummy Knife 2020","Uncommon","K",2,"",0,"2","","MummyK2020UP.png",""],
+["Mummy gun 2020","Uncommon","G",2,"",0,"2","","Mummygun2020UP.png",""],
+["Portal gun","Uncommon","G",2,"",0,"2","","PortalGun2020UP.png",""],
+["Ghosts knife 2020","Uncommon","K",2,"",0,"2","","Ghosts2020UP.png",""],
+["Neopolitan","Uncommon","K",2,"",0,"0","","Neapolitan.png",""],
+["Floral","Uncommon","K",2,"",0,"0","","Floral2026.png",""],
+["Turtles","Uncommon","K",2,"",0,"0","","Turtles2026.png",""],
+["Floatie","Uncommon","G",5,"",0,"0","","Floatie.png",""],
+["Witchs Brew","Uncommon","K",5,"",0,"0","","WitchsBrew.png",""],
+["Leaves","Uncommon","G",5,"",0,"0","","Leaves2024.png",""],
+["Love (Gun)","Uncommon","G",5,"",0,"0","","lovegun.png",""],
+["Jellyfish Knife","Uncommon","K",3,"",0,"0","","Jellyfish.png",""],
+["Popsicle Gun","Uncommon","G",3,"",0,"0","","PopsicleGun.png",""],
+["Turtle Knife","Uncommon","K",3,"",0,"0","","Turtle.png",""],
+["Wanwood","Uncommon","K",3,"",0,"0","","WanvvoodUP.png",""],
+["Adurite (Knife)","Uncommon","K",3,"",0,"0","","AduriteKnifeUP.png",""],
+["Bluesteel (Knife)","Uncommon","K",3,"",0,"0","","BluesteelUP.png",""],
+["Adurite (Gun)","Uncommon","G",3,"",0,"0","","AduritegunUP.png",""],
+["Camo #1","Uncommon","G",3,"",0,"0","","CamoUP.png",""],
+["Stalker","Uncommon","K",3,"",0,"0","","Stalker2UP.png",""],
+["Missing","Uncommon","G",3,"",0,"0","","MissingUP.png",""],
+["Cheesy","Uncommon","K",3,"",0,"0","","CheesyKnifeUP.png",""],
+["Sketch","Uncommon","G",3,"",0,"0","","SketchUP.png",""],
+["Marina","Uncommon","G",3,"",0,"0.5","","MarinaUP.png",""],
+["Cheddar","Uncommon","G",3,"",0,"0","","CheddarUP.png",""],
+["Circuit","Uncommon","K",3,"",0,"0","","Circuit_UP.png",""],
+["Paper","Uncommon","K",3,"",0,"0","","PaperUP.png",""],
+["Doge","Uncommon","K",3,"",0,"0","","DogeUP.png",""],
+["Caution","Uncommon","G",3,"",0,"0","","CautionUP.png",""],
+["Soda","Uncommon","G",3,"",0,"0","","SodaUP.png",""],
+["Wooden","Uncommon","G",3,"",0,"0","","WoodenGunUP.png",""],
+["Hazmat","Uncommon","K",3,"",0,"0","","HazmatUP.png",""],
+["Bluesteel (Gun)","Uncommon","G",3,"",0,"0","","BluesteelgunUP.png",""],
+["Melon (Gun) #2","Uncommon","G",3,"",0,"0","","MelonUP.png",""],
+["Hive","Uncommon","K",3,"",0,"0","","HiveUp.png",""],
+["Jigsaw","Uncommon","K",3,"",0,"0","","JigsawUP.png",""],
+["Brush","Uncommon","K",3,"",0,"0","","BrushUP.png",""],
+["Lucky","Uncommon","K",3,"",0,"0","","Lucky_UP.png",""],
+["Pink","Uncommon","K",3,"",0,"0","","PinkUP.png",""],
+["Blue","Uncommon","K",3,"",0,"0","","BlueUP.png",""],
+["Red","Uncommon","K",3,"",0,"0","","RedUP.png",""],
+["Camo #2","Uncommon","K",3,"",0,"0","","CamoknifeUP.png",""],
+["Tiger","Uncommon","K",3,"",0,"0","","TigerUP.png",""],
+["Pirate","Uncommon","K",3,"",0,"0","","PirateUP.png",""],
+["Biogun","Uncommon","G",3,"",0,"0","","BiogunUP.png",""],
+["Graffiti","Uncommon","K",3,"",0,"0","","GraffitiUp.png",""],
+["High Tech","Uncommon","K",3,"",0,"0","","HighTechUp.png",""],
+["Bats Knife","Common","K",250,"",0,"3","","BatsK2018UP.png",""],
+["Gifts Knife","Common","K",110,"",0,"2","","giftsknife.png",""],
+["Pine Knife","Common","K",90,"",0,"3","","pineknife.png",""],
+["Ghoulish","Common","K",85,"",0,"2.5","","Ghoulish.png",""],
+["Glitch 1","Common","K",60,"",0,"2.5","","glitch.png",""],
+["Frosted Knife","Common","K",45,"",0,"3","","frostedknife.png",""],
+["Mummified","Common","K",38,"",0,"2","","mummified.png",""],
+["CandyCorn","Common","K",35,"",0,"2","","Candycorn2017UP.png",""],
+["Sparkle9","Common","K",30,"",0,"2","","Sparkle9UP.png",""],
+["Wrapped Gun","Common","G",30,"",0,"2","","Wrapped_gun_2018up.png",""],
+["Snowflakes Gun","Common","G",30,"",0,"2","","snowflakesgun.png",""],
+["Webbed Gun","Common","G",30,"",0,"2","","webbedgun.png",""],
+["Glitch 2","Common","K",30,"",0,"1","","glitch2.png",""],
+["Ecto","Common","K",30,"",0,"2","","Ecto2017UP.png",""],
+["Coal knife (2018)","Common","K",25,"",0,"1.5","","Coal_2018_knifeup.png",""],
+["Snowman Gun","Common","G",25,"",0,"2","","Snowman_gun2018up.png",""],
+["RIP Gun","Common","G",25,"",0,"2.5","","ripgun.png",""],
+["Sparkle8","Common","K",22,"",0,"2","","Sparkle8UP.png",""],
+["Sparkle10","Common","K",22,"",0,"2","","Sparkle10UP.png",""],
+["Elf Gun","Common","G",20,"",0,"2.5","","Elf_gun_2018up.png",""],
+["Slimy","Common","K",20,"",0,"2","","slimeyknife.png",""],
+["Sparkle7","Common","K",18,"",0,"2","","Sparkle7UP.png",""],
+["Prism","Common","K",15,"",0,"2","","prism.png",""],
+["Pumpkin Patch","Common","K",15,"",0,"2","","pumpkinpatch.png",""],
+["Sparkle6","Common","K",13,"",0,"2","","Sparkle6UP.png",""],
+["Elf (knife)","Common","K",13,"",0,"2","","Elf_knife2015UP.png",""],
+["Candycorn 2019","Common","K",12,"",0,"2","","Candycorn2019UP.png",""],
+["Combat II","Common","K",11,"",0,"2","","Combat2UP.png",""],
+["Sparkle4","Common","K",11,"",0,"2","","Sparkle4UP.png",""],
+["Phantom","Common","K",11,"",0,"1","","Phantom2017UP.png",""],
+["Tailslide","Common","K",10,"",0,"2","","TailslideUP.png",""],
+["Sparkle5","Common","K",10,"",0,"2","","Sparkle5knifeUP.png",""],
+["Zombie","Common","K",10,"",0,"1","","Zombie2017UP.png",""],
+["Ollie","Common","K",8,"",0,"2","","Ollie_UP.png",""],
+["Skool","Common","K",8,"",0,"1.5","","skool.png",""],
+["Sidewinder","Common","K",8,"",0,"2","","SidewinderUP.png",""],
+["Denis","Common","K",5,"",0,"2","","denis.png",""],
+["Alex","Common","K",5,"",0,"2","","alex.png",""],
+["Corl","Common","K",5,"",0,"2","","corl.png",""],
+["Sketchy","Common","K",5,"",0,"2","","sketchy.png",""],
+["Sub","Common","K",5,"",0,"2","","sub.png",""],
+["Euro","Common","K",5,"",0,"1.5","","EuroUP.png",""],
+["Starry","Common","G",4,"",0,"2","","Starrygun2020.png",""],
+["Bats (2020)","Common","G",3,"",0,"2","","Bats2020.png",""],
+["Infected Gun","Common","G",3,"",0,"2","","Infected_Gun_2022.png",""],
+["Elf (Gun)","Common","G",3,"",0,"1","","elfgun.png",""],
+["Asteroid","Common","K",3,"",0,"1","","asteroid.png",""],
+["Slime Knife","Common","K",3,"",0,"0.5","","SlimeK2018UP.png",""],
+["Grave Gun","Common","G",3,"",0,"1","","GraveG2018UP.png",""],
+["Sparkle2","Common","K",3,"",0,"2","","Sparkle2UP.png",""],
+["Sparkle3","Common","K",3,"",0,"2","","Sparkle3UP.png",""],
+["Indy","Common","K",2,"",0,"2","","IndyUP.png",""],
+["Apocalypse Gun","Common","G",2,"",0,"2","","ApocGun.png",""],
+["2015","Common","K",2,"",0,"1","","2015.png",""],
+["Ghosty","Common","K",2,"",0,"1","","Ghosty2016UP.png",""],
+["Sparkle1","Common","K",2,"",0,"2","","Sparkle1UP.png",""],
+["Grind","Common","K",2,"",0,"1.5","","GrindUP.png",""],
+["Slashed","Common","K",1,"",0,"2","","Slashed.png",""],
+["Frosted Gun","Common","G",1,"",0,"2","","frostedgun.png",""],
+["Webbed Knife","Common","K",1,"",0,"2","","webbedknife.png",""],
+["TNL","Common","K",1,"",0,"1","","tnl.png",""],
+["Hearts","Common","K",1,"",0,"2","","hearts.png",""],
+["Valentine","Common","K",1,"",0,"2","","valentine.png",""],
+["Goo","Common","K",1,"",0,"1","","goo.png",""],
+["Neon","Common","K",1,"",0,"1","","neon.png",""],
+["Reptile","Common","K",1,"",0,"1","","reptile.png",""],
+["Infected","Common","K",1,"",0,"1","","infected.png",""],
+["Passion","Common","K",1,"",0,"2","","passion.png",""],
+["Sweetheart","Common","K",1,"",0,"2","","sweetheart.png",""],
+["Blossom","Common","K",1,"",0,"2","","blossom.png",""],
+["Roses","Common","K",1,"",0,"2","","roses.png",""],
+["Ornament2 (knife)","Common","K",1,"",0,"1","","orn22015UP.png",""],
+["Ornament2 (Gun)","Common","G",1,"",0,"1","","Ornament22015UP.png",""],
+["Ornament 1","Common","G",1,"",0,"1","","ornament1gun.png",""],
+["Ornament","Common","K",1,"",0,"1","","orn12015UP.png",""],
+["Tulip","Common","K",1,"",0,"1","","tulip.png",""],
+["Patrick","Common","K",1,"",0,"1","","patrick.png",""],
+["Bunny","Common","K",1,"",0,"1","","bunny.png",""],
+["Choco","Common","K",1,"",0,"1","","choco.png",""],
+["Egg","Common","K",1,"",0,"1","","egg.png",""],
+["Carrot","Common","K",1,"",0,"1","","carrot.png",""],
+["Witch","Common","K",1,"",0,"1","","Witch2016UP.png",""],
+["Bones","Common","K",1,"",0,"1","","bones2016UP.png",""],
+["Slime Gun","Common","G",1,"",0,"0.5","","SlimeGun2018UP.png",""],
+["Bats Gun","Common","G",1,"",0,"1","","Bats2018UP.png",""],
+["Grave Knife","Common","K",1,"",0,"0.5","","Grave2018UP.png",""],
+["Haunted Knife","Common","K",1,"",0,"0.5","","Hauntedk2018UP.png",""],
+["Haunted Gun","Common","G",1,"",0,"1","","Haunted2018UP.png",""],
+["Brains","Common","K",4,"",0,"1","","Brain2016UP.png",""],
+["Gifts Gun","Common","G",3,"",0,"2","","giftsgun.png",""],
+["Pine Gun","Common","G",3,"",0,"2","","pinegun.png",""],
+["Santa (Knife)","Common","K",3,"",0,"1","","Santa_knife2015UP.png",""],
+["Santa (Gun)","Common","G",3,"",0,"1","","SantaGun2015UP.png",""],
+["Snowflakes Knife","Common","K",2,"",0,"2","","snowflakesknife.png",""],
+["Penguin Knife","Common","K",2,"",0,"2","","Penguin2025.png",""],
+["Reindeer Knife","Common","K",2,"",0,"2","","Reindeer_2025.png",""],
+["Cats","Common","K",3,"",0,"3","","catsKnife2025.png",""],
+["Haunted","Common","K",3,"",0,"3","","HauntedKnife2025.png",""],
+["Candycorn Gun","Common","G",3,"",0,"3","","CandyCornGun2025.png",""],
+["UFOs Knife","Common","K",3,"",0,"3","","UFOsKnife2025.png",""],
+["Coal Gun (2018)","Common","G",1,"",0,"2","","Coal_2018UP.png",""],
+["Snowman Knife","Common","K",1,"",0,"2","","Snowman_2018up.png",""],
+["Santa Knife","Common","K",1,"",0,"2","","Santa_2018up.png",""],
+["Wrapped Knife","Common","K",1,"",0,"2","","Wrapped2018UP.png",""],
+["Ornaments Gun","Common","G",1,"",0,"2","","Ornamentsgun2020.png",""],
+["RB Knife","Common","K",1,"",0,"2","","RBKnife.png",""],
+["Apocalypse Knife","Common","K",1,"",0,"2","","ApocKnife.png",""],
+["Darkness Knife","Common","K",1,"",0,"2","","Darkness_Knife_2022.png",""],
+["Hunter Knife","Common","K",1,"",0,"2","","Hunter_Knife_2022.png",""],
+["Webs Gun","Common","G",1,"",0,"2","","Websgun22.png",""],
+["Infected Knife","Common","K",1,"",0,"2","","Infected_Knife_2022.png",""],
+["Candycorn Knife","Common","K",1,"",0,"3","","CandyCornKnife2025.png",""],
+["Fall","Common","G",1,"",0,"3","","FallGun2025.png",""],
+["UFOs Gun","Common","G",1,"",0,"3","","UFOsGun2025.png",""],
+["Stickers (2025)","Common","K",1,"",0,"3","","StickersKnife2025.png",""],
+["Etched","Common","K",1,"",0,"2","","Etched_Knife_2023.png",""],
+["Elf (2017)","Common","K",1,"",0,"2","","Elf2017UP.png",""],
+["Santa (2017)","Common","K",1,"",0,"2","","Santa2017UP.png",""],
+["Coal","Common","K",1,"",0,"2","","Coal2017UP.png",""],
+["Present","Common","K",1,"",0,"2","","Present2017UP.png",""],
+["Scarf","Common","K",1,"",0,"2","","Scarf.png",""],
+["Strawberries Gun","Common","G",4,"",0,"2","","Strawberries_gun26.png",""],
+["Strawberries Knife","Common","K",4,"",0,"2","","Strawberriesknifes.png",""],
+["Hearts Knife","Common","K",4,"",0,"2","","Hearts_2026.png",""],
+["Ornaments Knife","Common","K",3,"",0,"1","","Ornaments2020.png",""],
+["Gift Bag Knife","Common","K",3,"",0,"2","","giftbagknife.png",""],
+["Ribbons","Common","K",3,"",0,"0","","Ribbon2021.png",""],
+["Cane Gun","Common","G",3,"",0,"0","","CaneGun2021.png",""],
+["Candy Corn Gun","Common","G",3,"",0,"1","","CandyCornG22.png",""],
+["Striped Gun","Common","G",2,"",0,"1.5","","StripedG25.png",""],
+["Stickers #1","Common","K",2,"",0,"1","","Thanksgiving_stickers.png",""],
+["Toy Knife","Common","K",2,"",0,"2","","Toy_knife_Summer.png",""],
+["Vines Knife","Common","K",2,"",0,"2","","Vines_Knife_2023.png",""],
+["Ghosts (2023)","Common","K",2,"",0,"2","","Ghosts_Knife_2023.png",""],
+["Pumpkin","Common","G",2,"",0,"2","","Pumpkin_Gun_2023.png",""],
+["Stockings","Common","K",1,"",0,"0","","stockings2020.png",""],
+["Trees","Common","K",1,"",0,"0","","trees2020.png",""],
+["Gift Bag Gun","Common","G",1,"",0,"0","","giftbaggun.png",""],
+["Coal Knife (2021)","Common","K",1,"",0,"0","","CoalKnife2021.png",""],
+["Carrots","Common","K",1,"",0,"0","","CarrotKnife2025.png",""],
+["Chick","Common","K",1,"",0,"0","","ChickKnife2025.png",""],
+["Skyline Knife","Common","K",1,"",0,"0","","SkylineK25.png",""],
+["Dolphins Knife","Common","K",1,"",0,"1.5","","DolphinsK25.png",""],
+["Stickers Gun (2025)","Common","G",1,"",0,"1.5","","StickersG25.png",""],
+["Striped Knife","Common","K",1,"",0,"1.5","","StripedK25.png",""],
+["Leaves Knife","Common","K",1,"",0,"1.5","","LeavesK25.png",""],
+["Coal Gun 2022","Common","G",1,"",0,"2","","CoalG2022.png",""],
+["Coconut Knife","Common","K",1,"",0,"1.5","","CoconutK25.png",""],
+["Candied Knife","Common","K",1,"",0,"2","","CandiedKnife22.png",""],
+["Stickers Knife (2025)","Common","K",1,"",0,"1.5","","StickersK25.png",""],
+["Snowman Gun 2022","Common","G",1,"",0,"2","","SnowmanG2022.png",""],
+["Love","Common","K",1,"",0,"2","","Love2023.png",""],
+["Cherries","Common","G",1,"",0,"0","","CherriesGun2026.png",""],
+["Duckies","Common","G",1,"",0,"0","","DuckiesGun2026.png",""],
+["Sand","Common","K",1,"",0,"0","","Sand2026.png",""],
+["Tourist","Common","K",1,"",0,"0","","Tourist.png",""],
+["Wavy Gun","Common","G",3,"",0,"0","","WavyGun.png",""],
+["Wavy Knife","Common","K",3,"",0,"0","","WavyKnife.png",""],
+["Cane Knife","Common","K",3,"",0,"0","","Cane2021.png",""],
+["Stickers Knife (2021)","Common","K",3,"",0,"0","","StickersKnife2021.png",""],
+["Hot Chocolate","Common","K",3,"",0,"0","","HotChocolate2024.png",""],
+["Carved (Gun)","Common","G",3,"",0,"0","","CurvedGun.png",""],
+["Gifts 2024","Common","K",3,"",0,"0","","Giftsknife2024.png",""],
+["Carved (Knife)","Common","K",3,"",0,"0","","Carvedknife.png",""],
+["Igloo Gun","Common","G",3,"",0,"0","","Igloogun2024.png",""],
+["Stickers Xmas 2024","Common","K",3,"",0,"0","","Stickersknifexmas2024.png",""],
+["Eyeball Knife","Common","K",3,"",0,"0","","Eyeball_Knife22.png",""],
+["Darkness Gun","Common","G",3,"",0,"0","","Darkness_Gun_2022.png",""],
+["Stickers Knife (2022)","Common","K",3,"",0,"0","","StickersKnife2022.png",""],
+["Candy Corn knife 2020","Common","K",3,"",0,"0","","CandyCornKnife2020UP.png",""],
+["Watcher gun 2020","Common","G",3,"",0,"0","","Watcher_Gun.png",""],
+["Toy Gun","Common","G",3,"",0,"0","","Toy_gun_Summer.png",""],
+["Snowfall","Common","K",2,"",0,"0","","Snowfall2023knife.png",""],
+["Santa Gun 23","Common","G",2,"",0,"0","","Santa2023gun.png",""],
+["Elf Gun 23","Common","G",2,"",0,"0","","Elfgun2023.png",""],
+["Ribbon Knife","Common","K",2,"",0,"0","","Ribbonknife2023.png",""],
+["Bells","Common","K",2,"",0,"0","","Bellsknife2023.png",""],
+["Present Knife","Common","K",2,"",0,"0","","Present2023knife.png",""],
+["Frozen Gun 23","Common","G",2,"",0,"0","","Frozengun2023.png",""],
+["Frozen Knife 23","Common","K",2,"",0,"0","","Frozenknife2023.png",""],
+["Giftwrap Knife","Common","K",2,"",0,"0","","GiftWrap2021.png",""],
+["Coal Gun (2021)","Common","G",2,"",0,"0","","CoalGun2021.png",""],
+["Stickers Gun (2021)","Common","G",2,"",0,"0","","Stickersgun2021.png",""],
+["Candy Corn (Gun)","Common","G",2,"",0,"0","","CandyCorn2024.png",""],
+["Bats (2024)","Common","K",2,"",0,"0","","Bats_knife24.png",""],
+["Stickers Knife (2024)","Common","K",2,"",0,"0","","StickersKnife2024.png",""],
+["Candles","Common","K",2,"",0,"0","","CandlesKnife.png",""],
+["Candy Corn (Gun) #2","Common","G",2,"",0,"0","","CandyCornGun2024.png",""],
+["Ghosts (2024)","Common","K",2,"",0,"0","","Ghosts2024.png",""],
+["Stickers Gun (2024)","Common","G",2,"",0,"0","","StickersGun2024.png",""],
+["Bats (2024) #2","Common","K",2,"",0,"0","","BatsKnife2024.png",""],
+["Stickers Gun #1","Common","G",2,"",0,"0","","StickersGun.png",""],
+["Stickers Knife #1","Common","K",2,"",0,"0","","StickersKnife.png",""],
+["Reindeer 2024","Common","K",2,"",0,"0","","Reindeer2024.png",""],
+["Stockings Gun 24","Common","G",2,"",0,"0","","Stockingsgun2024.png",""],
+["Igloo Knife","Common","K",2,"",0,"0","","IglooKnife2024.png",""],
+["Stickers Xmas 24","Common","G",2,"",0,"1","","StickersGunXmas2024.png",""],
+["Candy Corn Knife","Common","K",2,"",0,"0","","Candy_Corn_Knife_2022.png",""],
+["Stickers (2022)","Common","K",2,"",0,"0","","Stickers_Knife_2022.png",""],
+["Coal Knife 2022","Common","K",2,"",0,"0","","CoalK2022.png",""],
+["Candied Gun 2022","Common","G",2,"",0,"0","","CandiedGun22.png",""],
+["Stickers Gun 2022","Common","G",2,"",0,"0","","StickersG2022.png",""],
+["Snowman Knife 2022","Common","K",2,"",0,"0","","SnowmanK2022.png",""],
+["Candy Corn gun 2020","Common","G",2,"",0,"0","","CandyCorn2020gunUP.png",""],
+["Watcher Knife 2020","Common","K",2,"",0,"0","","watcherknfie2020.png",""],
+["Candle","Common","K",2,"",0,"0","","Candle2020UP.png",""],
+["Stickers Gun #2","Common","G",2,"",0,"0","","Stickers_Gun_29.png",""],
+["Lights Gun","Common","G",2,"",0,"0","","Lights_Gun_2025.png",""],
+["Snowball Knife","Common","K",2,"",0,"0","","Snowball_Knife_2025.png",""],
+["Peppermint Knife","Common","K",2,"",0,"0","","Peppermint_Knife_2025.png",""],
+["Peppermint Gun","Common","G",2,"",0,"0","","peppermintgun.png",""],
+["Fragile Gun","Common","G",2,"",0,"0","","fragilegun.png",""],
+["Lights Knife","Common","K",2,"",0,"0","","Lights_Christmas_2025.png",""],
+["Fragile Knife","Common","K",2,"",0,"0","","fragileknife.png",""],
+["Snowball Gun","Common","G",2,"",0,"0","","Snowball_Gun_2025_chistmas.png",""],
+["Stickers Knife (2025) #2","Common","K",2,"",0,"0","","Stickers_Knife_Christmas_2025.png",""],
+["Sticker Gun","Common","G",2,"",0,"0","","Stickers_gun_Summer.png",""],
+["Stickers Knife #2","Common","K",2,"",0,"0","","Stickers_knife_Summer.png",""],
+["Xbox","Common","K",2,"",0,"0","","xbox.png",""],
+["Whiteout","Common","K",1,"",0,"0","","WhiteoutUP.png",""],
+["Splatter","Common","K",1,"",0,"0","","spaltterUP.png",""],
+["Ice","Common","K",1,"",0,"0","","IceUP.png",""],
+["Love (Knife)","Common","K",1,"",0,"0","","Love_UP.png",""],
+["Iron","Common","G",1,"",0,"0","","IronUP.png",""],
+["Big Kill","Common","G",1,"",0,"0","","Big_KillUP.png",""],
+["Fallout","Common","G",1,"",0,"0","","FalloutUP.png",""],
+["Cold","Common","G",1,"",0,"0","","ColdgunUP.png",""],
+["Linked","Common","K",1,"",0,"0","","LinkedUP.png",""],
+["Slate","Common","K",1,"",0,"0","","SlateKnifeUP.png",""],
+["Borders","Common","K",1,"",0,"0","","BordersUP.png",""],
+["8Bit","Common","K",1,"",0,"0","","8BitUP.png",""],
+["Engraved","Common","G",1,"",0,"0","","EngravedUP.png",""],
+["Infiltrator","Common","G",1,"",0,"0","","InfiltratorUP.png",""],
+["Juice","Common","G",1,"",0,"0","","JuiceGunUP.png",""],
+["Star","Common","G",1,"",0,"0","","StargunUP.png",""],
+["Clan","Common","K",1,"",0,"0","","ClanUP.png",""],
+["Cherry","Common","K",1,"",0,"0","","CherryUP.png",""],
+["Cardboard","Common","K",1,"",0,"0","","CardboardUP.png",""],
+["Stainless","Common","K",1,"",0,"0","","StainlessUP.png",""],
+["Bit","Common","G",1,"",0,"0","","BitGunUP.png",""],
+["Pea","Common","G",1,"",0,"0","","PeaUP.png",""],
+["News","Common","G",1,"",0,"0","","NewsUP.png",""],
+["HL2","Common","G",1,"",0,"0","","HL2UP.png",""],
+["Bleached","Common","K",1,"",0,"0","","BleachedUP.png",""],
+["Clown","Common","K",1,"",0,"0","","ClownUP.png",""],
+["Oily","Common","K",1,"",0,"0","","OilyUP.png",""],
+["Aqua","Common","K",1,"",0,"0","","AquaUP.png",""],
+["Eco","Common","K",1,"",0,"0","","EcoUP.png",""],
+["Log","Common","K",1,"",0,"0","","Log_UP.png",""],
+["Sandy","Common","K",1,"",0,"0","","Sandy_UP.png",""],
+["Static","Common","K",1,"",0,"0","","Static_UP.png",""],
+["Brown","Common","K",1,"",0,"0","","Brown_UP.png",""],
+["Green","Common","K",1,"",0,"0","","GreenUP.png",""],
+["Yellow","Common","K",1,"",0,"0","","YellowUP.png",""],
+["Orange","Common","K",1,"",0,"0","","OrangeUP.png",""],
+["Clownfish Gun","Common","G",1,"",0,"0","","Clowngun.png",""],
+["Sandy Gun","Common","G",1,"",0,"0","","Sandy.png",""],
+["Balloons Gun","Common","G",1,"",0,"0","","Balloons.png",""],
+["Starfish Knife","Common","K",1,"",0,"0","","StarfishNew.png",""],
+["Starfish Gun","Common","G",1,"",0,"0","","StarFishGun.png",""],
+["Clownfish Knife","Common","K",1,"",0,"0","","ClownfishKnife.png",""],
+["Combat","Common","K",1,"",0,"0","","Combat1UP.png",""],
+["Copper","Common","K",1,"",0,"0","","CopperUP.png",""],
+["Hardened","Common","K",1,"",0,"0","","HardUP.png",""],
+["Splat","Common","K",1,"",0,"0","","Splatup.png",""],
+["Clown Gun","Common","G",1,"",0,"0","","ClownGunUp.png",""],
+["Leaf","Common","K",1,"",0,"0","","LeafMM2UP.png",""],
+["Lovely","Common","K",1,"",0,"0","","LovelyKnifeUP.png",""],
+["Shaded","Common","K",1,"",0,"0","","ShadedUp.png",""],
+["Wood Knife","Common","K",1,"",0,"0","","Wood.png",""],
+["Vines Gun","Common","G",1,"",0,"0","","Vines_Gun_2023.png",""],
+["Spider","Common","K",1,"",0,"0","","Spider2023.png",""],
+["Plaid Gun","Common","G",0,"",0,"0","","Plaid26.png",""],
+["Bat Swarm","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Candy Cane","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Gingerbread","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Knife Wrapper","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Northern Lights","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Snowflakes","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Pumpkin (2017)","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Snowflakes 2017","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Common Ornament","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Legendary Ornament","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Rare Ornament","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Uncommon Ornament","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Candies (2019)","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Batswarm","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Hallow's Blaze","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Easter Glow","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Floral","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Jellyfish","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Matrix","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Sunbeams","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Carrots","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Christmas Glow","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Leaves","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Rainbows (2025)","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Bubbly","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Hearts","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Nightlife","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Strawberries","Effects","F",null,"Event prize or quest",0,"","","",""],
+["Bokeh","Effects","F",null,"Crafting",0,"","","",""],
+["Coal","Effects","F",null,"Crafting",0,"","","",""],
+["Lights","Effects","F",null,"Crafting",0,"","","",""],
+["Nightsky","Effects","F",null,"Crafting",0,"","","",""],
+["Rainbow Fire","Effects","F",null,"Promo / merch code",0,"","","",""],
+["Void","Effects","F",null,"Promo / merch code",0,"","","",""],
+["Scarytree","Common","G",null,"Halloween 2026 Battle Pass, tier 2",0,"","","","H26"],
+["Wolf (2026)","Common","G",null,"Halloween 2026 Battle Pass, tier 4",0,"","","","H26"],
+["Bramble","Common","G",null,"Halloween 2026 Battle Pass, tier 10",0,"","","","H26"],
+["CandyCorn (2026)","Common","G",null,"2026 Halloween Box",0,"","","","H26"],
+["Bombs","Common","G",null,"2026 Halloween Box",0,"","","","H26"],
+["Skulls (2026)","Common","K",null,"2026 Halloween Box",0,"","","","H26"],
+["Bullets","Common","K",null,"2026 Halloween Box",0,"","","","H26"],
+["Hexed","Common","K",null,"Halloween 2026: complete 15 daily quests",0,"","","","H26"],
+["Glow","Uncommon","K",null,"2026 Halloween Box",0,"","","","H26"],
+["Brew","Uncommon","K",null,"2026 Halloween Box",0,"","","","H26"],
+["Drool","Uncommon","K",null,"2026 Halloween Box",0,"","","","H26"],
+["Catseye","Rare","K",null,"2026 Halloween Box",0,"","","","H26"],
+["Raven","Rare","K",null,"2026 Halloween Box",0,"","","","H26"],
+["Embergun","Legendary","G",null,"2026 Halloween Box",0,"","","","H26"],
+["Zombie Plush","Emotes","E",null,"Halloween 2026 Battle Pass, tier 1 (free)",0,"","","","H26"],
+["Skull","Emotes","E",null,"Halloween 2026 Battle Pass, tier 6",0,"","","","H26"],
+["Darkwave","Effects","F",null,"Halloween 2026 Battle Pass, tier 28",0,"","","","H26"],
+["Haunted House","Halloween 2026","K",null,"Battle Pass, tier 14",0,"","","","H26"],
+["Candy Corn (Pass)","Halloween 2026","X",null,"Battle Pass, tier 8",0,"","","","H26"],
+["Drool (Gun)","Halloween 2026","G",null,"Battle Pass, tier 16",0,"","","","H26"],
+["Skelly (Knife)","Halloween 2026","K",null,"Battle Pass, tier 18",0,"","","","H26"],
+["Catseye (Gun)","Halloween 2026","G",null,"Battle Pass, tier 20",0,"","","","H26"],
+["Broom","Halloween 2026","X",null,"Battle Pass, tier 24",0,"","","","H26"],
+["Serpent","Halloween 2026","X",null,"Battle Pass, tier 26",0,"","","","H26"],
+["Emberknife","Halloween 2026","K",null,"Battle Pass, tier 29",0,"","","","H26"],
+["Pumpkin (2026)","Halloween 2026","X",null,"Event quest: complete 30 daily quests",0,"","","","H26"],
+["Ghostly (2026)","Halloween 2026","X",null,"Event quest: complete 45 daily quests",0,"","","","H26"],
+["Pumpkins","Halloween 2026","K",null,"Bingo: complete column 2",0,"","","","H26"],
+["Flameburst","Halloween 2026","K",null,"Bingo: complete column 3",0,"","","","H26"],
+["Bats (2026)","Halloween 2026","X",null,"Bingo: complete the Innocent row",0,"","","","H26"],
+["Witches Brew","Halloween 2026","X",null,"Bingo: complete the Sheriff row",0,"","","","H26"],
+["Jack (2026)","Halloween 2026","X",null,"Bingo: complete the Murderer row",0,"","","","H26"],
+["Gold Emberbow","Halloween 2026","G",null,"Candy leaderboard: 1st place",1,"","","","H26"],
+["Silver Emberbow","Halloween 2026","G",null,"Candy leaderboard: 2nd place",1,"","","","H26"],
+["Bronze Emberbow","Halloween 2026","G",null,"Candy leaderboard: 3rd place",1,"","","","H26"],
+["Blue Emberbow","Halloween 2026","G",null,"Candy leaderboard: top 100",1,"","","","H26"]];
+const CATS=["Halloween 2026","Ancient","Chroma","Godly","Vintage","Legendary","Rare","Uncommon","Common","Pets","Effects","Emotes","Radios"];
+const EXTRA=new Set(["Effects","Emotes","Radios"]);
+const LOWC=new Set(["Legendary","Rare","Uncommon","Common"]);
+const LEGACY={"L:K:Predator":"L:K:Predator (knife)","L:K:Tree":"L:K:Tree (knife)","L:K:Overseer":"L:K:Overseer (knife)","L:K:Santa's Magic":"L:K:Santas Magic","L:K:Santa's Spirit":"L:K:Santas Spirit","L:K:Cursed":"L:K:Cursed (Knife)","L:G:Tree (Gun)":"L:G:Tree (gun)","L:G:Overseer (Gun)":"L:G:Overseer (gun)","L:G:Predator (Gun)":"L:G:Predator (gun)","L:G:Shadow (Gun)":"L:G:Shadow","R:K:Cane Knife (2018)":"R:K:Cane Knife","R:K:Darkknife":"R:K:DarkKnife","R:K:Cane":"R:K:Cane (Knife)","R:K:Rainbow (Rare)":"R:K:Rainbow","R:K:Molten":"R:K:Molten (Knife)","R:K:Gingerbread":"R:K:GingerBread","R:K:Phaser (Rare)":"R:K:Phaser","R:K:Cowboy (Rare)":"R:K:Cowboy","U:K:Bones (Uncommon)":"U:K:Bones","U:K:Mummy":"U:K:Mummy (Knife)","U:K:Snowman":"U:K:Snowman (Knife)","U:K:Camo":"U:K:Camo #2","U:K:Bluesteel":"U:K:Bluesteel (Knife)","U:K:Adurite":"U:K:Adurite (Knife)","U:K:Wrapped":"U:K:Wrapped (Knife)","U:K:Snowman (2024)":"U:K:Snowman (Knife)","U:K:Snowman (2023)":"U:K:Snowman (Knife)","U:K:Mummy (2017)":"U:K:Mummy (Knife)","U:K:Tree (2017)":"U:K:Tree","Co:K:Glitch1":"Co:K:Glitch 1","Co:K:Glitch2":"Co:K:Glitch 2","Co:K:Ornament2":"Co:K:Ornament2 (knife)","Co:K:Carved":"Co:K:Carved (Knife)","Co:K:Candy Corn":"Co:K:CandyCorn","Co:K:Present (2023)":"Co:K:Present","Co:K:CandyCorn (2019)":"Co:K:CandyCorn","Co:K:Spider (2023)":"Co:K:Spider","Co:K:Bats Knife (2024)":"Co:K:Bats Knife","Co:K:Stockings (2024)":"Co:K:Stockings","Co:K:Hearts (2025)":"Co:K:Hearts","Co:K:Haunted (2025)":"Co:K:Haunted","Co:G:Cold (Gun)":"Co:G:Cold","Co:G:Fallout (Gun)":"Co:G:Fallout","Co:G:Iron (Gun)":"Co:G:Iron","Co:G:Engraved (Gun)":"Co:G:Engraved","Co:G:Infiltrator (Gun)":"Co:G:Infiltrator","Co:G:Juice (Gun)":"Co:G:Juice","Co:G:Star (Gun)":"Co:G:Star","Co:G:HL2 (Gun)":"Co:G:HL2","Co:G:News (Gun)":"Co:G:News","Co:G:Pea (Gun)":"Co:G:Pea","Co:G:Snowman Gun (2022)":"Co:G:Snowman Gun","Co:G:Elf Gun (2023)":"Co:G:Elf Gun","Co:G:Cane Gun (2021)":"Co:G:Cane Gun","Co:G:Striped Gun (Summer 2025)":"Co:G:Striped Gun","Co:G:Elf Gun (2018)":"Co:G:Elf Gun","Co:G:Infected Gun (2022)":"Co:G:Infected Gun","Co:G:Starry (Gun)":"Co:G:Starry","Co:G:Peppermint Gun (2025)":"Co:G:Peppermint Gun","Co:G:Bats Gun (2024)":"Co:G:Bats Gun","Co:G:Bats Gun (2018)":"Co:G:Bats Gun","Co:G:Snowman Gun (2018)":"Co:G:Snowman Gun","Co:G:Wrapped Gun (2018)":"Co:G:Wrapped Gun","Co:G:Ornament1 (Gun)":"Co:G:Ornament 1"};
+const items=D.map(r=>({id:(r[1]==="Common"?"Co":EXTRA.has(r[1])?r[1].slice(0,3):r[1][0])+":"+r[2]+":"+r[0],name:r[0],cat:r[1],type:r[2],val:r[3],src:r[4],lock:!!r[5],dem:r[6],stab:r[7],mvimg:r[8],ev:r[9]||""}));
+const IMG={"G":{"Chroma Traveler's Gun":"chroma-travelers-gun-3fb248c092eb076c.webp","Chroma Vampire's Gun":"chroma-vampires-gun-0b079af27a5cb1d7.webp","Chroma Constellation":"chroma-constellation-c8e62d69f7593d58.webp","Chroma Snowcannon":"c-snowcannon-684003979330ef41.png","Chroma Emberbow":"chroma-emberbow-abe4a6f4a71ca6d3.webp","Chroma Sands":"chroma-sands-38cd9645761efe99.png","Gingerscope":"gingerscope-79c58e3580fc9506.webp","Harvester":"harvester-38f65311464bee2f.webp","Icepiercer":"icepiercer-96de8c3d82f8e626.webp","Emberbow":"emberbow-c9b04218431c6bea.png","Chroma Bauble":"chroma-bauble-a628c80716a543c1.webp","Traveler's Gun":"travelers-gun-b2313cd79af66da5.webp","Evergun":"evergun-ffdd00465b518886.webp","Chroma Watergun":"chroma-watergun-dd45a61d53aef101.webp","Constellation":"constellation-46fb92f3f0922bd3.webp","Vampire's Gun":"vampires-gun-a39b000fff89f7ae.webp","Darkshot":"darkshot-c47822be69f28070.png","Raygun":"raygun-11ba1d6997958303.webp","Bauble":"bauble-8eef31a629606d12.webp","Snowcannon":"snowcannon-e81bd74433dcc8db.webp","Soul":"soul-df0cd29af84e4ec1.webp","Rainbow Gun":"rainbow-gun-57de38b8f053fa88.webp","Flora":"flora-a6040d04bd718278.webp","Treat":"treat-9c6d87e92fa22fba.webp","Flowerwood Gun":"flowerwood-gun-8d69a2409f788c1e.webp","Xenoshot":"xenoshot-6e5ad600d8e9ef00.webp","Ocean":"ocean-7e3461ff519712b5.webp","Blizzard":"blizzard-aafe066cd1365e74.webp","Watergun":"watergun-8c5360b03e6a87e3.webp","Borealis":"borealis-304991adaccf9bc2.webp","Chroma Darkbringer":"chroma-darkbringer-74a0035ee271bc1a.webp","Chroma Swirly Gun":"chroma-swirly-gun-0f975c819333cc0d.webp","Chroma Luger":"chroma-luger-1fb7ccbbf1bb96b1.webp","Pearlshine":"pearlshine-43211857b0538eab.webp","Chroma Laser":"chroma-laser-6cc5c724e57a99b8.webp","Sugar":"sugar-c2832927fae1f8a3.png","Luger":"luger-cbc51ee60eb1c923.png","Darkbringer":"darkbringer-aaee514a3de3947c.webp","Elderwood Revolver":"elderwood-revolver-55e9a2ff3c74488f.png","Iceblaster":"iceblaster-b1925c289f7e8214.png","Red Luger":"red-luger-f9935c260c9e5899.png","Chroma Shark":"chroma-shark-5b16e288912bad65.webp","Swirly Gun":"swirly-gun-66a6e6c380fa9f66.webp","Green Luger":"green-luger-0163139a122fa154.png","Plasmabeam":"plasmabeam-c727b13ab0c6b436.png","Icebeam":"icebeam-0e2ce897c3839a28.png","Hallowgun":"hallowgun-5e9bc7822a67dcc4.webp","Amerilaser":"amerilaser-b2c37eb48c117347.png","Shark":"shark-769e425aef3eec0c.webp","Blaster":"blaster-461911d763c2e66b.png","Ginger Luger":"ginger-luger-93a1348c44bc0837.png","Lugercane":"lugercane-e92669c8a08d8348.png","Jinglegun":"jinglegun-2ea21b8a9cd3c2ce.png","Immortal":"immortal-9d58ba70a02566bf.png","Sands":"sands-92a90e98e26434d8.png","Sunrise":"sunrise-bfa5f20ee801fd12.png","Latte (Gun)":"latte-gun-5345fd4fbd82d940.png","Traveler (Gun)":"traveler-gun-6b50901c2fbf7c5d.png","Vampire (Gun)":"vampire-gun-448d811672d1b485.png","Aurora (Gun)":"aurora-gun-a9dbcdf6d7133132.png","Ginger (Gun)":"ginger-gun-0daef0f2abeff7ea.png","Nightsky":"nightsky-e5638714f1fb8b28.webp","Arctic (Gun)":"arctic-gun-2bbc13d1476eec6f.png","Tree (Gun)":"tree-gun-13c37b11ee3b7b14.png","Viper":"viper-dfd01498db492802.png","Chromatic (Gun)":"chromatic-gun-692bc8c73dc862b3.png","Overseer (Gun)":"overseer-gun-80e1a5f08b52586e.png","Predator (Gun)":"predator-gun-b8b88c6d3b680dd6.png","Aquarium (Gun)":"aquarium-gun-3e15127208004941.png","Frozen (Gun)":"frozen-gun-7a1ba776e4d8cc8e.png","Splash (Gun)":"splash-gun-9c4538f8263e2856.png","Palms (Gun)":"palms-gun-b705a1557d84ad31.webp","Spectral (Gun)":"spectral-gun-ef8b95ba77cf22cc.png","Ghost (Gun)":"ghost-gun-3ad12f28ba417f32.png","Ripper (Gun)":"ripper-gun-0a565e5c48dd160c.png","Cursed (Gun)":"cursed-gun-a93f4f6eed06549d.png","Frostfade (Gun)":"frostfade-gun-9ac1581ece435df5.png","Energized (Gun)":"energized-gun-49e60b77d79e82b9.png","Cavern (Gun)":"cavern-gun-57325a092663ea42.png","Shadow (Gun)":"shadow-gun-655d296241ec5096.webp"},"K":{"Traveler's Axe":"traveler-s-axe-e0df9d3e12b2d681.webp","Celestial":"celestial-073a0980a4114c57.webp","Vampire's Axe":"vampire-s-axe-5493cb9fef348ade.webp","Icebreaker":"icebreaker-53dfac0b90d91698.png","Swirly Axe":"swirly-axe-e3d4d689baaf95b5.webp","Elderwood Scythe":"elderwood-scythe-36533b2e4c53a9c4.png","Batwing":"batwing-1ccb9082ed84ebcd.webp","Hallowscythe":"hallowscythe-cabf813f402d94ca.webp","Logchopper":"logchopper-59953dde6983d27c.png","Icewing":"icewing-5d0cbecd55dddb82.webp","Emberscythe":"emberscythe-f304f1bbd3bc6557.webp","Chroma Evergun":"chroma-evergun-282b86d1fac0db8f.webp","Chroma Evergreen":"chroma-evergreen-90d9180e31fd633b.webp","Chroma Alienbeam":"chroma-alienbeam-7678f7448a6637ae.webp","Chroma Raygun":"chroma-raygun-87a8c5c72155c4f2.webp","Chroma Sunrise":"chroma-sunrise-dac413edf1294368.webp","Chroma Blizzard":"chroma-blizzard-44d4cd3962418a31.png","Chroma Heart Wand":"chroma-heart-wand-ed46922f398af37e.webp","Chroma Sunset":"chroma-sunset-a67dc39a7b0bcbe8.webp","Chroma Snowstorm":"chroma-snowstorm-6602d205a408323a.png","Chroma Treat":"chroma-treat-769240172fda46ad.webp","Chroma Sweet":"chroma-sweet-3e17f9a1df70228b.webp","Chroma Snow Dagger":"chroma-snow-dagger-a4bd4c06726ba5a3.png","Chroma Ornament":"chroma-ornament-befd2064575340e6.png","Chroma Lightbringer":"chroma-lightbringer-63267588fdfb067c.webp","Chroma Candleflame":"chroma-candleflame-8edd58d51a736639.webp","Chroma Elderwood Blade":"chroma-elderwood-blade-fc6ef760e2c3663c.webp","Chroma Cookiecane":"chroma-cookiecane-5126cf3d293c3024.png","Chroma Deathshard":"chroma-deathshard-18dce6ffd4bf1899.webp","Chroma Gingerblade":"chroma-gingerblade-9412d7e3ebe47b5e.webp","Chroma Slasher":"chroma-slasher-ed9ead352ec25c0e.webp","Chroma Fang":"chroma-fang-966629d549b85400.webp","Chroma Gemstone":"chroma-gemstone-74693b8c5fa04e6c.webp","Chroma Heat":"chroma-heat-2b136f6812885234.webp","Chroma Seer":"chroma-seer-1ce9c7446421142a.webp","Chroma Saw":"chroma-saw-213db7d4dadd4a34.webp","Chroma Tides":"chroma-tides-ca1f6660c5dbd9f1.webp","Chroma Boneblade":"chroma-boneblade-5186d9c06826ca11.webp","Chroma Embersickle":"chroma-embersickle-fab620955a768d7c.png","Chroma Emberscythe":"chroma-emberscythe-27ce38f57e1dd472.png","Chroma Icecream":"chroma-icecream-2f3792c8a78e6ff9.webp","Chroma Beachy":"chroma-beachy-3b8744c66e172846.webp","Turkey":"turkey-856deec834f96883.webp","Alienbeam":"alienbeam-303c717fba050fd1.webp","Darksword":"darksword-e2b1e594b6e39e27.png","Sakura":"sakura-18f74f7fa607811b.png","Spirit":"spirit-a80710a877c5af87.webp","Rainbow":"rainbow-460e529432f06ab3.webp","Bloom":"bloom-30b78be7b1e46dba.png","Heart Wand":"heart-wand-e3f6f9fa588474ce.webp","Sweet":"sweet-8ab1cb94656e28a3.webp","Flowerwood":"flowerwood-81c996d0ee720151.png","Xenoknife":"xenoknife-ca9eccbfa71ce5a6.webp","Snow Dagger":"snow-dagger-60d49d59abe2a106.webp","Waves":"waves-de476b588f54b216.webp","Snowstorm":"snowstorm-7e7b0eb25a2de6a9.png","Heartblade":"heartblade-a514317070dc8f06.webp","Candy":"candy-3c7ebd675bf3bb1c.webp","Australis":"australis-05e809690f1ddcef.webp","Pearl":"pearl-e9dbf59e34b7106d.webp","Candleflame":"candleflame-5a1b6a4d4de5cef7.webp","Elderwood Blade":"elderwood-blade-05d322f9a14c41d6.png","Phantom":"phantom-7a8da47657b2538f.png","Ornament":"ornament-0c7ccf7297a2316b.webp","Plasmablade":"plasmablade-cda410232f92bac6.png","Swirly Blade":"swirly-blade-518fe6267d0a22ee.webp","Iceflake":"iceflake-21ddf42dff4f7c9c.png","Eternalcane":"eternalcane-86dbe0348d6ae590.png","Nightblade":"nightblade-e5c1b4e2dc3c2423.png","Pixel":"pixel-ed9b1311214f33e8.webp","Slasher":"slasher-05ff89e32a2c096c.png","Cookiecane":"cookiecane-df971d108928778b.png","BattleAxe II":"battleaxe-ii-d60d414db4512437.png","Gingerblade":"gingerblade-bb434145447b6581.webp","Old Glory":"old-glory-d7131e954150beba.png","Virtual":"virtual-5634efcad0330fb9.png","Gemstone":"gemstone-14498984dd575085.png","Vampire's Edge":"vampire-s-edge-93ce14287ea36f5a.png","Nebula":"nebula-07e8c9b09576fa9a.png","Deathshard":"deathshard-e5a966f43c39ebe7.png","BattleAxe":"battleaxe-77f7d415a820df0b.png","Tides":"tides-a7f2a06c64193e53.webp","Heat":"heat-41d8a3e90e4fcb2d.png","Eternal IV":"eternal-iv-66c1f1d8b2c5dde5.webp","Frostsaber":"frostsaber-48b7f950d30a9b86.png","Eternal III":"eternal-iii-4f1076fc63013b65.png","Spider":"spider-ee795b0b1c22a7f8.png","Clockwork":"clockwork-7d4237bdaff412f9.png","Bioblade":"bioblade-3f72160d04793379.png","Fang":"fang-deeee2b00c4c0931.png","Chill":"chill-b2a7f1dea94ac66f.png","Handsaw":"handsaw-3dcbdedd74eeb115.png","Eternal":"eternal-93dc9d5093c1ae5b.png","Hallow's Edge":"hallow-s-edge-7247b427e8500c96.webp","Eternal II":"eternal-ii-0556364754d81ace.webp","Xmas":"xmas-97fd66ca33eaf3fa.webp","Hallow's Blade":"hallow-s-blade-ff58baec5d328917.webp","Ice Shard":"ice-shard-8a27764371cf988f.png","Ice Dragon":"ice-dragon-e41502945932b438.png","Ghostblade":"ghostblade-2a13ac26b90fa550.png","Boneblade":"boneblade-a82afde40e395fd3.png","Saw":"saw-a3e965cbec7f39cb.png","Frostbite":"frostbite-12b712b208bd0637.png","Prismatic":"prismatic-ff8c5fa569cf4c40.webp","Pumpking":"pumpking-b9da97e9790f312d.png","Eggblade":"eggblade-f72a67449c46c4d1.png","Winter's Edge":"winter-s-edge-b33e560c057cdc1d.png","Snowflake":"snowflake-9a307d75cf446a29.webp","Flames":"flames-5efd42adefbd92c4.png","Peppermint":"peppermint-47b8203ab49a8eae.webp","Blue Seer":"blue-seer-3fd1d57db2da0c0f.png","Seer":"seer-7bdfef0b528f3e8d.png","Red Seer":"red-seer-ee0e0b9eb097a5ef.png","Cookieblade":"cookieblade-61fab964850333bf.png","Purple Seer":"purple-seer-c0a2d49fd07c6016.png","Orange Seer":"orange-seer-c978ef99a89932a8.png","Yellow Seer":"yellow-seer-5ac80867d44000b9.png","Gingermint":"gingermint-3c885a97a4735f4c.png","Minty":"minty-9b0d7037d671dfa3.png","Bat":"bat-ab91e5f852532a9f.webp","Spectre":"spectre-92b6d30f307a6f4c.png","Lightbringer":"lightbringer-2c4c781fc7b1894a.png","Ghost":"ghost-23ad937c13e7329d.png","Blood":"blood-a9da527383ca7b49.webp","Prince":"prince-40a0c2d86c8f36d3.webp","Shadow":"shadow-7b83739bf0c5f5c6.webp","Phaser":"phaser-3e8eaa29754d893e.png","Cowboy":"cowboy-ee3977f6b062f1a4.png","Splitter":"splitter-54fa70869d229d57.png","Latte":"latte-1da9500908a16f39.png","Cotton Candy":"cotton-candy-1043f0ed28c19cde.png","JD":"jd-72c7cfb1b7bafc44.png","Beach":"beach-4c5c7d74a2317b0b.png","Spectral":"spectral-3444e14136948985.png","Cavern":"cavern-f6b0eb06495bbe57.png","Skulls":"skulls-987d723d0fd4d60b.png","Broken":"broken-69372d200c0767d5.png","Ghost (Legendary)":"ghost-legendary-8f5e8d401bc7ed60.webp","Icedriller":"icedriller-36c007dbd2bd4dbd.png","Bunnies":"bunnies-adf64b3c518a4344.png","Emerald":"emerald-4a510e006ede0d6c.png","Red Scratch":"red-scratch-2cb8ea757d0fa2c4.png","Arctic":"arctic-cf24f4db42a65930.webp","Predator":"predator-a7d3511ae0f74eed.webp","Rupture":"rupture-324f28979b78ffac.png","Tree":"tree-09187d724c84fa2c.webp","Web":"web-766f4e4615003279.png","Green Fire":"green-fire-6f8ceb36f397dc81.png","Overseer":"overseer-db8aa171333021e7.webp","Rune":"rune-271a29e05936de75.png","Universe":"universe-7e5138e3ee8c5569.png","Fade":"fade-f3c4677b33f506f5.png","Fusion":"fusion-2d4bf4e4d9e116fe.png","Plasmite":"plasmite-f6df59cdb2f1d060.png","Shiny":"shiny-0673cf72dd0dcd96.png","Splash":"splash-ad68246cce51cab6.png","Ripper":"ripper-9fcb208e2afd6d57.png","Energized":"energized-db5e5aa72198f9b2.png","Vampire":"vampire-eea50427d8c9a811.webp","Cupid":"cupid-694d3f24b7d203b4.png","Nightstar":"nightstar-72c19408ac419f64.png","Midnight":"midnight-838f6711a2dd9eaf.png","Santa's Magic":"santa-s-magic-7e8a8e48c941b6f6.png","Frozen":"frozen-d3675d0854bafd69.webp","Sparkle":"sparkle-fe13bcc9b01e2bf4.png","Santa's Spirit":"santa-s-spirit-2e75b5d381ec3849.png","Elite":"elite-1d041a770e53cb26.webp","Cursed":"cursed-fa92305e2037d23f.webp","Green Elite":"green-elite-bacee594377f01af.png","Blue Elite":"blue-elite-19c25b122b1307e0.png","Witched":"witched-9a14447a32891310.png","Palms":"palms-ae7d3c050e45e729.png","Blue Scratch":"blue-scratch-a82d4e3eac025b64.png","Aurora":"aurora-09f3dd9608f4ce9d.webp","Traveler":"traveler-2542145e1f405d27.png","Ginger":"ginger-abc24a10d06263b9.webp","Aquarium":"aquarium-11834aa4219b1bc3.png","Frostfade":"frostfade-c8db67d03ce629e4.png","Icecracker":"icecracker-1b7e2c1bf9791f5e.png","Chromatic":"chromatic-d4bfc18ddd7fc9dd.webp","Red Fire":"red-fire-63833c9edcab3961.png","Cane Knife (2018)":"cane-knife-2018-450e02dfa0746f4e.png","Silent Night":"silent-night-6b5bb9f2134076cb.png","Makeshift":"makeshift-51331b91a84b03ac.png","Dungeon":"dungeon-1d1fd6a48adb6e7f.png","Zombified":"zombified-3f28eeb537b41a60.webp","Floral":"floral-cbbf47380238b5c4.webp","Darkknife":"darkknife-610730dc7c47ba83.png","Toxic":"toxic-fd8fa0f837d1fd69.png","Swirl":"swirl-1e8bcb1f1e9ddd70.png","Magma":"magma-a9b1c48bdc1e12c0.png","Black":"black-c072b75eb72e87cd.png","Cane":"cane-1e177b00c8e7e699.webp","Starry":"starry-6b0eb4e25483d867.webp","Squire":"squire-ad6bceb45092a158.png","Snowflakes":"snowflakes-03c8d2cd71ca8274.png","Spectrum":"spectrum-e5b3824f5cd645bb.png","Space":"space-16cc82728eb26ef7.png","Purple":"purple-5aed1d46375e865d.png","Abstract":"abstract-c526da20ad2d9a22.png","Nightfire":"nightfire-76b6d3adc24ee259.png","Musical":"musical-d3e2420a7a208a69.png","Korblox":"korblox-f92c81da865e9729.png","Imbued":"imbued-58620b0005fe0894.png","Hacker":"hacker-f8ab5e203f3246b2.png","Vortex":"vortex-d71c24714cea14ab.png","Galaxy":"galaxy-a50ee93568b6e50c.png","Krypto":"krypto-bc9d5dd9d4ff4c6a.png","Galactic":"galactic-5d71037a6e0992d2.png","Bacon":"bacon-3e83cecfa809deec.png","Ace":"ace-005cabf598207e5c.png","Rainbow (Rare)":"rainbow-rare-460e529432f06ab3.webp","Nova":"nova-2f03d54c4f7ac1a4.png","Curse":"curse-67a756f2c01ec197.png","Tropical":"tropical-4f8f775d88b3e89d.png","Storm":"storm-9e7b7c795cfd0980.png","Green Marble":"green-marble-946b2e68b1d5616a.png","Snakebite":"snakebite-8547e14c1f9a6371.png","Molten":"molten-f0927a0bdaf8f4bf.png","Snowy":"snowy-c7ff274817ab1179.png","Bio":"bio-64a9cc6a826f70c6.png","Bones":"bones-b5e818af063d1cb7.webp","Gingercookie":"gingercookie-30dfc91abb16ad9a.png","Ice Camo":"ice-camo-0f9a0030c3d126dc.png","Spearmint":"spearmint-f888bc337d147767.webp","Spring":"spring-25dde9e38ec4eec9.png","Xeno":"xeno-a3bdc883ed627524.png","Deep Sea":"deep-sea-8f088b2cc45a4566.png","Pop Art":"pop-art-55a0e6a3bd3e973d.png","Gingerbread":"gingerbread-4cd2ca02a3d50b90.webp","Sharky":"sharky-d1cb7d5a6b066d91.png","Kraken":"kraken-1f686be83bf927f3.webp","Yummy":"yummy-f074320d87805515.webp","Hologram":"hologram-7b203e512d922b02.png","Portal":"portal-d6bc7c759f0d8639.png","Snowglobe":"snowglobe-ac91149bec01eaf6.png","Icicles":"icicles-a7cb1f4761680caf.png","Wraith":"wraith-a93f69e52085b0d4.webp","Sleigh":"sleigh-ff0b0c45fa61ce0d.webp","Robot":"robot-727ad247b6e7f537.png","Orange Marble":"orange-marble-0c56352e507c7247.png","Ghastly":"ghastly-93707efee51e9b27.png","Painted":"painted-bd348fee51ffabe2.webp","Logcutter":"logcutter-a8996e53d9df82fc.webp","Candy Swirl":"candy-swirl-5912ed1f15a868fe.png","Heart":"heart-2d36374c679a2e63.png","Neon":"neon-38a5c6dca745eda1.png","Nuke":"nuke-8048159c8c1c114c.png","Damp":"damp-11e834e95f4436cd.png","Frostflame":"frostflame-5914769dddbc3997.webp","Nether":"nether-26dde5dd8192cbad.png","Spitfire":"spitfire-1966533640134b0b.png","Watcher":"watcher-dc6d6400ec1faba1.png","Tree (2023)":"tree-2023-943979366f3a857b.png","Blossom":"blossom-61e9b5e31412f2a5.webp","Bones (Uncommon)":"bones-uncommon-b5e818af063d1cb7.webp","Zombified (Uncommon)":"zombified-uncommon-3f28eeb537b41a60.webp","Sweater":"sweater-0d216cbe4bc3f8dd.png","Branches":"branches-9ca9e36d3471ffa6.png","Void":"void-add599f00424345c.png","Potion":"potion-39de27ce63bb5e17.webp","Snowflake (Uncommon)":"snowflake-uncommon-9a307d75cf446a29.webp","Wooden":"wooden-071c8ed23cd256a4.png","Mummy":"mummy-7c13fcfd1a7e524c.png","Red":"red-60e1b8bf8cd66e1c.png","Wanwood":"wanwood-946eb937a11f4c61.png","Paper":"paper-7646981f6acdf0d1.png","Stalker":"stalker-79624542d59e1395.png","Hive":"hive-056ec863f7a04b8f.png","Nutcracker":"nutcracker-98e474b3b8c7ec34.png","Snowman":"snowman-9c9c302928d20138.webp","Pink":"pink-5dc006be7a8f2284.png","Circuit":"circuit-04e3f17bc0c402fd.png","Cheddar":"cheddar-8b74c7e8df4208bf.png","Caution":"caution-b433ed4abc3d6885.png","Cheesy":"cheesy-cc11652e1d8a63db.webp","Camo":"camo-d7ed2c619d39422e.png","Brush":"brush-ae77fdedc9299ce1.png","Pirate":"pirate-8249bbc4d2ccd77d.png","Bluesteel":"bluesteel-be5979edc447beb3.png","Blue":"blue-4f9c656249532956.png","Marina":"marina-a03af9632d26ca5c.png","Hazmat":"hazmat-04d61df4204bc84a.png","Sketch":"sketch-d9a15f76c55ea44b.png","Jigsaw":"jigsaw-b35958336321c2fd.png","Lucky":"lucky-e96376867cdf02b9.png","Missing":"missing-ecadc12c79058df6.png","Doge":"doge-7dbc7353496282d8.png","Soda":"soda-fb21b13d7a441f54.png","Gifted":"gifted-7cdbbeceafee3739.png","Adurite":"adurite-47443ac9883b6fbf.png","Carrot":"carrot-af9abc9df8e13288.png","Decorated":"decorated-c138bc0058e6a453.png","Lantern":"lantern-6ec789c0af19e672.png","Monster":"monster-fb6c1a57b36364a3.webp","Pool Noodle":"pool-noodle-016189293c44bc1a.webp","Popsicle":"popsicle-bd17d25c048ae385.webp","Witchbrew":"witchbrew-e6a8bdd04963935d.png","Wrapped":"wrapped-5f1968c68d8c9750.webp","Gothic":"gothic-ce77d8c358eb6fab.webp","Meltdown":"meltdown-cf0e396c210866bd.png","Stockings":"stockings-61a231a8a2f89bfa.png","Fall Camo":"fall-camo-8011a59d2ddcc73e.png","Floatie":"floatie-446ec5737d9d053c.png","Meadow":"meadow-06cce649189156ea.png","Checkers":"checkers-f816f90ea2471c72.png","Eclipse":"eclipse-7dcc7eccd65a8885.png","Future":"future-4576f28c373fc32c.png","Glowy":"glowy-e80c6cc3429191f9.png","Lava":"lava-e2e3cb49c70c3145.png","Night":"night-187bb0a1aa963ac0.png","Pool":"pool-3e68f73325921f3f.png","Graffiti":"graffiti-6b1fdd73c6e57b73.png","High Tech":"high-tech-b30256d3433b52e1.png","Eyes":"eyes-d66d7ac6b617dfee.png","Jellyfish":"jellyfish-597fd75c5c51f937.png","Turtle":"turtle-26b119168b17f42a.png","Pumpkin Pie":"pumpkin-pie-f25bd6084a5ab184.png","Snowman (2024)":"snowman-2024-13fe613c3be0cd34.png","Mistletoe":"mistletoe-ddb939e64406153d.webp","Pumpkin":"pumpkin-5a84f88a6a77bb1f.webp","Donut":"donut-7fe925f21e070134.png","Gingerheart":"gingerheart-74e81084b6ab9830.png","Ghostly":"ghostly-f780f855914d3c84.png","Abduction":"abduction-98d7d6f54e72a3f1.png","Canes":"canes-407f82f049623e1f.png","Pumpkin Patch":"pumpkin-patch-c9b6a8ea1cfaf9aa.png","Retro":"retro-e1dd2192b6267e56.png","Snowman (2023)":"snowman-2023-57108e83cd144753.png","Treats":"treats-6259842ba69cd161.png","Mummy (2017)":"mummy-2017-87c6e4ba8c41b10b.png","Rose":"rose-2695cfd603be9eaa.png","Holly":"holly-09aa14dbe177e7ba.webp","Frosty":"frosty-f52c95efdbbbdf9a.png","Hazard":"hazard-c210beafdedaf234.webp","Wraiths":"wraiths-45c2304ad33f7761.png","Cookie":"cookie-832f5bef52dd039b.webp","Brains (2022)":"brains-2022-4638983f8c4ca491.png","Moons (2024)":"moons-2024-f42266f17a3b0b9e.png","Pumpkin (2025)":"pumpkin-2025-c550c9b9d53a4766.png","Steel":"steel-1050118bd33eba3a.png","Tree (2017)":"tree-2017-a6784282563b727b.png","Ghosts":"ghosts-a057414a74b74103.png","Wrapped Knife (2024)":"wrapped-knife-2024-469456c4bd2a1f0d.png","Soda (Knife)":"soda-knife-b628f17758aca44e.png","Mummy 2018":"mummy-2018-afa07aeca52ddfaf.png","Bats":"bats-7e345ce19b6b0854.webp","Pine":"pine-eecca64a11a7f788.png","Glitch1":"glitch1-f8f4b217e89e2531.webp","Gifts":"gifts-56990ea82a84d3f1.webp","Glitch2":"glitch2-cbc6c4ae12e87d62.png","Ghoulish":"ghoulish-65a7355faacc6610.png","Sparkle9":"sparkle9-977586e56acc5a16.png","Sparkle8":"sparkle8-f2a6dedff22215d3.png","Sparkle10":"sparkle10-4f8bb704598ec985.png","Sparkle7":"sparkle7-e313b368efc27d23.png","Elf":"elf-e7c95953e297aa3c.webp","Frosted":"frosted-d6a23a3acd7abc73.png","Sparkle6":"sparkle6-f15471eefb372c84.png","RIP":"rip-e92e0d261f80d589.png","Coal":"coal-c7ecedd8d1f15bf9.webp","CandyCorn 2017":"candycorn-2017-e4f06b097c07b21c.png","Sparkle4":"sparkle4-be4ec2e1b955fca5.png","Prism":"prism-c957910405882e1d.webp","Combat II":"combat-ii-a31aab670215dc9b.png","Skool":"skool-b2dd3501bb74123f.png","Tailslide":"tailslide-31a35623ea902045.png","Sparkle5":"sparkle5-2ed662c0abfcea82.png","Ollie":"ollie-e85c0ecdf8691fda.png","Sidewinder":"sidewinder-e221e4142d9b6234.png","Pumpkin (2019)":"pumpkin-2019-29ec1c4d22c48dbc.png","Ecto":"ecto-778175699871d0c0.png","Valentine":"valentine-dd06dbf4814cfa16.png","Choco":"choco-e90216dbdb4fd54c.png","Goo":"goo-25523bdba4ad9eb0.png","Hearts":"hearts-48c1fcf88dcfbe57.png","Egg":"egg-fbbaf94957719478.png","Sketchy":"sketchy-be9b2909fbbc5e8b.webp","Euro":"euro-1eeb204e6fc47f21.png","Slime":"slime-f22a94aa5192e419.png","Ornament1":"ornament1-74cc3b99af291e6e.png","Santa":"santa-90d3716c06aacb67.png","Slimy":"slimy-83bdd6a5f2269c2e.png","Roses":"roses-154711d2e03096d0.png","Sweetheart":"sweetheart-0c395b1cbb5def96.png","Passion":"passion-b473f7adfeec7078.png","Ornament2":"ornament2-cf856a7b8ca18fca.png","Patrick":"patrick-8c0d18804f4ab7a8.png","Tulip":"tulip-de52c71bdf7a7e10.png","Carrots":"carrots-a8e27af9b4ee5492.webp","Clownfish":"clownfish-53f17f2461946fc3.png","Sub":"sub-70dadb8c6f6503a4.webp","Chick":"chick-f664a45f36426542.png","Etched":"etched-638688e21fc92cba.png","Bats (2020)":"bats-2020-02b2b09ed2eed32b.png","Stickers":"stickers-145439e689ebb2df.png","Cats":"cats-9dc62c8b96fe428e.png","Ornaments":"ornaments-8157ebd0b2dd1980.png","Carved":"carved-c43cb51c9070d3d9.webp","Denis":"denis-8380ac72346b77d4.png","Candle":"candle-f4c357a371469c6c.png","Ghosts (2023)":"ghosts-2023-9c743b05671ef70d.png","Scarf":"scarf-104fcc050f1c6010.png","Candles":"candles-d093e89e34fa2714.webp","Gift Bag":"gift-bag-c57cf696cf48e6c7.png","Coal 2021":"coal-2021-44e8799b4c8f7859.png","Toy":"toy-6a7195bfe6916da8.webp","Fragile":"fragile-fb81ae9b92e1f85a.webp","Candy Corn":"candy-corn-72d31251fb4356b9.webp","Present":"present-bf5e263966346650.png","Elf (2017)":"elf-2017-977ac17474ecc898.png","Webbed":"webbed-eff0606f163e4c55.png","Present (2023)":"present-2023-5d1a718b737e6a88.png","TNL":"tnl-a18515658da9e10d.png","Wavy":"wavy-2f90ea15248fbedc.png","Asteroid":"asteroid-2b14aa3e4f2e46be.png","UFOs":"ufos-e2573221d71e11ab.webp","Sparkle3":"sparkle3-7dbc11448dc7837c.png","Corl":"corl-79bcfa27aa850c62.webp","Alex":"alex-a098fb8e97d97ff7.webp","Sparkle2":"sparkle2-43be3fb25391971b.png","Infected":"infected-a0b4c74f7ae8c884.webp","Sparkle1":"sparkle1-e3c1742984088c70.png","Eyeball":"eyeball-d87e12e378baff1f.webp","Penguin":"penguin-6048bc5ee065a4ec.png","RB Knife":"rb-knife-5050a9519a84b582.webp","Snowman (Common)":"snowman-common-9c9c302928d20138.webp","Mummified":"mummified-809fb2903460f000.png","CandyCorn (2019)":"candycorn-2019-8007a4c8d47691c5.png","Grind":"grind-631a77433694dc49.png","Indy":"indy-8f9dd2ca531475de.png","Elf (2018)":"elf-2018-175c854795dd2436.png","Slashed":"slashed-56ab7743a72e9796.png","Candied":"candied-92c6ecadc0f513a2.webp","Cane 2021":"cane-2021-ae68b5b6431b96c9.png","Cracks":"cracks-d12034fef12015f3.webp","Giftwrap":"giftwrap-724f50622d31e33c.png","Santa (2018)":"santa-2018-90c088cac3e3ab3c.png","Snowman (2018)":"snowman-2018-a4acb406605b175d.png","Trees":"trees-ffa58888aea6e731.png","Snowman 2022":"snowman-2022-60425a33a0cdb389.png","Spider (2023)":"spider-2023-4fbade5417804779.png","Wood":"wood-76504b1fcc84a371.png","Balloons":"balloons-a35a0c21fe4ddcdf.png","Bats Knife (2024)":"bats-knife-2024-5f919652f0bea006.png","Bells":"bells-9915c23f0e91b30a.png","Dolphins":"dolphins-eab55b2d0e8557c7.png","Elf (2023)":"elf-2023-283c11d41736b251.png","Hallows Stickers 2022":"hallows-stickers-2022-b567411ea72ccc18.png","Igloo":"igloo-6bfd8cc267f5c0d5.webp","Snowfall":"snowfall-777c55b4cb0cf60b.png","Starfish":"starfish-9a35ced2b09d6e3d.png","Stockings (2024)":"stockings-2024-131812bcd7909976.png","Strawberries":"strawberries-8e0c7d3cffb12db1.webp","Striped":"striped-4b3c2eee6e32003d.png","Xbox":"xbox-1d5932ecb98865c5.png","Ghosts (2024)":"ghosts-2024-483a99d72e7a52e1.png","Coconut":"coconut-f8eb71feeceb06e4.png","Hearts (2025)":"hearts-2025-a15a3cd32d84254b.png","Static":"static-794e3a1f8f1a6876.png","Whiteout":"whiteout-a53c91773e1416cd.png","Yellow":"yellow-68ba1d83c16c6a46.webp","Combat":"combat-e9428c8de46126e7.png","Cold":"cold-3a585ba3a3fc17cd.png","Copper":"copper-11f1b47bff071b74.png","Clan":"clan-60682cd90ce42b73.png","Cherry":"cherry-7fcee8795c9d9757.png","Cardboard":"cardboard-bc34c81473332ada.png","Moon":"moon-5183d0ac80722a32.png","Brown":"brown-34e28a880b063fd3.png","Witch":"witch-f9230ed0876059a2.png","Haunted":"haunted-78d2d0c3941cb872.webp","Borders":"borders-b1cb4b3e58baa708.png","Bleached":"bleached-9b091b2e713a8670.png","8Bit":"8bit-414fad336d3f2fe4.png","Clown":"clown-aeeb596b04337302.webp","Ribbon":"ribbon-75c483d9ab145e7b.png","Hot Chocolate":"hot-chocolate-efcb73f89f68937b.png","Gifts (2024)":"gifts-2024-edff26e4fbc70e94.png","Darkness":"darkness-b8c0474bb0a278cc.webp","Vines":"vines-cf4609e29fcb1a14.png","Pumpkin (2023)":"pumpkin-2023-4ed0c7e1d2c932c7.png","Snowflakes (Common)":"snowflakes-common-03c8d2cd71ca8274.png","Love 2023":"love-2023-cf8f33bb190150ea.png","Grave":"grave-bddd92bcf28675d9.webp","Green":"green-f178a51a011e7887.png","Juice":"juice-3ca457ffdb9b3a5c.png","Splatter":"splatter-afebe75950a28d42.png","Hunter":"hunter-fa30a2eb44759bc1.png","Shaded":"shaded-422d0d06824711b9.webp","Ribbons":"ribbons-a015c4d2fed9bc12.webp","Reindeer":"reindeer-3658806b9070a2c2.webp","Eco":"eco-15738602fc1d6c3c.png","Engraved":"engraved-f28e777c88686d55.png","Fallout":"fallout-3f31b3d4ff7e9822.png","Hardened":"hardened-e9f956d2d07ec53a.png","HL2":"hl2-8b6ead6de789504e.png","Ice":"ice-ebd82b265116ac1c.png","Infiltrator":"infiltrator-e5773657992fde80.png","Iron":"iron-2a389625c482f71b.png","Leaf":"leaf-ef0c75975e00ae00.png","Linked":"linked-e44a7fb29628a08a.png","Log":"log-4173833360acb587.png","Love":"love-01a6625614f0ef86.png","Lovely":"lovely-eb276d87ef3e27d6.png","News":"news-fec68f823c40f80a.png","Oily":"oily-f830187a8022893e.png","Orange":"orange-10c732c730993b0b.png","Pea":"pea-f493a5dadd7a6853.png","Sandy":"sandy-8e714a3a7b5948a1.png","Slate":"slate-f7cd9fe6c18c6bbf.png","Splat":"splat-13094a1973bbbca8.png","Stainless":"stainless-1f368d0ee2238b25.png","Star":"star-55cb7f7db344776a.png","Coal 2022":"coal-2022-e6694f87963a3264.png","Aqua":"aqua-d8a58cea4c1fc020.png","Apocalypse":"apocalypse-35dd408172d93d59.webp","Haunted (2025)":"haunted-2025-b61f9475b0903e8c.png","Mortal":"mortal-eabf8358a45b892c.webp","Embersickle":"embersickle-78277893a46020f8.png","Evergreen":"evergreen-20a79ece4bf04d8f.webp","Sunset":"sunset-a3ae18414e601e89.webp","Icecream":"icecream-c8e0a58e8d338eaa.png","Beachy":"beachy-bc0fae7ae97246f0.webp"},"P":{"Cat":"cat-15c38c9925f362e5.webp","Dog":"dog-4c13bddfc064c2bf.webp","Fox":"fox-b69448fbab366c15.webp","Pig":"pig-3acaf66fdc2c77f5.webp","Bear":"bear-ec756cd1117e67b3.webp","Bunny":"bunny-1e9b1ed9ea247cb4.webp","Bat":"bat-ab91e5f852532a9f.webp","Fire Cat":"fire-cat-2e79c5d77b0d968d.webp","Fire Dog":"fire-dog-9433e4da354ac711.webp","Fire Fox":"fire-fox-d7530b4bff97b31f.webp","Fire Pig":"fire-pig-75f2ae98d2e15d7b.webp","Fire Bear":"fire-bear-30c9f80c2e6afa50.webp","Fire Bat":"fire-bat-648cfaed6bb4e752.webp","Chroma Fire Cat":"chroma-fire-cat-57b30b6729f3a42d.webp","Chroma Fire Dog":"chroma-fire-dog-1cd87d51820213ef.webp","Chroma Fire Fox":"chroma-fire-fox-9b6dc47c71b31830.webp","Chroma Fire Pig":"chroma-fire-pig-61dfceee13dab6a5.webp","Chroma Fire Bear":"chroma-fire-bear-0926b2e1bc350741.webp","Chroma Fire Bat":"chroma-fire-bat-88c076d362118f15.webp","Chroma Fire Bunny":"chroma-fire-bunny-ff668c351879daee.webp","Dogey":"dogey-d8cc4474ddc60423.webp","Piggy":"piggy-91ddaeeff547ddcb.webp","Nobledragon":"nobledragon-4edbec2e3f1c7f23.png","Seahorsey":"seahorsey-123b98d3dc0d30f4.webp","Chilly":"chilly-45187d2de94b263f.webp","Pengy":"pengy-2b6743bbf09337d5.webp","Badger":"badger-c8f0358748a7f4c2.webp","UFO":"ufo-44e3200bf398422d.webp","Mechbug":"mechbug-d2641f211819f01f.png","Tankie":"tankie-8cdae30db1750701.png","Deathspeaker":"deathspeaker-79f7b480e5d5da15.png","Fairy":"fairy-02b29141a66c98ed.webp","Eyeball":"eyeball-d87e12e378baff1f.webp","Jetstream":"jetstream-33bc9826800a9280.png","Zombie Dog":"zombie-dog-c36cdb6dedb33143.webp","Black Cat":"black-cat-e57aa8c09c68f5fa.png","Blue Pumpkin (2018)":"blue-pumpkin-2018-49e9743e19938e36.png","Red Pumpkin (2018)":"red-pumpkin-2018-e66a883bd24a10db.png","Green Pumpkin (2018)":"green-pumpkin-2018-11d6435e5ec2a0cd.png","Purple Pumpkin (2018)":"purple-pumpkin-2018-184c3ff4a7fdf949.png","Pumpkin (2017)":"pumpkin-2017-7f3e45bd4dc89b16.png","Pumpkin (2018)":"pumpkin-2018-5061fde84e01baf2.png","Vampire Bat":"vampire-bat-01a50522b896efe2.png","Red Pumpkin (2019)":"red-pumpkin-2019-55ed76f44d2b9ce8.png","Green Pumpkin (2019)":"green-pumpkin-2019-4c4615a546058a0c.png","Blue Pumpkin (2019)":"blue-pumpkin-2019-f3a109cdb7bcc409.png","Pumpkin (2019)":"pumpkin-2019-3241ce34871a282f.png","Scarecrow":"scarecrow-5f5e832e37b4f1a9.webp","Red Pumpkin (2020)":"red-pumpkin-2020-545eb2e97995afc2.png","Green Pumpkin (2020)":"green-pumpkin-2020-baaa4b15c214e846.png","Blue Pumpkin (2020)":"blue-pumpkin-2020-a7957b58d72ac16b.png","Pumpkin (2020)":"pumpkin-2020-f690b52bc118d67f.png","Red Pumpkin (2021)":"red-pumpkin-2021-492db62a293b83b2.png","Green Pumpkin (2021)":"green-pumpkin-2021-e146e8fa10bccec3.png","Shadow Pumpkin":"shadow-pumpkin-9274fe59f4629619.webp","Skully":"skully-99375b425c4455c9.webp","Pumpkin (2021)":"pumpkin-2021-0ba891050e041e27.png","Lil' Alien":"lil-alien-21b5064d980d4c12.webp","Elf (2019)":"elf-2019-d9e9753d2a678a4e.png","Mr. Reindeer":"mr-reindeer-3a2e597a060de8a0.png","Elf (2016)":"elf-2016-e7c95953e297aa3c.webp","Reindeer":"reindeer-3658806b9070a2c2.webp","Rudolph":"rudolph-fa4f22f3dbbb9e67.png","Mr. Snowman":"mr-snowman-60fa5e506ef3303f.webp","Snowbear":"snowbear-f52f96fb621ccfda.webp","Santa Dog":"santa-dog-4e0a53c81f84893f.png","Frostbird":"frostbird-7b4198a2ac3af17f.png","Snowman":"snowman-9c9c302928d20138.webp","Santa (2019)":"santa-2019-bfbd1326d2a74bdc.webp","<3":"heart-1cbf910c11fb83a2.png","Carrot Bunny":"carrot-bunny-d4b58586f54aa05b.webp","Teddy":"teddy-4e4a4a8aacb8db11.png","Ghosty":"ghosty-6c733e7ee4498671.png","Traveller":"traveller-111021de1a343b3e.webp","Icey":"icey-4a742654a46d6522.png","Skelly":"skelly-0d3ffe82c73ee6b8.png","Phoenix":"phoenix-7da98f2a088c13eb.png","Sammy":"sammy-e6c9cef7577bd26a.png","Electro":"electro-788a540d0340b34f.png","Steambird":"steambird-ff3098f2dfda6b8e.png","Ice Phoenix":"ice-phoenix-83122c0bd8c648e9.png","Overseer Eye":"overseer-eye-4080d6dabb38bd95.png","Elitey":"elitey-a20f568f724b0517.png"}};
+const IMGBASE="https://media.bloxodes.com/wiki/66654135/";
+const FANDOM={"Reaver":"7/72/ReaverLegendaryUpdated.png","Icecrusher":"d/db/Icecrusher1.png","Gingerscythe":"e/ea/Gingerscythe_Rare.png","America":"0/06/99ada3d2ed367aa358c7284dd9c6a13b.png","Golden":"3/3a/GoldenUpdated.png","Bubbles":"b/b9/Bubbles2026.png","Pier":"7/71/Pier2026.png","Neopolitan":"3/39/Neapolitan.png","Turtles":"d/d4/Turtles2026.png","Default Gun":"5/58/DGUpdated.png","Big Kill":"1/19/Big_Kill.png","Bit":"d/d8/Png_%286%29.png","Clown (Gun)":"2/28/ClownGunUpdated.png","Clownfish (Gun)":"d/d9/ClownfishGun.png","Duckies":"e/e9/Duckies2026.png","Cherries":"7/7c/CherriesGun2026.png","Balloons (Gun)":"e/eb/BalloonsGun.png","Stickers Gun (Halloween 2024)":"8/87/StickersGun2024.png","Candy Corn Gun (2024)":"4/4e/Candy_CornGun2024.png","UFOs Gun":"c/c2/UFOsGun2025.png","Fall":"b/be/FallGun2025.png","Coal Gun (2021)":"1/13/CoalGun2021.png","Stickers Gun (Christmas 2021)":"0/00/StickersChristmas.png","Candied (Gun)":"a/a7/CandiedGun.png","Stickers Gun (Christmas 2022)":"7/7d/StickersG2022.png","Snowman Gun (2022)":"f/fd/SnowmanG2022.png","Coal Gun (2022)":"7/71/CoalG2022.png","Candy Corn Gun (2022)":"f/fb/CCG.png","Frozen Gun (2023)":"6/6a/FrozengunImproved.png","Vines (Gun)":"b/b2/Vines.png","Stickers (Gun)":"4/42/StickersGun.png","Candy Corn Gun (2020)":"e/e4/Candy2020gun.png","Cane Gun (2021)":"4/4b/CaneGun2021.png","Darkness (Gun)":"7/73/Darkness_Gun_2022.png","Wavy (Gun)":"a/a4/Wavyrevamped.png","Aliens":"a/a0/Aliens2021.png","Carved (Gun)":"5/5e/Curved_Gun.png","Gift Bag (Gun)":"b/bc/Gift_Bag_Gun.png","Cat (Gun)":"4/4a/CatsGunUpdated.png","Cracks (Gun)":"9/9f/CracksGun.png","Toy (Gun)":"d/d4/Toy_gun.png","Stickers Gun (Summer 2025)":"c/c8/Stickers_G_2025.webp","Striped Gun (Summer 2025)":"9/91/Striped_G_2025.webp","Watcher Gun (2020)":"8/8c/Watcher_Gun.png","Stickers Gun (Summer 2023)":"1/11/Stickers_gun.png","Webs (Gun)":"e/e9/Websgun.png","Pumpkin Gun (2023)":"8/83/Pumpkin_Gun_2023.png","Sandy (Gun)":"0/0d/SandyGun.png","Starfish (Gun)":"d/d4/StarfishGun.png","Ornaments (Gun)":"1/14/Ornamentsgun.png","Gifts (Gun)":"2/25/Gifts_icon.png","Pine (Gun)":"c/c2/Pine_gun.png","Infected Gun (2022)":"a/a7/Infected_Gun_2022.png","Fragile (Gun)":"4/40/Fragile_%28Gun%29.png","Apocalypse (Gun)":"e/ed/ApocGun.png","Snowflakes (Gun)":"1/12/Snowflakes2019Gun.png","Webbed (Gun)":"4/48/WebbedGun.png","Frosted (Gun)":"a/a4/Frosted.png","RIP Gun":"b/b1/RIP_Gun.png","Coal Gun (2018)":"9/9f/Coal_2018.png","Igloo (Gun)":"7/77/Igloo2024.png","Stickers Gun (Christmas 2024)":"c/cc/StickersGunXmas2024.png","Peppermint Gun (2025)":"3/36/PeppermintGun2025.png","Snowball (Gun)":"3/33/SnowballGun2025.png","Bats Gun (2024)":"7/7a/Batsimproved.png","Candy Corn Gun (2025)":"b/ba/CandyCornGun2025.png","Bats Gun (2018)":"b/ba/2513741174.png","Haunted (Gun)":"8/81/Haunted_improved.png","Slime (Gun)":"f/fa/SlimeGun_improved.png","Snowman Gun (2018)":"1/1c/Snowman_gun.png","Wrapped Gun (2018)":"f/fb/Wrapped_gun_2018.png","Grave (Gun)":"4/48/GG2018.png","Ornament1 (Gun)":"7/73/OrnamentRed.png","Ornament2 (Gun)":"8/8b/Ornament2_improved.png","Santa Gun (2015)":"e/ec/SantaGun_improved.png","Laser":"f/f7/54798135.png","Phaser (Rare)":"d/d8/PhaserUpdated.png","Cowboy (Rare)":"9/96/144290769.png","Cold (Gun)":"6/60/Cold_Gun.png","Fallout (Gun)":"0/01/FalloutGun.png","Iron (Gun)":"4/45/Iron.png","Engraved (Gun)":"b/bd/Engraved_improved.png","Infiltrator (Gun)":"c/c4/Infiltrator_improved.png","Juice (Gun)":"8/8b/Png_%284%29.png","Star (Gun)":"a/af/Star_improved.png","HL2 (Gun)":"3/36/HL2_improved.png","News (Gun)":"7/74/News_improved.png","Pea (Gun)":"d/de/Pea_improved.png","Splat (Gun)":"2/20/Splat.png","Bells (Gun)":"6/6e/Bellsimproved.png","Elf Gun (2023)":"f/f7/Elf2023.png","Santa Gun (2023)":"5/5a/Santa_2023.png","Elf Gun (2018)":"2/2a/Elf_gun_2018.png"};
+const FANDOM2={"Scarytree":"0/04/Scarytree.png","Wolf (2026)":"6/6f/Wolf_Gun.png","Zombie Plush":"b/ba/ZombiePlush.png","Skull":"4/4a/Skull.png","Haunted House":"0/0c/HauntedMansionSquare.webp"};
+const FBASE="https://static.wikia.nocookie.net/murder-mystery-2/images/";
+const MVBASE="https://mm2values.com/img/";
+const RADIO={"Default":"default-079538c247e381ef.png","Elite":"elite-7a815cfe2b33eae7.png","Dubstep":"dubstep-6d308b4ca47e8d1f.png","Camo":"camo-3ab42df9227052f6.png","Bluesteel":"bluesteel-aa5ed779ade567f1.png","Boombastic":"boombastic-55c36ca817b34fc0.png","Golden":"golden-9e19b9d931c2df27.png","Omega":"omega-943a15acae40cfa9.png","Fade":"fade-6575e25c62a9b311.png","Rainbow":"rainbow-c652482ecbcf5185.png","Flaming":"flaming-4791317a2a2140b3.png","Pink Sparkletime":"pink-sparkletime-d56d9c7d4c1e48b7.png","Blue Sparkletime":"blue-sparkletime-1744fccdaef39253.png","Green Sparkletime":"green-sparkletime-150e011bff824ddf.png","Red Sparkletime":"red-sparkletime-53bddee840c90f0c.png","Diamond":"diamond-69dafad465c5afd4.png","Overseer":"overseer-c84d77bdd2c2b71c.png","Candy":"candy-ab68f695e6e3f71d.png","Jack-o-Radio":"jack-o-radio-234dc39ba1923b1f.png","Elderwood":"elderwood-caa2d621906cf6c8.png","Ghost":"ghost-2ab67ee8216cd475.png","Hallowradio":"hallowradio-e641268df3f23d72.png","Reaver":"reaver-2861259a6e1960dd.png","Vampire":"vampire-bab6392b22600e1c.png","Gingerbread":"gingerbread-ff1f8a3ed483b274.png","Candy Cane":"candy-cane-eea39a324345b575.png","Snowy":"snowy-d8c03c471a6434f7.png","Ice":"ice-2dd3b6688be4c226.png","Coal":"coal-d4525e781116aa9a.png","Green Candy Cane":"green-candy-cane-1f1a357bc9cd6d77.png","Blue Candy Cane":"blue-candy-cane-7625d07042d7f13b.png","Tree":"tree-c69d14c3aa8d8f11.webp","Candy Cane '18":"candy-cane-18-e0e4fd3388a3d703.png","Blue Candy Cane '18":"blue-candy-cane-18-868eb6f368fe485a.png","Minty":"minty-318e0816339f256d.png","Iceplayer":"iceplayer-c1f2f685c7c6c19a.png","Swirly":"swirly-c9b2232e97167efa.png","Boombox":"boombox-e4979cc403e9d19c.png"};
+const PETIMG={"Zombie Dog":"zombiedog.png","Bat":"batpet.png","Dogey":"dogey.png","Piggy":"piggy.png","Seahorsey":"seahorse.png","Fairy":"fairy.png","Pengy":"pengy.png","Chilly":"chilly.png","Chroma Fire Cat":"cfirecat.png","Chroma Fire Dog":"cfiredog.png","Chroma Fire Fox":"cfirefox.png","Chroma Fire Pig":"cfirepig.png","Chroma Fire Bear":"cfirebear.png","Chroma Fire Bat":"cfirebat.png","Bunny":"bunnypet.png","Skully":"skully2021.png","UFO":"ufo.png","Lil' Alien":"LilAlien.png","Snowbear":"Snowbear.png","Carrot Bunny":"bunnypet23.png","Chroma Fire Bunny":"chromabunny.png","Traveller":"traveller.png","Mr. Snowman":"Mrsnowman.png","Fox":"foxpet.png","Pig":"pig.png","Shadow Pumpkin":"ShadowPumpkin2021.png","Bear":"bearpet.png","Green Pumpkin (2020)":"Greenpumpkin2020.png","Fire Cat":"firecat.png","Fire Dog":"firedog.png","Fire Fox":"firefox.png","Fire Pig":"firepig.png","Fire Bear":"firebear.png","Fire Bat":"firebat.png","Dog":"dog.png","Badger":"badger.png","Scarecrow":"scarecrowpet.png","Santa (2019)":"santapet.png","Cat":"cat.png","Nobledragon":"noble.png","Mechbug":"mechbug.png","Tankie":"tankie.png","Deathspeaker":"deathspeaker.png","Eyeball":"eyeball.png","Jetstream":"jetstream.png","Black Cat":"blackcat.png","Vampire Bat":"vampirebat.png","Pumpkin (2017)":"PumpkinPet2017UP.png","Blue Pumpkin (2018)":"BluePumpkin2018UP.png","Red Pumpkin (2018)":"RedPump2018UP.png","Green Pumpkin (2018)":"GreenPump2018UP.png","Purple Pumpkin (2018)":"PurpPump2018UP.png","Pumpkin (2019)":"2019pumpkin.png","Red Pumpkin (2019)":"2019redpumpkin.png","Green Pumpkin (2019)":"2019greenpumpkin.png","Blue Pumpkin (2019)":"2019bluepumpkin.png","Pumpkin (2020)":"pumpkin2020.png","Red Pumpkin (2020)":"redpumpkin2020.png","Blue Pumpkin (2020)":"Bluepumpkin2020.png","Pumpkin (2021)":"Pumpkin2021.png","Red Pumpkin (2021)":"RedPumpkin2021.png","Green Pumpkin (2021)":"GreenPumpkin2021.png","Elf (2016)":"elfp.png","Elf (2019)":"2019elf.png","Mr. Reindeer":"mrreindeer.png","Reindeer":"reindeer.png","Rudolph":"rudolph.png","Santa Dog":"Santadog2017UP.png","Frostbird":"frostbird2018UP.png","Snowman":"snowmanpet2019.png","<3":"heartp.png","Teddy":"Teddy2023.png","Icey":"icey.png","Skelly":"skelly.png","Phoenix":"phoenix.png","Sammy":"sammy.png","Electro":"electro.png","Steambird":"steambird.png","Ice Phoenix":"IcePhoenix2017.png","Overseer Eye":"overseereye.png","Elitey":"elitey.png","Ghosty":"ghostyPet.png","Fire Bunny":"firebunny.png"};
+const EMOTE={"Zen":"zen-ab88748a5febe94a.png","Floss":"floss-fad0ad3b50367d35.png","Spray Paint":"spray-paint-a7f23f4c7bbdc780.png","GG Sign":"gg-sign-68e46f784e317f84.png","Prank Bomb":"prank-bomb-83d8eb92a322ecdd.png","Dab":"dab-3e497cd4837771a4.png","Ninja Rest":"ninja-rest-f2ee765548c0bb83.png","Firefly Jar":"firefly-jar-ff02d8f8ed0679f3.png","Sit":"sit-4b11c4da1fc64ef7.png","Teddy Bear":"teddy-bear-d9d126780870fa87.png","Chocolate Milk":"chocolate-milk-3e842c3c467d594a.png","Ice Cream":"ice-cream-1718a8d2404b59e7.png","Pizza":"pizza-fd3b9312645dcb58.png","Headless":"headless-0e25837ff125d53c.png","Zombie":"zombie-d224fa858f7841c4.png","Zombie Friend":"zombie-friend-a9ca5c32546d7650.png","Treat Bucket":"treat-bucket-a6a4b3006b3a3556.png","Toy Candy":"toy-candy-0d2820d6046226e2.png","Key Toy":"key-toy-089b90fdc7e262a2.png","Toy Candy 2":"toy-candy-2-b98d8a8d34d15a97.png","BooSign":"boosign-846e290311310ac9.png","Toy Candy 3":"toy-candy-3-282cd353c857d6de.png","Reaver Sign":"reaver-sign-2f1e56ada7d39915.png","Candy Emote":"candy-emote-77f53013613f1775.png","Survivor Sign":"survivor-sign-24d2268c7631eb07.png","Zombie Sign":"zombie-sign-d81f61d5117cd3a9.png","Pumpkin Toy (2023)":"pumpkin-toy-2023-d9d7b6ead304813d.png","Gravestone":"gravestone-319d3c4a6d49f032.png","Spellbook":"spellbook-9ba7ea6fd30211d3.png","Villager's Lantern":"villagers-lantern-dfe7da052c1f17a0.png","Candle (2024)":"candle-2024-6fee344b64e68fd1.png","Alien Plush":"alien-plush-fe06d2a3b61aaf44.png","Candy Bucket":"candy-bucket-134679f721023f1e.png","Pumpkin (2025)":"pumpkin-2025-ba71db19a5955138.png","Toy Token":"toy-token-41bfb4aa3aded7a2.png","Snowball":"snowball-89386864bab98b1d.png","Cookie":"cookie-57ab2b4285c33dd5.png","Santa (2024)":"santa-2024-ffa81ece6c8edb66.png","Tree":"tree-e373d3892c14a6d4.png","Snowglobe":"snowglobe-8bffc65c580ad918.png","Snowman":"snowman-26bd6ac68b197723.png","Bell":"bell-77136de6da114290.png","Candle (2025)":"candle-2025-f9a8f89cd0955b92.png","Santa Plushie (2025)":"santa-plushie-2025-43ff4bcfcef616e1.png","Velvet Cake":"velvet-cake-3ef2eba054e4503a.png","Egg Toy (2023)":"egg-toy-2023-b536a571d58355fa.png","Egg Toy (2024)":"egg-toy-2024-1f16904876a0cbbd.png","Bunny Toy":"bunny-toy-9aee10dc62b8068b.png","Rare Egg Toy (2024)":"rare-egg-toy-2024-7b3f5a0f42213442.png","Egg Toy (2025)":"egg-toy-2025-8bbaf8dad629089c.png","Rare Egg Toy (2025)":"rare-egg-toy-2025-8bbaf8dad629089c.png","Beach Ball":"beach-ball-f05a994126f80829.png","Coconut":"coconut-999a99a57de950a1.png","Sand Bucket":"sand-bucket-3cfb7f7444233531.png","Water Balloon":"water-balloon-f65a9ed23d68f83f.png","Ice Cream (2025)":"ice-cream-2025-506afb48a7161263.png","Flamingo":"flamingo-5ed009002826b553.png","Volleyball":"volleyball-e3a2c186264c441f.png","Bubble Blower":"bubble-blower-942c3570c7c04a0d.png","RC Car (2026)":"rc-car-2026-b1f6f56ccea38391.png","Pie":"pie-510c905c315cfc20.png","Latte":"latte-35e5155f5d6ff579.webp","Heart":"heart-883a736646a3637d.png"};
+const EFFECT={"Blue Flaming Knife":"blue-flaming-knife-fb2eae0daed69e80.png","Doge":"doge-01cd9a46ef530dfe.png","Dual Wield":"dual-wield-0cca19c5915c37b1.png","Electric Knife":"electric-knife-4e5aac52a700088b.png","Flaming Knife":"flaming-knife-ab93983af90a82cf.png","Ghostify":"ghostify-54edd845e384b5f9.png","Green Flaming Knife":"green-flaming-knife-4ba114933e1e769a.png","Heartify":"heartify-b33e6dcde013d25d.png","Knifeception":"knifeception-e7aed33c782c673f.png","Monify":"monify-22d3f66bd464069b.png","Musical":"musical-2d1607796dc5d8bd.png","Pink Flaming Knife":"pink-flaming-knife-a00e04733b93f31d.png","Radioactive":"radioactive-9828a7c82aef1314.png","Bats":"bats-8747c78cc5971cf2.png","Bitsplosion":"bitsplosion-4b169be7045bb09d.png","Blizzard":"blizzard-b612d0185afbf38a.png","Darkfire":"darkfire-75b5211b2e3695f0.png","Elite-ify":"elite-ify-5fe729aabe591bc3.png","Ethereal":"ethereal-831a592efaf62157.png","Frostbite":"frostbite-74d56504bffdb379.png","Gearstorm":"gearstorm-9fb14602761f7e98.png","Ghostly":"ghostly-da2171f23a61248d.png","Ice Magic":"ice-magic-82ba1baf5a8dc116.png","Petals":"petals-51d5cc1fca142f8f.png","Plasma":"plasma-efb0fc658780150d.png","Rainbow":"rainbow-03510ca56ce6b67d.png","Vampire":"vampire-c47d599fe41f6c2f.png","Darkswirl":"darkswirl-4007fe1bed4bfe1a.png","Flow":"flow-dc0c3a6852042e07.png","Aurora Lights":"aurora-lights-12a3569cff32ff4e.png","Flowerwood":"flowerwood-466c6a8a97661cb6.png","Glisten":"glisten-69a70c39b3cc91cb.png","Wraith":"wraith-ac44f2fba52f2273.png","Bloom":"bloom-48973ec7c16bf82a.png","Snowstorm":"snowstorm-13cf32cbcd1b4db8.png","Xeno":"xeno-6e30efebab1d94c6.png","Ocean":"ocean-85b60b16b72166f4.png","Pixie Dust":"pixie-dust-4463ac94d55ea251.png","Poison":"poison-4103ceb3d2934303.png","Frostfire":"frostfire-f490a3b11524f0e9.png","Ghosts (2020)":"ghosts-2020-ccc6a341361ef19b.png","Jingle":"jingle-4b237f33a1f016e7.png","Snowfall":"snowfall-23d799fe52818ba9.png","Aurora":"aurora-9de1fd5f45fdba10.png","Phantom":"phantom-b350f64a804137cf.png","Snowflake":"snowflake-ac792a2ebf805cfe.png","Starry":"starry-44f4aaa7ce9b2b52.png","Wraithfire":"wraithfire-122b314c02072bb2.png","Arctic":"arctic-6669ab098b478a17.png","Candies (2022)":"candies-2022-761e6dbc02527315.webp","Chilly":"chilly-dbe310ce7179fb97.png","Minty":"minty-f15a3a58ec49afbb.png","Pumpkin (2022)":"pumpkin-2022-a025059d020bf9ec.png","Stickers":"stickers-6675ecc807fa76cd.png","Toxic":"toxic-6fd7dc0b4f845177.png","Versus":"versus-eb44f5698fcc11e1.png","Candies (2023)":"candies-2023-40b12e48ebf8a2ab.png","Fireworks":"fireworks-c11812ee78cc4946.png","Ghosts (2023)":"ghosts-2023-b7be41950897ea00.png","Glowy":"glowy-040b185341173525.png","Stars":"stars-71143cb2ea734ae6.png","Swirls":"swirls-08e0db832ba14244.png","Traveler's Flame":"traveler-s-flame-5636e091d83c481c.png","Celestial":"celestial-e8175a3ed3cc1c75.png","Cursed":"cursed-7ec6f9e339043a13.png","Flowers":"flowers-bc5ef586522fed09.png","Ghosts (2024)":"ghosts-2024-ecdb182e3dbc63fd.png","Gifts":"gifts-155f98c1d681066c.png","Snowy":"snowy-0ca28b4cb0bc64c9.png","Vampiric":"vampiric-1497066b2d2b6a5c.png","Abduction":"abduction-bbae66884e9c031e.png","Aquatic":"aquatic-8401d073dff6db52.png","Cat Eyes":"cat-eyes-8e57ef532aa452f5.png","Confetti":"confetti-85cb5eb0ff645f09.png","Flamingo":"flamingo-22d70b5d46aff7bb.png","Frost":"frost-53b1222b083f1b34.png","Heatwave":"heatwave-cca76325f197fc1e.png","Retro":"retro-451be3d084e9fac8.png","Snowballs":"snowballs-693694db9eef591f.png","Synthwave":"synthwave-f5311e74ac385e8e.png","Treats":"treats-3e6d08915db740d5.png","UFOs":"ufos-5659a1b869d5f954.png","Bat Swarm":"bat-swarm-251443c92747c93a.png","Candy Cane":"candy-cane-952d852ed9714e57.png","Gingerbread":"gingerbread-8f7a102f55b372d7.png","Knife Wrapper":"knife-wrapper-b8f9942419289c1b.png","Northern Lights":"northern-lights-1b7fcc0fd91c036a.png","Snowflakes":"snowflakes-ca1bf492e50e7132.png","Pumpkin (2017)":"pumpkin-2017-7f82cf57391375c6.png","Snowflakes 2017":"snowflakes-2017-18f26359e4e5781f.png","Common Ornament":"common-ornament-791e6db3a676023d.png","Legendary Ornament":"legendary-ornament-067e9d372d1be633.png","Rare Ornament":"rare-ornament-9f60bc0ad3727e85.png","Uncommon Ornament":"uncommon-ornament-473ec55f52208f78.png","Candies (2019)":"candies-2019-09b02516f4664018.png","Batswarm":"batswarm-4ef8a4f7dea4acec.png","Hallow's Blaze":"hallow-s-blaze-eb42b4d864a80e75.png","Easter Glow":"easter-glow-d53d37790b7c1186.png","Floral":"floral-cf7dd73af52d67c1.png","Jellyfish":"jellyfish-cd36661a824cfd51.png","Matrix":"matrix-bd013ff71e4eaf12.png","Sunbeams":"sunbeams-9390394c2c4b58ff.png","Carrots":"carrots-41c78e97100465e7.png","Christmas Glow":"christmas-glow-350a9916afded9d0.png","Leaves":"leaves-2f7d6cd8f2041655.png","Rainbows (2025)":"rainbows-2025-55375c9e3210fc5a.png","Bubbly":"bubbly-30ebc581b7aa72e5.png","Hearts":"hearts-453a31f17c526ba9.png","Nightlife":"nightlife-35fbe963a1ff4f1b.png","Strawberries":"strawberries-4a5938b1d7a4f906.png","Bokeh":"bokeh-65be7c111242d12e.png","Coal":"coal-5a9764879a569c22.png","Lights":"lights-308791143736a661.png","Nightsky":"nightsky-22140626dce86195.png","Rainbow Fire":"rainbow-fire-5ab9b01fa036282a.png","Void":"void-535e8b43aa0b85e0.png"};
+function imgFor(i){
+  if(i.ev==="H26"&&FANDOM2[i.name]) return FBASE+FANDOM2[i.name];
+  if(i.type==="F"){const f=EFFECT[i.name];return f?IMGBASE+"effects/"+f:null}
+  if(i.type==="E"){const f=EMOTE[i.name];return f?IMGBASE+"emotes/"+f:null}
+  if(i.type==="P"&&PETIMG[i.name]) return MVBASE+encodeURIComponent(PETIMG[i.name]);
+  if(i.type==="R"){const f=RADIO[i.name];return f?IMGBASE+"radios/"+f:null}
+  if(LOWC.has(i.cat)&&i.mvimg) return MVBASE+encodeURIComponent(i.mvimg);
+  const tries=[[i.type,i.name]];
+  if(i.cat==="Chroma") tries.push([i.type==="G"?"K":"G",i.name]);
+  for(const [t,n] of tries){const f=IMG[t]&&IMG[t][n]; if(f) return IMGBASE+(t==="G"?"guns":t==="K"?"knives":"pets")+"/"+f;}
+  if(FANDOM[i.name]) return FBASE+FANDOM[i.name];
+  if(i.mvimg&&i.mvimg!=="coming.png") return MVBASE+encodeURIComponent(i.mvimg);
+  return null;
+}
+const GLYPH={K:'<svg viewBox="0 0 24 24"><path d="M4 20l6-6M10 14L20 4c0 5-3 9-7 12z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+G:'<svg viewBox="0 0 24 24"><path d="M3 8h17v4h-9l-1 3H7l1-3H3z M7 15l-1 4h3l1-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+P:'<svg viewBox="0 0 24 24"><circle cx="7" cy="9" r="2" fill="currentColor"/><circle cx="12" cy="6.5" r="2" fill="currentColor"/><circle cx="17" cy="9" r="2" fill="currentColor"/><path d="M12 12c-3 0-5 3-5 5s2 2 5 2 5 0 5-2-2-5-5-5z" fill="currentColor"/></svg>',
+R:'<svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="14" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15 12h3M15 16h3M7 8l9-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+F:'<svg viewBox="0 0 24 24"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+E:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 14c1 1.5 2 2 3.5 2s2.5-.5 3.5-2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>'};
+const VALURL="",HAS_AUTH_BUTTON=true,ACCT_OFF_TEXT="Not signed in · progress is saved in this browser only";
+const $=id=>document.getElementById(id);
+const fmt=v=>v==null?"–":v>=1000?(v/1000).toLocaleString("en-US",{maximumFractionDigits:1})+"K":v.toLocaleString("en-US");
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+const RC={Ancient:"#ffc94d",Chroma:"#c9a7ff",Godly:"#ff5c7a",Vintage:"#d39565",Legendary:"#b97bff",Rare:"#58a6ff",Uncommon:"#4fd88a",Common:"#a7a2bd",Pets:"#ff9a52",Effects:"#ff6ad5",Emotes:"#3fd4d8",Radios:"#cdd45f","Halloween 2026":"#ff8a3d"};
+const TYPE={K:"Knife",G:"Gun",P:"Pet",R:"Radio",F:"Effect",E:"Emote",X:"Item"};
+const EVC="Halloween 2026";
+function grpStats(c){const all=items.filter(i=>i.cat===c&&!i.lock&&(cat!==EVC||i.ev==="H26"));const h=all.filter(i=>owned.has(i.id)).length;return{h,n:all.length}}
+const CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+/* ---------- state ---------- */
+const KEY="mm2-owned-v1",VKEY="mm2-view";
+let owned=new Set();
+try{const s=localStorage.getItem(KEY);if(s)owned=new Set(JSON.parse(s))}catch(e){}
+{const byOld=new Map(items.filter(i=>!LOWC.has(i.cat)).map(i=>[i.cat[0]+":"+i.name,i.id]));const n=new Set();owned.forEach(id=>n.add(LEGACY[id]||byOld.get(id)||id));owned=n}
+let view="grid";try{view=localStorage.getItem(VKEY)||"grid"}catch(e){}
+let cat="All";
+const byId=new Map(items.map(i=>[i.id,i]));
+
+/* ---------- account / saving ---------- */
+let cloud=null,saveT=null,who="";
+function save(){try{localStorage.setItem(KEY,JSON.stringify([...owned]))}catch(e){}
+  if(cloud){clearTimeout(saveT);saveT=setTimeout(()=>cloud.set({owned:[...owned],updated:Date.now()}).then(()=>acct("ok")).catch(()=>acct("err")),600)}
+  updateCode()}
+function acct(s){const el=$("acct");if(!el)return;el.dataset.s=s;
+  el.textContent=s==="ok"?`Signed in${who?" as "+who:""} · saved to your account`:s==="err"?"Couldn't save to your account. Kept in this browser for now.":s==="off"?ACCT_OFF_TEXT:s==="setup"?"Sign-in isn't set up yet. Progress is saved in this browser.":"Connecting…";
+  const b=$("authBtn");if(b){b.hidden=!HAS_AUTH_BUTTON||s==="wait"||s==="setup";b.classList.toggle("out",s==="ok"||s==="err");b.querySelector("span").textContent=(s==="ok"||s==="err")?"Sign out":"Sign in with Google"}}
+
+/* ---------- images ---------- */
+function artHTML(i,big){const u=imgFor(i);const g=GLYPH[i.type]||GLYPH.K;
+  return u?`<img src="${u}" alt="${big?esc(i.name):""}" ${big?"":'loading="lazy" '}decoding="async" onerror="this.outerHTML=GLYPH['${i.type}']||GLYPH.K">`:g}
+
+/* ---------- progress ---------- */
+const counted=i=>!i.lock&&!EXTRA.has(i.cat);
+function catStats(c){const all=items.filter(i=>(c==="All"?counted(i):c==="Halloween 2026"?i.ev==="H26"&&!i.lock:i.cat===c&&!i.lock));const h=all.filter(i=>owned.has(i.id)).length;return{h,n:all.length,p:all.length?h/all.length:0}}
+function tabs(){
+  $("tabs").innerHTML=["All",...CATS].map(c=>{const s=catStats(c);
+    return `<button class="chip c-${c}${EXTRA.has(c)?" x":""}" style="--rc:${RC[c]||"var(--gold)"}" aria-pressed="${c===cat}" data-c="${c}"><span class="cn"><i></i>${c}</span><span class="cc">${s.h} / ${s.n}</span><span class="cb" style="width:${(s.p*100).toFixed(1)}%"></span></button>`}).join("")}
+function stats(){
+  const s=catStats("All");const C=364.4;
+  $("ringv").style.strokeDashoffset=(C*(1-s.p)).toFixed(1);
+  $("pct").textContent=(s.p>0&&s.p<.1?(s.p*100).toFixed(1):Math.floor(s.p*100))+"%";$("ringv").style.opacity=s.h?1:0;
+  $("pof").textContent=`${s.h.toLocaleString("en-US")} / ${s.n.toLocaleString("en-US")} items`;
+  const miss=items.filter(i=>counted(i)&&!owned.has(i.id)&&i.val!=null).reduce((a,i)=>a+i.val,0);
+  $("mval").textContent=fmt(miss);
+  document.querySelectorAll(".chip").forEach(b=>{const t=catStats(b.dataset.c);b.querySelector(".cc").textContent=`${t.h} / ${t.n}`;b.querySelector(".cb").style.width=(t.p*100).toFixed(1)+"%"});
+  document.querySelectorAll(".grp").forEach(g=>{const t=grpStats(g.dataset.c);g.querySelector(".gc").textContent=`${t.h} / ${t.n}`})}
+
+/* ---------- list ---------- */
+function cardHTML(i){const own=owned.has(i.id);const untr=i.lock||EXTRA.has(i.cat);
+  return `<li class="card${own?" own":""}${i.cat==="Chroma"?" chroma":""}" data-id="${esc(i.id)}" style="--rc:${RC[i.cat]}">
+<button class="chk" aria-pressed="${own}" aria-label="I own ${esc(i.name)}">${CHECK}</button>
+<button class="open" aria-label="${esc(i.name)} details"><span class="art">${artHTML(i)}</span><span class="info"><span class="nm">${esc(i.name)}</span><span class="meta"><span>${TYPE[i.type]||""}${untr?' · <span class="lk">untradeable</span>':""}</span><span class="v${i.val==null?" na":""}">${i.val!=null?fmt(i.val):""}</span></span></span></button></li>`}
+function render(){
+  const q=$("q").value.trim().toLowerCase(),onlyMiss=$("missing").checked,srt=$("sort").value;
+  const show=cat==="All"?CATS.filter(c=>!EXTRA.has(c)):cat===EVC?CATS:[cat];let html="";
+  for(const c of show){
+    let arr=items.filter(i=>i.cat===c&&(cat!==EVC||i.ev==="H26")&&(!q||i.name.toLowerCase().includes(q))&&(!onlyMiss||!owned.has(i.id)));
+    if(cat==="All"&&q&&!arr.length)continue;
+    arr.sort(srt==="name"?(a,b)=>a.name.localeCompare(b.name):(a,b)=>(b.val??-1)-(a.val??-1)||a.name.localeCompare(b.name));
+    if(cat===EVC&&!arr.length&&!q&&!onlyMiss)continue;
+    const s=grpStats(c);
+    html+=`<section class="grp c-${c}" data-c="${c}" style="--rc:${RC[c]}"><div class="gh"><h2>${c===EVC?"Halloween 2026 · rarity TBA":c}</h2><span class="gc">${s.h} / ${s.n}</span>${EXTRA.has(c)?'<span class="nt">untradeable · not counted</span>':""}<span class="gl"></span></div><ul class="cards">`;
+    html+=arr.length?arr.map(cardHTML).join(""):`<li class="empty">${onlyMiss&&!q?"Nothing missing here. Nice.":"No matches."}</li>`;
+    html+=`</ul></section>`}
+  if(!html)html=`<p class="empty" style="margin-top:26px">No items match “${esc(q)}”.</p>`;
+  $("groups").innerHTML=html;$("groups").className=view==="list"?"list":"";
+  stats();updateCode()}
+function setOwn(id,on){on?owned.add(id):owned.delete(id);save();
+  if($("missing").checked&&on){render();return}
+  const li=document.querySelector(`.card[data-id="${CSS.escape(id)}"]`);
+  if(li){li.classList.toggle("own",on);li.querySelector(".chk").setAttribute("aria-pressed",on)}
+  stats()}
+function updateCode(){const c=$("code");if(c)c.value=btoa(unescape(encodeURIComponent(JSON.stringify([...owned]))))}
+
+$("tabs").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;cat=b.dataset.c;
+  document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));render()});
+$("groups").addEventListener("click",e=>{const li=e.target.closest(".card");if(!li)return;const id=li.dataset.id;
+  if(e.target.closest(".chk")){setOwn(id,!owned.has(id));return}
+  if(e.target.closest(".open"))openItem(id)});
+let qT;$("q").addEventListener("input",()=>{clearTimeout(qT);qT=setTimeout(render,120)});
+["sort","missing"].forEach(id=>$(id).addEventListener("input",render));
+function setView(v){view=v;try{localStorage.setItem(VKEY,v)}catch(e){}$("vGrid").setAttribute("aria-pressed",v==="grid");$("vList").setAttribute("aria-pressed",v==="list");$("groups").className=v==="list"?"list":""}
+$("vGrid").addEventListener("click",()=>setView("grid"));$("vList").addEventListener("click",()=>setView("list"));
+
+/* ---------- detail window ---------- */
+let VDATE="Oct 25, 2026";
+const VALHIST={};items.forEach(i=>{if(i.val!=null)VALHIST[i.id]=[["2026-10-25",i.val]]});
+const MV={Ancient:"ancient",Chroma:"chroma",Godly:"godly",Legendary:"legend",Rare:"rare",Uncommon:"uncommon",Common:"common",Vintage:"vintage",Pets:"pets"};
+function chart(h){
+  if(!h||!h.length)return '<p class="mnote">No value tracked for this item yet.</p>';
+  if(h.length<2)return `<div class="hist1"><b>${fmt(h[0][1])}</b><span>since ${h[0][0]}</span></div><p class="mnote">Tracking starts here. Every value-list update adds a new point, so this chart fills in over time.</p>`;
+  const W=320,H=120,P=24,vs=h.map(x=>x[1]),mn=Math.min(...vs),mx=Math.max(...vs),rg=mx-mn||1;
+  const pts=h.map((x,k)=>[P+k*(W-2*P)/(h.length-1),H-P-(x[1]-mn)/rg*(H-2*P)]);
+  const line=pts.map((p,k)=>(k?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  return `<svg class="hchart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Value history"><path d="${line} L${pts.at(-1)[0]} ${H-P} L${pts[0][0]} ${H-P}Z" fill="rgba(255,201,77,.14)"/><path d="${line}" fill="none" stroke="#ffc94d" stroke-width="2"/>${pts.map((p,k)=>`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#ffc94d"><title>${h[k][0]}: ${fmt(h[k][1])}</title></circle>`).join("")}<text x="${P}" y="${H-6}" font-size="10" fill="#9a93b8">${h[0][0]}</text><text x="${W-P}" y="${H-6}" font-size="10" fill="#9a93b8" text-anchor="end">${h.at(-1)[0]}</text></svg>`}
+let lastFocus=null,cur=null;
+function openItem(id){const i=byId.get(id);if(!i)return;cur=id;lastFocus=document.activeElement;const own=owned.has(id);const untr=i.lock||EXTRA.has(i.cat);
+  const wiki="https://murder-mystery-2.fandom.com/wiki/"+encodeURIComponent(i.name.replace(/ /g,"_"));
+  const mv="https://mm2values.com/?p="+(MV[i.cat]||"misc");
+  const mc=$("mcard");mc.style.setProperty("--rc",RC[i.cat]);mc.className="mcard c-"+i.cat;
+  $("mbody").innerHTML=`<div class="mart">${artHTML(i,true)}</div>
+<div class="mbody"><span class="mrar"><i></i>${i.cat===EVC?"Halloween 2026 · rarity not confirmed yet":i.cat+(i.ev==="H26"?" · Halloween 2026":"")}</span><h3 id="mtitle">${esc(i.name)}</h3>
+<dl class="tiles"><div class="tile"><dt>Value</dt><dd class="vv">${i.val!=null?i.val.toLocaleString("en-US"):"–"}</dd></div><div class="tile"><dt>Demand</dt><dd>${i.dem!==""&&i.dem!=null?esc(i.dem)+'<small>/10</small>':"–"}</dd></div><div class="tile"><dt>Trend</dt><dd>${i.stab?'<span class="st st-'+i.stab.toLowerCase().replace(/[^a-z]/g,"")+'">'+esc(i.stab)+"</span>":"–"}</dd></div></dl>
+<p class="tags"><span>${TYPE[i.type]||""}</span>${untr?'<span class="lk">Untradeable</span>':"<span>Tradeable</span>"}${i.val!=null?'<span>Value: MM2Values · '+VDATE+'</span>':""}</p>
+<p class="how"><b>How to get:</b> ${i.src?esc(i.src):"Trading"}</p>
+<button class="ownbtn" id="ownbtn" aria-pressed="${own}">${CHECK}<span>${own?"In your inventory":"Mark as owned"}</span></button>
+<h4>Value history</h4>${chart(VALHIST[id])}
+<div class="mlinks"><a class="b" href="${mv}" target="_blank" rel="noopener">See it on MM2Values ↗</a><a class="b" href="${wiki}" target="_blank" rel="noopener">MM2 Wiki ↗</a></div></div>`;
+  $("ownbtn").addEventListener("click",e=>{const on=!owned.has(id);setOwn(id,on);const b=e.currentTarget;b.setAttribute("aria-pressed",on);b.querySelector("span").textContent=on?"In your inventory":"Mark as owned"});
+  $("modal").hidden=false;document.body.style.overflow="hidden";$("mclose").focus()}
+function closeItem(){$("modal").hidden=true;document.body.style.overflow="";cur=null;if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+$("mclose").addEventListener("click",closeItem);
+$("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeItem()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("modal").hidden)closeItem()});
+
+/* ---------- backup tools ---------- */
+const msg=t=>{$("msg").textContent=t;setTimeout(()=>$("msg").textContent="",2500)};
+$("copy").addEventListener("click",()=>{const t=$("code").value;
+  navigator.clipboard.writeText(t).then(()=>msg("Code copied.")).catch(()=>{$("code").select();msg("Code selected. Press Ctrl+C to copy.")})});
+$("load").addEventListener("click",()=>{try{const a=JSON.parse(decodeURIComponent(escape(atob($("code").value.trim()))));if(!Array.isArray(a))throw 0;owned=new Set(a);save();render();msg("Progress loaded.")}catch(e){msg("That code isn't valid. Copy the whole code and try again.")}});
+let armed=false;
+$("reset").addEventListener("click",e=>{const b=e.currentTarget;if(!armed){armed=true;b.textContent="Tap again to reset";setTimeout(()=>{armed=false;b.textContent="Reset everything"},3000);return}
+  owned=new Set();save();render();armed=false;b.textContent="Reset everything";msg("Progress reset.")});
+
+
+/* ---------- trade checker ---------- */
+const TKEY="mm2-trade";
+let trade={A:{},B:{}};try{const t=JSON.parse(localStorage.getItem(TKEY)||"null");if(t&&t.A&&t.B)trade=t}catch(e){}
+const tradeable=items.filter(i=>!i.lock&&!EXTRA.has(i.cat));
+function saveTrade(){try{localStorage.setItem(TKEY,JSON.stringify(trade))}catch(e){}}
+function miniArt(i){const u=imgFor(i);return u?`<img src="${u}" alt="" loading="lazy" onerror="this.outerHTML=GLYPH['${i.type}']||GLYPH.K">`:(GLYPH[i.type]||GLYPH.K)}
+function sideTotal(k){let v=0,miss=0,n=0;for(const[id,q]of Object.entries(trade[k])){const i=byId.get(id);if(!i)continue;n+=q;if(i.val==null)miss+=q;else v+=i.val*q}return{v,miss,n}}
+function renderSide(k){const L=$("list"+k);const ent=Object.entries(trade[k]).filter(([id])=>byId.has(id));
+  L.innerHTML=ent.length?ent.map(([id,q])=>{const i=byId.get(id);const need=k==="B"&&!owned.has(id);
+    return `<li class="ti" style="--rc:${RC[i.cat]}" data-id="${esc(id)}"><span class="mi">${miniArt(i)}</span><span class="tn">${esc(i.name)}<small>${i.cat}${i.dem!==""&&i.dem!=null?" · demand "+esc(i.dem):""}${need?' · <span class="need">needed</span>':""}</small></span><span class="qty"><button data-q="-1" aria-label="One less">−</button><span>${q}</span><button data-q="1" aria-label="One more">+</button></span><span class="tv${i.val==null?" na":""}">${i.val!=null?fmt(i.val*q):"no value"}</span></li>`}).join(""):`<li class="empty">Nothing added yet.</li>`;
+  const t=sideTotal(k);$("tot"+k).textContent=t.v.toLocaleString("en-US");$("cnt"+k).textContent=t.n+(t.n===1?" item":" items")}
+function renderVerdict(){const a=sideTotal("A"),b=sideTotal("B");const B=$("vbadge"),D=$("vdiff"),N=$("vnote");B.className="vbadge";
+  if(!a.n||!b.n){B.textContent="–";D.textContent="Add items to both sides";N.textContent="";return}
+  const diff=b.v-a.v,pct=a.v?diff/a.v:(b.v?1:0);
+  const k=pct>=.05?"win":pct<=-.05?"lose":"fair";B.classList.add(k);B.textContent=k==="win"?"WIN":k==="lose"?"LOSE":"FAIR";
+  D.textContent=(diff>=0?"+":"")+diff.toLocaleString("en-US")+" ("+(pct>=0?"+":"")+(pct*100).toFixed(1)+"%)";
+  const m=a.miss+b.miss;N.textContent=(k==="win"?"You get more value than you give.":k==="lose"?"You give more value than you get.":"Both sides are about equal.")+(m?` ${m} item${m>1?"s have":" has"} no value yet and ${m>1?"aren't":"isn't"} counted.`:"")}
+function renderTrade(){renderSide("A");renderSide("B");renderVerdict()}
+function addTrade(k,id){trade[k][id]=(trade[k][id]||0)+1;saveTrade();renderTrade()}
+function setupPicker(k){const inp=$("pick"+k),ul=$("sugg"+k);let res=[],sel=0,bt;
+  const draw=()=>{ul.innerHTML=res.map((i,n)=>`<li role="option" aria-selected="${n===sel}" data-id="${esc(i.id)}"><span class="mi">${miniArt(i)}</span><span class="sn">${esc(i.name)}<small>${i.cat}${k==="B"&&!owned.has(i.id)?" · needed":""}</small></span><span class="sv">${i.val!=null?fmt(i.val):"–"}</span></li>`).join("");ul.hidden=!res.length};
+  inp.addEventListener("input",()=>{clearTimeout(bt);const q=inp.value.trim().toLowerCase();sel=0;
+    res=q?tradeable.filter(i=>i.name.toLowerCase().includes(q)).sort((x,y)=>(x.name.toLowerCase().startsWith(q)?0:1)-(y.name.toLowerCase().startsWith(q)?0:1)||(y.val??-1)-(x.val??-1)).slice(0,12):[];draw()});
+  inp.addEventListener("keydown",e=>{if(ul.hidden)return;if(e.key==="ArrowDown"){sel=Math.min(sel+1,res.length-1);draw();e.preventDefault()}else if(e.key==="ArrowUp"){sel=Math.max(sel-1,0);draw();e.preventDefault()}else if(e.key==="Enter"&&res[sel]){addTrade(k,res[sel].id);inp.value="";res=[];draw()}else if(e.key==="Escape"){res=[];draw()}});
+  ul.addEventListener("mousedown",e=>{const li=e.target.closest("li");if(!li)return;e.preventDefault();addTrade(k,li.dataset.id);inp.value="";res=[];draw();inp.focus()});
+  inp.addEventListener("blur",()=>{bt=setTimeout(()=>{ul.hidden=true},120)});inp.addEventListener("focus",()=>clearTimeout(bt));
+  $("list"+k).addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(!b)return;const id=b.closest(".ti").dataset.id;const q=(trade[k][id]||0)+(+b.dataset.q);if(q<=0)delete trade[k][id];else trade[k][id]=q;saveTrade();renderTrade()})}
+setupPicker("A");setupPicker("B");
+document.querySelectorAll("[data-clear]").forEach(b=>b.addEventListener("click",()=>{trade[b.dataset.clear]={};saveTrade();renderTrade()}));
+$("swap").addEventListener("click",()=>{trade={A:trade.B,B:trade.A};saveTrade();renderTrade()});
+function showView(v){const t=v==="trade";$("colView").hidden=t;$("tradeView").hidden=!t;$("vCol").setAttribute("aria-pressed",!t);$("vTrade").setAttribute("aria-pressed",t);if(t)renderTrade();try{history.replaceState(null,"",t?"#trade":location.pathname+location.search)}catch(e){}}
+$("vCol").addEventListener("click",()=>showView("col"));$("vTrade").addEventListener("click",()=>showView("trade"));
+tabs();setView(view);render();acct("wait");
+/* ---------- live values (updated by the GitHub Action) ---------- */
+(async()=>{try{
+  const get=f=>fetch(VALURL+f,{cache:"no-cache"}).then(r=>r.ok?r.json():null).catch(()=>null);
+  const [v,h]=await Promise.all([get("values.json"),get("history.json")]);
+  if(v&&v.v){for(const[id,x]of Object.entries(v.v)){const i=byId.get(id);if(!i||x[0]==null)continue;i.val=x[0];i.dem=x[1];i.stab=x[2]}
+    if(v.updated){VDATE=new Date(v.updated+"T12:00:00Z").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"});document.querySelectorAll(".vdate").forEach(e=>e.textContent=VDATE)}}
+  if(h)for(const[id,a]of Object.entries(h))if(a&&a.length)VALHIST[id]=a;
+  if(v||h){render();if(!$("tradeView").hidden)renderTrade();if(cur&&!$("modal").hidden)openItem(cur)}
+}catch(e){}})();
+if(location.hash==="#trade")showView("trade");
+window.MM={getOwned:()=>[...owned],setOwned:a=>{owned=new Set(a);try{localStorage.setItem(KEY,JSON.stringify([...owned]))}catch(e){}render()},setCloud:(c,name)=>{cloud=c;who=name||""},save:()=>save(),acct:s=>acct(s)};
+</script>
+
+<script type="module">
+const firebaseConfig = {
+  apiKey: "AIzaSyCh4nXMLoJUErJ4mQojp3VdBNMv7nQK5iY",
+  authDomain: "mm2-tracker-cc183.firebaseapp.com",
+  projectId: "mm2-tracker-cc183",
+  appId: "1:381099117833:web:96ae395bf12afb3ade97d8"
+};
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const MM = window.MM;
+if (!firebaseConfig.apiKey) { MM.acct("setup"); }
+else {
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app), fs = getFirestore(app);
+  const btn = document.getElementById("authBtn");
+  btn.addEventListener("click", async () => {
+    if (auth.currentUser) { await signOut(auth); return; }
+    try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+    catch (e) { if (e.code !== "auth/popup-closed-by-user") { MM.acct("off"); alert("Sign-in failed: " + e.code); } }
+  });
+  onAuthStateChanged(auth, async (u) => {
+    if (!u) { MM.setCloud(null, ""); MM.acct("off"); return; }
+    const ref = doc(fs, "users", u.uid);
+    MM.setCloud({ set: d => setDoc(ref, d) }, u.displayName || u.email || "");
+    try {
+      const snap = await getDoc(ref);
+      const remote = snap.exists() && Array.isArray(snap.data().owned) ? snap.data().owned : [];
+      const merged = [...new Set([...remote, ...MM.getOwned()])];
+      MM.setOwned(merged);
+      if (merged.length > remote.length) MM.save(); else MM.acct("ok");
+    } catch (e) { MM.acct("err"); }
+  });
+}
+</script>
+</body>
+</html>
