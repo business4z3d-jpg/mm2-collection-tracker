@@ -2033,7 +2033,7 @@ const $=id=>document.getElementById(id);
 const fmt=v=>v==null?"–":v>=1000?(v/1000).toLocaleString("en-US",{maximumFractionDigits:1})+"K":v.toLocaleString("en-US");
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
-const RC={Ancient:"#E0A100",Chroma:"#8E5AE0",Godly:"#D9344F",Vintage:"#A8693B",Legendary:"#7E3FCF",Rare:"#2F7BE0",Uncommon:"#2BA35A",Common:"#8A9099",Pets:"#E06F22",Effects:"#CC3D9E",Emotes:"#1A9EA3",Radios:"#97A01A","Halloween 2026":"#E06F22",Trophies:"#B8932E"};
+const RC={Ancient:"#6B2FE6",Chroma:"#B44BE1",Godly:"#FA03B0",Vintage:"#D4B400",Legendary:"#DD000A",Rare:"#23BA27",Uncommon:"#1FCFCF",Common:"#8C8C8C",Pets:"#9C6B3F",Effects:"#CC3D9E",Emotes:"#1A7FA3",Radios:"#97A01A","Halloween 2026":"#E06F22",Trophies:"#F08C00"};
 const TYPE={K:"Knife",G:"Gun",P:"Pet",R:"Radio",F:"Effect",E:"Emote",X:"Item"};
 const EVC="Halloween 2026";
 function grpStats(c){const all=items.filter(i=>i.cat===c&&(!i.lock||c==="Trophies")&&(cat!==EVC||i.ev==="H26"));const h=all.filter(i=>owned.has(i.id)).length;return{h,n:all.length}}
