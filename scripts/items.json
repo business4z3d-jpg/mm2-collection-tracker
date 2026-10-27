@@ -963,7 +963,7 @@
 {"id":"Co:K:Broom","name":"Broom","cat":"Common","img":"","ev":"H26","val":null},
 {"id":"Co:K:Serpent","name":"Serpent","cat":"Common","img":"","ev":"H26","val":null},
 {"id":"L:K:Emberknife","name":"Emberknife","cat":"Legendary","img":"","ev":"H26","val":null},
-{"id":"G:G:Gold Emberbow","name":"Gold Emberbow","cat":"Godly","img":"","ev":"H26","val":null},
-{"id":"G:G:Silver Emberbow","name":"Silver Emberbow","cat":"Godly","img":"","ev":"H26","val":null},
-{"id":"G:G:Bronze Emberbow","name":"Bronze Emberbow","cat":"Godly","img":"","ev":"H26","val":null},
-{"id":"G:G:Blue Emberbow","name":"Blue Emberbow","cat":"Godly","img":"","ev":"H26","val":null}]
+{"id":"T:G:Gold Emberbow","name":"Gold Emberbow","cat":"Trophies","img":"","ev":"H26","val":null},
+{"id":"T:G:Silver Emberbow","name":"Silver Emberbow","cat":"Trophies","img":"","ev":"H26","val":null},
+{"id":"T:G:Bronze Emberbow","name":"Bronze Emberbow","cat":"Trophies","img":"","ev":"H26","val":null},
+{"id":"T:G:Blue Emberbow","name":"Blue Emberbow","cat":"Trophies","img":"","ev":"H26","val":null}]
