@@ -10,9 +10,10 @@ ITEMS = json.loads((ROOT / "scripts/items.json").read_text())
 VALUES = ROOT / "site/values.json"
 HISTORY = ROOT / "site/history.json"
 
-PAGES = ["ancient", "chroma", "godly", "vintage", "legend", "rare", "uncommon", "common", "pets"]
+PAGES = ["ancient", "chroma", "godly", "vintage", "legend", "rare", "uncommon", "common", "pets", "misc"]
 CAT2PAGE = {"Ancient": "ancient", "Chroma": "chroma", "Godly": "godly", "Vintage": "vintage",
-            "Legendary": "legend", "Rare": "rare", "Uncommon": "uncommon", "Common": "common", "Pets": "pets"}
+            "Legendary": "legend", "Rare": "rare", "Uncommon": "uncommon", "Common": "common", "Pets": "pets",
+            "Collectibles": "misc"}
 ROW = re.compile(
     r"<div class=stackable><img src='img/([^']+)'[^>]*><b>(.*?)</b>(?:<br>)?\s*Value:\s*([\d,]*)"
     r".*?Demand:\s*([^<-]*?)\s*-.*?Stability:\s*([^<]*)<hr>", re.S)
@@ -65,7 +66,7 @@ def scrape():
 
 def match(rows):
     out = {}
-    pages_for = lambda i: [CAT2PAGE[i["cat"]]] if i["cat"] in CAT2PAGE else PAGES
+    pages_for = lambda i: [CAT2PAGE[i["cat"]]] if i["cat"] in CAT2PAGE else [p for p in PAGES if p != "misc"]
 
     def take(i, r):
         r["used"] = True
